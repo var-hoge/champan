@@ -27,16 +27,8 @@ public class RespawnBubble : MonoBehaviour
 
         var force = Time.deltaTime * 10f;
         // マルチプレイヤー対応
-        var axisX = InputUtil.GetAxis(gameObject, AxisCode.Horizontal);
+        var axisX = InputUtil.GetAxis(_player.gameObject, AxisCode.Horizontal);
         _rb.AddForce(new(axisX * force, 0.0f));
-        //if (Input.GetKey(KeyCode.LeftArrow))
-        //{
-        //    _rb.AddForce(new(-force, 0));
-        //}
-        //else if (Input.GetKey(KeyCode.RightArrow))
-        //{
-        //    _rb.AddForce(new(force, 0));
-        //}
 
         if (_burstTimer < 0)
         {
