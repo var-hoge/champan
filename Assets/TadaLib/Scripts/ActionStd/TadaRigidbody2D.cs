@@ -731,7 +731,7 @@ namespace TadaLib.ActionStd
 
             Gizmos.color = Color.white;
             Gizmos.DrawWireCube((Vector2)fromPos + offset, hitBox.size);
-
+            
             Gizmos.color = Color.blue;
             foreach (var data in _gizmosDataList)
             {
