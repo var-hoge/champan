@@ -16,9 +16,15 @@ namespace Scene
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void LoadManagerScene()
         {
+#if UNITY_EDITOR
+            Scenes.LoadScenes("TadaLibManager", "TadaLibGlobalManager", "TadaLibDebug");
+            // シーン終了時にリロードされる Manager Scene
+            TadaLib.Scene.TransitionManager.SetNeedReloadScenes("TadaLibManager", "TadaLibDebug");
+#else
             Scenes.LoadScenes("TadaLibManager", "TadaLibGlobalManager");
             // シーン終了時にリロードされる Manager Scene
             TadaLib.Scene.TransitionManager.SetNeedReloadScenes("TadaLibManager");
+#endif
         }
     }
 }

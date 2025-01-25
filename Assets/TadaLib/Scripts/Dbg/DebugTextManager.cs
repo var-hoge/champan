@@ -27,14 +27,12 @@ namespace TadaLib.Dbg
         // Update is called once per frame
         void Update()
         {
-            //// Qが押されたら。ほかに良い書き方ありそう
-            //if (UnityEngine.InputSystem.Keyboard.current.allKeys.
-            //    Where(x => x.keyCode == UnityEngine.InputSystem.Key.Q).
-            //    Where(x => x.wasPressedThisFrame).Count() == 1)
-            //{
-            //    _debugCanvas.SetActive(!_debugCanvas.activeSelf);
+            // Qが押されたら。ほかに良い書き方ありそう
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Q))
+            {
+                _debugCanvas.SetActive(!_debugCanvas.activeSelf);
 
-            //}
+            }
 
             _debugText.text = string.Empty;
             for (int i = _debugElements.Count - 1; i >= 0; i--)
