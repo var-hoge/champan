@@ -27,6 +27,116 @@
             "bindings": [
                 {
                     "name": "2D Vector",
+                    "id": "7ad6a13f-8c3c-49ff-8890-fdae1235b3fc",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "ae11caac-7377-4c33-99df-29d134180de0",
+                    "path": "<Keyboard>/numpad8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "2b40ec07-38ef-42a0-b4ca-2106dbd56b99",
+                    "path": "<Keyboard>/numpad5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "6ddc8659-9f1b-410a-b1d8-0583e3bcddb5",
+                    "path": "<Keyboard>/numpad4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "3403c9d5-e912-4868-a228-630593226755",
+                    "path": "<Keyboard>/numpad6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "d7be8f42-9d1b-45f2-a356-d244532887cc",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "4f46ee3e-1720-4da8-a13c-652a5622cf5d",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "b5daa2e1-4753-49aa-9383-75107504dee0",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "5ea560ef-86da-4591-aeb5-bd53ea3d2719",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "6cdb67aa-2439-461b-bb12-e2da6cf8a79e",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "2D Vector",
                     "id": "8376e9c4-57ed-4c7e-83e0-f27f19672761",
                     "path": "2DVector",
                     "interactions": "",
@@ -141,8 +251,30 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/hat",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b62ba10-f88b-4a16-be53-b85642c906a8",
+                    "path": "<Keyboard>/numpad9",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "773c40a4-a1a7-4d40-9a97-d1e4ed630e46",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -174,7 +306,7 @@
                     "path": "<Joystick>/trigger",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -185,7 +317,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button2",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -196,7 +328,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button3",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -207,7 +339,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button4",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -218,7 +350,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button5",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -229,7 +361,29 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button6",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
+                    "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "22ae4963-e03f-4c0c-9692-7b6709224dff",
+                    "path": "<HID::Nintendo Wireless Gamepad>/button9",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Arrows;WASD;IJKL;8456",
+                    "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ef2024dc-49e6-492f-8a2a-885464a9f8cb",
+                    "path": "<HID::Nintendo Wireless Gamepad>/button10",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -240,7 +394,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button15",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -251,7 +405,7 @@
                     "path": "<HID::Nintendo Wireless Gamepad>/button16",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Arrows;WASD",
+                    "groups": ";Arrows;WASD;IJKL;8456",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -279,6 +433,38 @@
         {
             "name": "WASD",
             "bindingGroup": "WASD",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Joystick>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "IJKL",
+            "bindingGroup": "IJKL",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Joystick>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "8456",
+            "bindingGroup": "8456",
             "devices": [
                 {
                     "devicePath": "<Keyboard>",

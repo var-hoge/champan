@@ -30,7 +30,7 @@ public class GameController : MonoBehaviour
 		int playerIndex = PlayerInput.all.Count;
 		string schemeMapping = InputActions.controlSchemes[playerIndex].name;
 		Joystick joystick = Joystick.all.Count > playerIndex ? Joystick.all[playerIndex] : null;
-		PlayerInput playerInput = PlayerInput.Instantiate(playerPrefab, playerIndex, schemeMapping, pairWithDevices: new InputDevice[] { Keyboard.current, joystick });
+		PlayerInput playerInput = PlayerInput.Instantiate(playerPrefab, playerIndex, schemeMapping, pairWithDevices: Keyboard.current);
 
 		Debug.Log($"Adding Player {playerIndex} using scheme {playerInput.currentControlScheme}");
 		if (joystick != null)
