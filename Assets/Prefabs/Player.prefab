@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 7177387029285353195}
   - component: {fileID: 8817762753609954406}
   - component: {fileID: 4084096041492405670}
+  - component: {fileID: 8482986263008895390}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -256,10 +257,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e02cd2c5e3ed4bc4782aad8d94054869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _landingAnimStrengthBase: 0.05
+  _landingAnimStrengthBase: 0.11
   _landingAnimDurationSec: 0.15
-  _jumpAnimStrengthBase: 0.12
-  _jumpAnimDurationSec: 0.4
+  _jumpAnimStrengthBase: 0.16
+  _jumpAnimDurationSec: 0.6
   _fastFallAnimMaxStrength: 0.5
 --- !u!114 &7348453302683924106
 MonoBehaviour:
@@ -276,9 +277,9 @@ MonoBehaviour:
   _stateJump:
     _jumpPowerArray:
     - 18
-    - 21
+    - 22
     - 24
-    _gravityIgnoreMaxSec: 1
+    _gravityIgnoreMaxSec: 0.5
     _jumpEffectPrefab: {fileID: 0}
     _jumpSe: {fileID: 0}
   _stateFall:
@@ -309,11 +310,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxVelocity: {x: 14, y: 24}
-  _accelX: 36
-  _decelX: 84
-  _accelAirX: 24
+  _accelX: 37
+  _decelX: 94
+  _accelAirX: 28
   _decelAirX: 55
-  _gravity: -49
+  _gravity: -51
   _decelGravity: 55
 --- !u!114 &4084096041492405670
 MonoBehaviour:
@@ -327,3 +328,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e7815335167ef04dbc1a304a50c1ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8482986263008895390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139938000420098449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07d6869d6dbe6d84cb7c67ce749c9afd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraintTrans: {fileID: 8468343991582604293}
+  _initCreatedNodes:
+  - PosOffset: {x: 0, y: 0}
+    Radius: 0.6
+  _tag: 2
