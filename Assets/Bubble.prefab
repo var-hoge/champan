@@ -135,6 +135,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f435b4309117a634c9c02d8f02ef1832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shieldConfigs:
+  - shieldLevel: 1
+    probability: 20
+    sprite: {fileID: 6804539369617127628, guid: 16fcb7dc4e4c8164f85ac97d9709d0b8, type: 3}
+  - shieldLevel: 2
+    probability: 10
+    sprite: {fileID: -5509887368520160791, guid: d3519f8fd85a2134dbe363efda9bb0b8, type: 3}
+  - shieldLevel: 3
+    probability: 5
+    sprite: {fileID: -546513314951284308, guid: 94db493b8a488354792c86bb67b1c6b3, type: 3}
+  - shieldLevel: 4
+    probability: 2
+    sprite: {fileID: -9130454481438517008, guid: e0405c6dce80e4340a461a541b3f2f14, type: 3}
+  - shieldLevel: 0
+    probability: 0
+    sprite: {fileID: 0}
+  shieldSpriteRenderer: {fileID: 1809511879503199091}
 --- !u!58 &2450477418945135004
 CircleCollider2D:
   m_ObjectHideFlags: 0
