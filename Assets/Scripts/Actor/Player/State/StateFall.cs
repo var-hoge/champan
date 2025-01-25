@@ -48,7 +48,7 @@ namespace Scripts.Actor.Player.State
                 if (_landEffectPrefab != null)
                 {
                     // ジャンプの先行入力が入っていたらエフェクトは出さない(ジャンプエフェクトとかぶってしまうため)
-                    if (!InputUtil.IsButtonDown(obj, ButtonCode.Jump, 0.1f - Time.unscaledDeltaTime))
+                    if (!InputUtil.IsButtonDown(obj, ButtonCode.Action, 0.1f - Time.unscaledDeltaTime))
                     {
                         //Effect.Util.Play(_landEffectPrefab, obj.transform.position);
                     }

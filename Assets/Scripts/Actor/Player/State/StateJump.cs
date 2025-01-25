@@ -40,15 +40,14 @@ namespace Scripts.Actor.Player.State
                 }
             }
 
-            //if (!InputUtil.IsButtonDown(obj, ButtonCode.Jump, 0.1f))
-            if (!UnityEngine.Input.GetKeyDown(KeyCode.Z))
+            if (!InputUtil.IsButtonDown(obj, ButtonCode.Action, 0.1f))
             {
                 return false;
             }
 
             // 過去のジャンプ入力をすべてONにしてIsButtonDownをfalseにする
             // 連続してジャンプするのを防ぐため
-            InputUtil.ForceFlagOnHistory(obj, ButtonCode.Jump);
+            InputUtil.ForceFlagOnHistory(obj, ButtonCode.Action);
 
             ChangeState(obj, jumpPowerKind);
             return true;
@@ -124,8 +123,7 @@ namespace Scripts.Actor.Player.State
                 return;
             }
 
-            //_isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !InputUtil.IsButton(obj, ButtonCode.Jump);
-            _isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !UnityEngine.Input.GetKey(KeyCode.Z);
+            _isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !InputUtil.IsButton(obj, ButtonCode.Action);
             obj.GetComponent<MoveCtrl>().GravityRateState = CalcGravityRate();
         }
         #endregion

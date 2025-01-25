@@ -1,41 +1,64 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class GameController : MonoBehaviour
+public class GameController : TadaLib.Util.SingletonMonoBehaviour<GameController>
 {
-	public static GameController Instance { get; private set; }
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private InputActionAsset InputActions;
 
-	[SerializeField] private GameObject playerPrefab;
-	[SerializeField] private InputActionAsset InputActions;
+    public int MaxPlayerCount => InputActions.controlSchemes.Count;
 
-	public int MaxPlayerCount => InputActions.controlSchemes.Count;
+    public int PlayerCount => _playerInputs.Count;
+    public PlayerInput GetPlayerInput(int idx)
+    {
+        // force...
+        while (PlayerInput.all.Count < MaxPlayerCount)
+        {
+            AddPlayer();
+        }
+        return _playerInputs[idx];
+    }
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-		{
-			if (PlayerInput.all.Count < MaxPlayerCount)
-			{
-				AddPlayer();
-			}
-			else
-			{
-				Debug.LogWarning($"Max player count reached");
-			}
-		}
-	}
+    List<PlayerInput> _playerInputs = new List<PlayerInput>();
 
-	private void AddPlayer()
-	{
-		int playerIndex = PlayerInput.all.Count;
-		string schemeMapping = InputActions.controlSchemes[playerIndex].name;
-		Joystick joystick = Joystick.all.Count > playerIndex ? Joystick.all[playerIndex] : null;
-		PlayerInput playerInput = PlayerInput.Instantiate(playerPrefab, playerIndex, schemeMapping, pairWithDevices: Keyboard.current);
+    private void Start()
+    {
+        // add max player at initialization
+        while (PlayerInput.all.Count < MaxPlayerCount)
+        {
+            AddPlayer();
+        }
+    }
 
-		Debug.Log($"Adding Player {playerIndex} using scheme {playerInput.currentControlScheme}");
-		if (joystick != null)
-		{
-			Debug.Log($"Using joystick {joystick.name}");
-		}
-	}
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (PlayerInput.all.Count < MaxPlayerCount)
+            {
+                AddPlayer();
+            }
+            else
+            {
+                Debug.LogWarning($"Max player count reached");          
+            }
+        }
+    }
+
+    private void AddPlayer()
+    {
+        int playerIndex = PlayerInput.all.Count;
+        string schemeMapping = InputActions.controlSchemes[playerIndex].name;
+        Joystick joystick = Joystick.all.Count > playerIndex ? Joystick.all[playerIndex] : null;
+        PlayerInput playerInput = PlayerInput.Instantiate(playerPrefab, playerIndex, schemeMapping, pairWithDevices: Keyboard.current);
+        DontDestroyOnLoad(playerInput);
+        _playerInputs.Add(playerInput);
+
+        Debug.Log($"Adding Player {playerIndex} using scheme {playerInput.currentControlScheme}");
+        if (joystick != null)
+        {
+            Debug.Log($"Using joystick {joystick.name}");
+        }
+    }
 }

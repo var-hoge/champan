@@ -175,7 +175,14 @@ namespace TadaLib.Input
         #region MonoBehavior の実装
         void Start()
         {
-            //_inputSystemInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            if (_playerIdx == -1)
+            {
+                _inputSystemInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            }
+            else
+            {
+                _inputSystemInput = GameController.Instance.GetPlayerInput(_playerIdx);
+            }
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
@@ -204,27 +211,28 @@ namespace TadaLib.Input
                 return;
             }
 
-            //    foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
-            //    {
-            //        var list = _buttonDict[code];
+            foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
+            {
+                var list = _buttonDict[code];
 
-            //        list.AddFirst(new ButtonData(_inputSystemInput.actions[code.ToString()].IsPressed(), Time.unscaledTime));
+                //list.AddFirst(new ButtonData(_inputSystemInput.actions[code.ToString()].IsPressed(), Time.unscaledTime));
+                list.AddFirst(new ButtonData(_inputSystemInput.actions["Action"].IsPressed(), Time.unscaledTime));
 
-            //        while (list.Count >= 2)
-            //        {
-            //            var duration = Time.unscaledTime - list.Last.Value.InputTime;
-            //            if (duration < MaxBuffSec)
-            //            {
-            //                break;
-            //            }
-            //            list.RemoveLast();
-            //        }
-            //    }
+                while (list.Count >= 2)
+                {
+                    var duration = Time.unscaledTime - list.Last.Value.InputTime;
+                    if (duration < MaxBuffSec)
+                    {
+                        break;
+                    }
+                    list.RemoveLast();
+                }
+            }
 
 
-            //    var moveVec2 = _inputSystemInput.actions["Move"].ReadValue<Vector2>();
-            //    _axisDict[AxisCode.Horizontal] = AdjustAxis(moveVec2.x);
-            //    _axisDict[AxisCode.Vertical] = AdjustAxis(moveVec2.y);
+            var moveVec2 = _inputSystemInput.actions["Move"].ReadValue<Vector2>();
+            _axisDict[AxisCode.Horizontal] = AdjustAxis(moveVec2.x);
+            _axisDict[AxisCode.Vertical] = AdjustAxis(moveVec2.y);
         }
         #endregion
 
@@ -265,8 +273,11 @@ namespace TadaLib.Input
             }
         }
 
+        [SerializeField]
+        int _playerIdx = -1;
+
         const float MaxBuffSec = 0.5f;
-        //UnityEngine.InputSystem.PlayerInput _inputSystemInput = null;
+        UnityEngine.InputSystem.PlayerInput _inputSystemInput = null;
         Dictionary<ButtonCode, LinkedList<ButtonData>> _buttonDict = new Dictionary<ButtonCode, LinkedList<ButtonData>>();
         Dictionary<AxisCode, float> _axisDict = new Dictionary<AxisCode, float>();
 
