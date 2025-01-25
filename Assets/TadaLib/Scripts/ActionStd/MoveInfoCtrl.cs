@@ -15,6 +15,7 @@ namespace TadaLib.ActionStd
     {
         #region プロパティ
         public Vector2 MoveDiff => (Vector2)transform.position - _PosPrev;
+        public List<GameObject> RideObjects => _rideObjects;
         #endregion
 
         #region メソッド
