@@ -76,12 +76,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 6804539369617127628, guid: 035a95cbff80cd7479e7ec6cffd25620, type: 3}
+  m_Sprite: {fileID: 6804539369617127628, guid: 16fcb7dc4e4c8164f85ac97d9709d0b8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.24, y: 2.22}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -170,7 +170,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.33
 --- !u!114 &6994359687701665451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,12 +276,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3017093950961416573, guid: 2d4d84782e640fb45955eadfd2484f82, type: 3}
+  m_Sprite: {fileID: 3017093950961416573, guid: 6bf158bf0dda3ce42becc2c511499208, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.24, y: 2.22}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -300,10 +300,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sprites:
-  - {fileID: 3017093950961416573, guid: 2d4d84782e640fb45955eadfd2484f82, type: 3}
-  - {fileID: -4178390869417250487, guid: 2e0449b7dfeffc648b5b41b009de2ae3, type: 3}
-  - {fileID: -1717888412633368228, guid: f434693889b1e2547a1f45deadafd05c, type: 3}
-  - {fileID: 8168903327556774430, guid: f098a412e6259f846b8990c3bddcbf12, type: 3}
+  - {fileID: 3017093950961416573, guid: 6bf158bf0dda3ce42becc2c511499208, type: 3}
+  - {fileID: -4178390869417250487, guid: 88b0eb052290d6448986efa1bf25e122, type: 3}
+  - {fileID: -1717888412633368228, guid: a3ca0f4577716734cb9735f9cbe882d0, type: 3}
+  - {fileID: 8168903327556774430, guid: 591d8db772b60dc45a3e07a50b2767b2, type: 3}
+  - {fileID: 5485582096018297686, guid: 94f665f57d8842d409b189ff638e73fb, type: 3}
 --- !u!1 &8902986967717663801
 GameObject:
   m_ObjectHideFlags: 0
