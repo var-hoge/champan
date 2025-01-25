@@ -23,6 +23,11 @@ namespace TadaLib.ActionStd
             _rideObjects.Add(obj);
         }
 
+        public bool IsRiding()
+        {
+            return _rideObjects.Count > 0;
+        }
+
         public bool IsRidedByPlayer()
         {
             var player = PlayerManager.TryGetMainPlayer();

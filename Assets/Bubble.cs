@@ -1,49 +1,34 @@
 using UnityEngine;
+using TadaLib.ActionStd;
 
 public class Bubble : MonoBehaviour
 {
     private float _burstTimer = BurstTime;
-    private bool _isPlayerStaying = false;
+    private bool _hasRidden = false;
+    private MoveInfoCtrl _moveInfoCtrl = null;
 
     private const float BurstTime = 5f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (_isPlayerStaying)
+        var isRiding = _moveInfoCtrl.IsRiding();
+        if (isRiding)
         {
+            _hasRidden = true;
             _burstTimer -= Time.deltaTime;
         }
-        if (_burstTimer < 0)
+
+        if ((!isRiding && _hasRidden)
+            || _burstTimer < 0)
         {
             Destroy(gameObject);
         }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (IsPlayer(collision))
-        {
-            _isPlayerStaying = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (IsPlayer(collision))
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private static bool IsPlayer(Collider2D collision)
-    {
-        return collision.transform.tag == "Player";
     }
 }
