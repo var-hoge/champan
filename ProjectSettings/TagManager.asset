@@ -41,5 +41,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Gimmick
+    uniqueID: 1422521125
+    locked: 0
+  - name: Player
+    uniqueID: 1737836293
+    locked: 0
+  - name: TopFront
+    uniqueID: 874687129
+    locked: 0
   m_RenderingLayers:
   - Default

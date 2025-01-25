@@ -48,7 +48,7 @@ MonoBehaviour:
   _constraintTrans: {fileID: 0}
   _initCreatedNodes:
   - PosOffset: {x: 0, y: 0}
-    Radius: 1
+    Radius: 2.4
   _tag: 3
 --- !u!114 &4520815914512914751
 MonoBehaviour:
@@ -69,4 +69,4 @@ MonoBehaviour:
   - Radius: 1.1
   - Radius: 0.9
   - Radius: 0.7
-  _blowPower: 30
+  _blowPower: 28
