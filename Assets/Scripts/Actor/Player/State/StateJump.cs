@@ -40,7 +40,8 @@ namespace Scripts.Actor.Player.State
                 }
             }
 
-            if (!InputUtil.IsButtonDown(obj, ButtonCode.Jump, 0.1f))
+            //if (!InputUtil.IsButtonDown(obj, ButtonCode.Jump, 0.1f))
+            if (!UnityEngine.Input.GetKeyDown(KeyCode.Z))
             {
                 return false;
             }
@@ -164,16 +165,7 @@ namespace Scripts.Actor.Player.State
         [SerializeField]
         AudioClip _jumpSe;
 
-        [SerializeField]
-        StateJump.JumpPowerKind _jumpPowerWallKick;
-        [SerializeField]
-        float _jumpSpeedWallKickX = 16.0f;
-        [SerializeField]
         float _uncontrollableDurationSec = 0.3f;
-        [SerializeField]
-        float _wallKickStartTimeScale = 0.05f;
-        [SerializeField]
-        float _wallKickStartHitStopDuration = 0.1f;
         TadaLib.Util.Timer _forceWallKickMoveTimer = new TadaLib.Util.Timer(0.0f);
         float _jumpVelXInitial = 0.0f;
         #endregion

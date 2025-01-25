@@ -260,8 +260,8 @@ MonoBehaviour:
   _decelX: 84
   _accelAirX: 24
   _decelAirX: 55
-  _gravity: -98
-  _decelGravity: 110
+  _gravity: -49
+  _decelGravity: 55
 --- !u!114 &256291116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,15 +287,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stateJump:
-    _jumpPowerArray: []
+    _jumpPowerArray:
+    - 18
+    - 21
+    - 24
     _gravityIgnoreMaxSec: 1
     _jumpEffectPrefab: {fileID: 0}
     _jumpSe: {fileID: 0}
-    _jumpPowerWallKick: 0
-    _jumpSpeedWallKickX: 16
-    _uncontrollableDurationSec: 0.3
-    _wallKickStartTimeScale: 0.05
-    _wallKickStartHitStopDuration: 0.1
   _stateFall:
     _maxSpeedRateYByDownInput: 1.5
     _landEffectPrefab: {fileID: 0}
@@ -311,9 +309,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e02cd2c5e3ed4bc4782aad8d94054869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _landingAnimStrengthBase: 0.03
+  _landingAnimStrengthBase: 0.05
   _landingAnimDurationSec: 0.15
-  _jumpAnimStrengthBase: 0.08
+  _jumpAnimStrengthBase: 0.12
   _jumpAnimDurationSec: 0.4
   _fastFallAnimMaxStrength: 0.5
 --- !u!114 &256291119

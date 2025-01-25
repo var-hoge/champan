@@ -125,7 +125,8 @@ namespace Scripts.Actor.Player
             {
                 var accelX = isGround ? _accelX : _accelAirX;
                 var decelX = isGround ? _decelX : _decelAirX;
-                var axisX = InputUtil.GetAxis(gameObject, AxisCode.Horizontal);
+                //var axisX = InputUtil.GetAxis(gameObject, AxisCode.Horizontal);
+                var axisX = UnityEngine.Input.GetKey(KeyCode.LeftArrow) ? -1.0f : UnityEngine.Input.GetKey(KeyCode.RightArrow) ? 1.0f : 0.0f;
                 if (IsUncontrollable || IsUncontrollableState)
                 {
                     axisX = 0.0f;
