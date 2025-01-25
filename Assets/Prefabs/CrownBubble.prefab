@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3294424518364933328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1919942360746498334}
+  - component: {fileID: 5619530840160709829}
+  - component: {fileID: 4520815914512914751}
+  m_Layer: 0
+  m_Name: CrownBubble
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1919942360746498334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3294424518364933328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.15, y: 0.12, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5619530840160709829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3294424518364933328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07d6869d6dbe6d84cb7c67ce749c9afd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraintTrans: {fileID: 0}
+  _initCreatedNodes:
+  - PosOffset: {x: 0, y: 0}
+    Radius: 1
+  _tag: 3
+--- !u!114 &4520815914512914751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3294424518364933328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549959eb1abf7524da0b698765e4ba49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bubbleLayerPrefab: {fileID: 8054237643416406885, guid: 1b26ac85d483d4f479ecc6c4dacca851, type: 3}
+  _bubbleLayerData:
+  - Radius: 1.5
+  - Radius: 1.3
+  - Radius: 1.1
+  - Radius: 0.9
+  - Radius: 0.7
+  _blowPower: 30

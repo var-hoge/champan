@@ -20,6 +20,10 @@ namespace TadaLib.HitSystem
         Default,
         Damage,
         Player,
+        CrownBubble,
+        ItemBlowWind,
+        ItemCreateBubble,
+        ItemHighJump,
     }
 
     /// <summary>
@@ -89,10 +93,22 @@ namespace TadaLib.HitSystem
         {
 #if UNITY_EDITOR
             Gizmos.color = Color.red;
-            foreach (var data in _initCreatedNodes)
+            if (Owner != null)
             {
-                var pos = _constraintTrans == null ? transform.position : _constraintTrans.position;
-                Gizmos.DrawWireSphere(pos + (Vector3)data.PosOffset, data.Radius);
+                for (int idx = 0; idx < Owner.NodeCount; ++idx)
+                {
+                    var node = Owner.Node(idx);
+                    var pos = _constraintTrans == null ? transform.position : _constraintTrans.position;
+                    Gizmos.DrawWireSphere((Vector3)node.CenterPos, node.Radius);
+                }
+            }
+            else
+            {
+                foreach (var data in _initCreatedNodes)
+                {
+                    var pos = _constraintTrans == null ? transform.position : _constraintTrans.position;
+                    Gizmos.DrawWireSphere(pos + (Vector3)data.PosOffset, data.Radius);
+                }
             }
 #endif
         }

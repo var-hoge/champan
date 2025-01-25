@@ -49,6 +49,11 @@ namespace Scripts.Actor.Player
         {
             Velocity = velocity;
         }
+
+        public void SetUncontrollableTime(float durationSec)
+        {
+            _uncontrollableTimer.TimeReset(durationSec);
+        }
         #endregion
 
         #region Monobehavior の実装
@@ -80,6 +85,8 @@ namespace Scripts.Actor.Player
         public void OnMove()
         {
             var deltaTime = gameObject.DeltaTime();
+
+            _uncontrollableTimer.Advance(deltaTime);
 
             var rigidbody = GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
             // 接地していたらY軸負の方向速度をなくす (永遠に速度が増えないようにするため)
@@ -127,7 +134,7 @@ namespace Scripts.Actor.Player
                 var decelX = isGround ? _decelX : _decelAirX;
                 //var axisX = InputUtil.GetAxis(gameObject, AxisCode.Horizontal);
                 var axisX = UnityEngine.Input.GetKey(KeyCode.LeftArrow) ? -1.0f : UnityEngine.Input.GetKey(KeyCode.RightArrow) ? 1.0f : 0.0f;
-                if (IsUncontrollable || IsUncontrollableState)
+                if (IsUncontrollable || IsUncontrollableState || !_uncontrollableTimer.IsTimout)
                 {
                     axisX = 0.0f;
                 }
