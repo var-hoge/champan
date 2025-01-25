@@ -35,7 +35,6 @@ namespace Scripts.Actor.Gimmick.CrownBubble
                 bubbleLayer.Setup(data.Radius, _bubbleLayers.Count);
                 _bubbleLayers.Add(bubbleLayer);
             }
-            GetComponent<TadaLib.HitSystem.OwnerCtrl>().Owner.EditNodeRadius(0, _bubbleLayers[0].Radius * 1.5f);
         }
         #endregion
 
@@ -124,7 +123,7 @@ namespace Scripts.Actor.Gimmick.CrownBubble
             dirDiff.z = 0.0f;
             var dirUnit = dirDiff.normalized;
             // x 軸方向の成分を強める
-            dirUnit.x += Mathf.Sign(dirUnit.x) * 0.3f;
+            dirUnit.x += Mathf.Sign(dirUnit.x) * 0.5f;
             dirUnit = dirUnit.normalized;
             if (dirUnit.sqrMagnitude < 0.0001f)
             {
@@ -141,7 +140,7 @@ namespace Scripts.Actor.Gimmick.CrownBubble
             // set hit collider
             if (_bubbleLayers.Count != 0)
             {
-                GetComponent<TadaLib.HitSystem.OwnerCtrl>().Owner.EditNodeRadius(0, _bubbleLayers[0].Radius * 1.5f);
+                GetComponent<TadaLib.HitSystem.OwnerCtrl>().Owner.EditNodeRadius(0, _bubbleLayers[0].Radius * 1.6f);
             }
         }
 
