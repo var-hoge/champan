@@ -10,8 +10,8 @@ public class PlayerInputHandler : MonoBehaviour
 		Debug.Log($"Player {playerInput.playerIndex}: Move");
 	}
 
-	public void Jump(InputAction.CallbackContext callback)
+	public void DoAction(InputAction.CallbackContext callback)
 	{
-		Debug.Log($"Player {playerInput.playerIndex}: Jump");
+		Debug.Log($"Player {playerInput.playerIndex}: Action");
 	}
 }
