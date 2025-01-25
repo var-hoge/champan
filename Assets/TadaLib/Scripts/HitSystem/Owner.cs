@@ -31,6 +31,16 @@ namespace TadaLib.HitSystem
         }
 
         /// <summary>
+        /// ノードの座標を調整
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="radius"></param>
+        public void EditNodeRadius(int idx, float radius)
+        {
+            _nodes[idx].EditRadius(radius);
+        }
+
+        /// <summary>
         /// ノード削除
         /// </summary>
         /// <param name="node"></param>

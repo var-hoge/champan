@@ -24,6 +24,10 @@ namespace TadaLib.HitSystem
         #endregion
 
         #region メソッド
+        public void EditRadius(float radius)
+        {
+            _radius = radius;
+        }
         #endregion
 
         #region プロパティ
