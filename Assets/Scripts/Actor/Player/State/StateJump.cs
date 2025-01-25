@@ -58,7 +58,6 @@ namespace Scripts.Actor.Player.State
         {
             var state = obj.GetComponent<StateMachine>().GetStateInstance<StateJump>();
             state._jumpPower = jumpPowerKind;
-            state._forceWallKickMoveTimer = new TadaLib.Util.Timer(uncontrollableDurationSec);
             state.ChangeState(typeof(StateJump));
         }
         #endregion
@@ -117,13 +116,6 @@ namespace Scripts.Actor.Player.State
         {
             var deltaTime = obj.DeltaTime();
             _gravityTimer.Advance(deltaTime);
-            _forceWallKickMoveTimer.Advance(deltaTime);
-
-            if (!_forceWallKickMoveTimer.IsTimout)
-            {
-                // 移動強制
-                obj.GetComponent<MoveCtrl>().SetVelocityForceX(_jumpVelXInitial);
-            }
 
             var speedY = obj.GetComponent<MoveCtrl>().Velocity.y;
             if (speedY < 0.0f)
@@ -132,7 +124,8 @@ namespace Scripts.Actor.Player.State
                 return;
             }
 
-            _isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !InputUtil.IsButton(obj, ButtonCode.Jump);
+            //_isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !InputUtil.IsButton(obj, ButtonCode.Jump);
+            _isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !UnityEngine.Input.GetKey(KeyCode.Z);
             obj.GetComponent<MoveCtrl>().GravityRateState = CalcGravityRate();
         }
         #endregion
@@ -164,10 +157,6 @@ namespace Scripts.Actor.Player.State
 
         [SerializeField]
         AudioClip _jumpSe;
-
-        float _uncontrollableDurationSec = 0.3f;
-        TadaLib.Util.Timer _forceWallKickMoveTimer = new TadaLib.Util.Timer(0.0f);
-        float _jumpVelXInitial = 0.0f;
         #endregion
     }
 }
