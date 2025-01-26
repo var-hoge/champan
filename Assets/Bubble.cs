@@ -45,6 +45,7 @@ public class Bubble : MonoBehaviour
 	private IEnumerator _vibrateCoroutine = null;
 	private int currentRiders;
 
+	public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
 	private bool HasCrown => CrownBubble == this;
 
 	void Start()
