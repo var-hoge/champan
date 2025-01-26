@@ -1,3 +1,4 @@
+using DG.Tweening;
 using KanKikuchi.AudioManager;
 using Scripts;
 using System.Collections.Generic;
@@ -31,11 +32,13 @@ public class BobbleGenerator : MonoBehaviour
 
 		if (Bubble.CrownShieldValue == 0)
 		{
-			// TODO: Game won by player, how to detect the player?
 			GameSequenceManager.WinnerPlayerIdx = Bubble.LastRidePlayerIdx;
 			GameSequenceManager.Instance.GameOver();
 			return;
 		}
+
+		Transform crown = Bubble.CrownBubble.CrownSpriteRenderer;
+		crown.SetParent(null);
 
 		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
@@ -50,6 +53,8 @@ public class BobbleGenerator : MonoBehaviour
 		}
 
 		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
+		crown.DOMove(Bubble.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
+
 		Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
 	}
 }
