@@ -1198,7 +1198,7 @@ MonoBehaviour:
   - {fileID: -3521875636901891048, guid: e726b552cdd51b645ab94f347417f55b, type: 3}
   - {fileID: 4381113020320212754, guid: a3ff6a51362097846bef35b16c0c56fe, type: 3}
   - {fileID: -7260974050487672157, guid: 8f4200d1a415ab4428bb8d529538bff8, type: 3}
-  - {fileID: 931359185589539332, guid: 0a8e22c1ffb604e4e924a95e244eba17, type: 3}
+  - {fileID: -8611869544389360058, guid: 8eca40ac52c139240913eedb9c206a50, type: 3}
   _canvas: {fileID: 809755498}
   _charaVarietySprites:
   - BackSprite: {fileID: -7190868768965136776, guid: 6e252172892727d43b60b1c648b3911e, type: 3}
@@ -2109,7 +2109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 11.9}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -212.2, y: 309}
+  m_AnchoredPosition: {x: -212.2, y: 313.87}
   m_SizeDelta: {x: 112, y: 103}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1460557415
@@ -2626,7 +2626,7 @@ RectTransform:
   m_GameObject: {fileID: 1887253350}
   m_LocalRotation: {x: 0, y: 0, z: 0.02268737, w: 0.9997426}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 809755497}
