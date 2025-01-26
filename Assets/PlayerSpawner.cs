@@ -1,5 +1,6 @@
 using UnityEngine;
 using TadaLib.ActionStd;
+using KanKikuchi.AudioManager;
 
 public class PlayerSpawner : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerSpawner : MonoBehaviour
     void Start()
     {
         _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
+        BGMManager.Instance.Play(BGMPath.FIGHT);
     }
 
     // Update is called once per frame
