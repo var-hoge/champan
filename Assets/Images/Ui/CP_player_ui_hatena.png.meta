@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      CP_player_ui_hatena_0: 7559503514470887910
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
