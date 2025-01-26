@@ -90,10 +90,10 @@ public class Bubble : MonoBehaviour
 
 				// TODO: Push back the player
 				// TODO: Update crown ownership
-
-				Destroy(gameObject);
-				return;
 			}
+
+			Destroy(gameObject);
+			return;
 
 			_burstTimer = BurstTime;
 
