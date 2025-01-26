@@ -64,12 +64,16 @@ namespace TadaLib.Scene
 
             Scenes.UnloadScenesAsync(unloadScenes.ToArray());
             //await Scenes.UnloadScenesAsync(unloadScenes.ToArray()).ToUniTask();
+            await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
 
             var loadScenes = new List<string>();
             loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
             loadScenes.Add(nextScene);
 
             Scenes.LoadScenesAsync(loadScenes.ToArray());
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+
             //await Scenes.LoadScenesAsync(loadScenes.ToArray()).ToUniTask();
 
             // nextScene を activeScene にする (メインはこれなので)

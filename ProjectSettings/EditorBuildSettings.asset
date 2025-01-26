@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/Scenes/Title.unity
+    guid: 2844e57522546d84cb05f780ae543d75
+  - enabled: 1
+    path: Assets/Scenes/CharaSelect.unity
+    guid: 21f1de3f12b1fe24aa844d35ba84f7d7
+  - enabled: 1
+    path: Assets/Scenes/Main.unity
+    guid: 8ff57657e56e9f34aa7b6912cc2b6a3e
+  - enabled: 1
+    path: Assets/Scenes/Result.unity
+    guid: 167873fd9e3d6ef4a897fd85d07ee5ff
   - enabled: 1
     path: Assets/TadaLib/Scenes/TadaLibGlobalManager.unity
     guid: ea6129d53885cd243a2b07fb5cc8a081
