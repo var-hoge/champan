@@ -49,7 +49,7 @@ namespace TadaLib.Util
             if (instance == null)
             {
                 instance = this as T;
-                DontDestroyOnLoad(instance);
+                //DontDestroyOnLoad(instance);
                 return true;
             }
             else if (Instance == this)
