@@ -34,6 +34,8 @@ public class BobbleGenerator : MonoBehaviour
 		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
 		List<Bubble> bubbles = (FindObjectsByType(typeof(Bubble), FindObjectsSortMode.None) as Bubble[]).ToList();
+		if (bubbles.Count == 0) return;
+
 		if (bubbles.Contains(Bubble.CrownBubble))
 		{
 			bubbles.Remove(Bubble.CrownBubble);
