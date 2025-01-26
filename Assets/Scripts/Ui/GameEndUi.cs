@@ -29,7 +29,7 @@ namespace Ui
             GameSequenceManager.Instance.PhaseKind = GameSequenceManager.Phase.AfterBattle;
 
             var winPlayerIdx = GameSequenceManager.WinnerPlayerIdx;
-            var winCharaIdx = CharaSelectUiManager.PlayerUseCharaIdList(winPlayerIdx);
+            var winCharaIdx = CharaSelectUiManager.PlayerUseCharaIdList(    winPlayerIdx);
 
             var goalUi = _charaVarietySprites[winPlayerIdx];
             var charaSprite = _charaSprites[winCharaIdx];
@@ -76,8 +76,10 @@ namespace Ui
 
             await UniTask.WaitForSeconds(10.0f);
 
+
+
             // シーン遷移
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("Result", 0.5f, 0.5f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.5f, 0.5f);
         }
         #endregion
 

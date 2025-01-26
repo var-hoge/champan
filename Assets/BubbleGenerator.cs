@@ -32,6 +32,7 @@ public class BobbleGenerator : MonoBehaviour
 		if (Bubble.CrownShieldValue == 0)
 		{
 			// TODO: Game won by player, how to detect the player?
+			GameSequenceManager.WinnerPlayerIdx = Bubble.LastRidePlayerIdx;
 			GameSequenceManager.Instance.GameOver();
 			return;
 		}
