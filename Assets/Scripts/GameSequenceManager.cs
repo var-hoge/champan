@@ -19,16 +19,14 @@ namespace Scripts
         #region 型定義
         public enum Phase
         {
-            Title,
-            InGameBeforeBattle,
-            InGameBattle,
-            InGameAfterBattle,
-            Result,
+            BeforeBattle,
+            Battle,
+            AfterBattle,
         }
         #endregion
 
         #region プロパティ
-        public Phase PhaseKind { private set; get; }
+        public Phase PhaseKind = Phase.BeforeBattle;
         #endregion
 
         #region static メソッド

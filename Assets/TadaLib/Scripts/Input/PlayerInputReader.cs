@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -216,7 +217,7 @@ namespace TadaLib.Input
                 var list = _buttonDict[code];
 
                 //list.AddFirst(new ButtonData(_inputSystemInput.actions[code.ToString()].IsPressed(), Time.unscaledTime));
-                list.AddFirst(new ButtonData(_inputSystemInput.actions["Action"].IsPressed(), Time.unscaledTime));
+                list.AddFirst(new ButtonData(_inputSystemInput.actions["Action"].IsPressed() && GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.Battle, Time.unscaledTime));
 
                 while (list.Count >= 2)
                 {
@@ -231,6 +232,10 @@ namespace TadaLib.Input
 
 
             var moveVec2 = _inputSystemInput.actions["Move"].ReadValue<Vector2>();
+            if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+            {
+                moveVec2 = Vector2.zero;
+            }
             _axisDict[AxisCode.Horizontal] = AdjustAxis(moveVec2.x);
             _axisDict[AxisCode.Vertical] = AdjustAxis(moveVec2.y);
         }
