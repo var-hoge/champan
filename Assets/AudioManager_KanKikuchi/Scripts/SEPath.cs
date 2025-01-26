@@ -31,7 +31,6 @@ public static class SEPath{
 	public const string PLAYER_JUMP_14    = "SE/Player Jump/Player_Jump_14";
 	public const string PLAYER_JUMP_15    = "SE/Player Jump/Player_Jump_15";
 	public const string PLAYER_JUMP_16    = "SE/Player Jump/Player_Jump_16";
-	public const string PLAYER_JUMP_17    = "SE/Player Jump/Player_Jump_17";
 	public const string PLAYER_RESPAWN_01 = "SE/Player Respawn/Player_Respawn_01";
 	public const string PLAYER_RESPAWN_02 = "SE/Player Respawn/Player_Respawn_02";
 	public const string PLAYER_RESPAWN_03 = "SE/Player Respawn/Player_Respawn_03";
