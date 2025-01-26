@@ -27,17 +27,24 @@ namespace Scripts
 
         #region プロパティ
         public Phase PhaseKind = Phase.BeforeBattle;
+        public static int WinnerPlayerIdx = 0;
         #endregion
 
         #region static メソッド
         #endregion
 
         #region メソッド
+        public void GameOver()
+        {
+            WinnerPlayerIdx = Bubble.LastRidePlayerIdx;
+            _gameEndUi.GameEnd().Forget();
+        }
         #endregion
 
         #region MonoBehavior の実装
         void Start()
         {
+            //_gameEndUi.GameEnd().Forget();
             _gameBeginUi.CountDown().Forget();
         }
         #endregion
@@ -48,6 +55,9 @@ namespace Scripts
         #region private フィールド
         [SerializeField]
         Ui.GameBeginUi _gameBeginUi;
+
+        [SerializeField]
+        Ui.GameEndUi _gameEndUi;
         #endregion
     }
 }
