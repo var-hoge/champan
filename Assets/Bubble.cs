@@ -33,7 +33,7 @@ public class Bubble : MonoBehaviour
 	[Header("Amplitude")]
 	[SerializeField] private float amplitude = 0.01f;
 
-	private float _burstTimer = BurstTime;
+	private float _burstTimer;
 	private bool _hasRidden = false;
 	private MoveInfoCtrl _moveInfoCtrl = null;
 	private BubbleShieldConfig currentShieldConfig;
@@ -41,6 +41,7 @@ public class Bubble : MonoBehaviour
 	private Transform visualRoot;
 	private bool _vibrating = false;
 	private IEnumerator _vibrateCoroutine = null;
+	private int currentRiders;
 
 	private bool HasCrown => CrownBubble == this;
 
@@ -48,6 +49,8 @@ public class Bubble : MonoBehaviour
 	{
 		_moveInfoCtrl = GetComponent<MoveInfoCtrl>();
 		visualRoot = transform.Find("VisualRoot").transform;
+
+		_burstTimer = BurstTime;
 
 		transform.localScale = Vector3.one * UnityEngine.Random.Range(minSize, maxSize);
 	}
@@ -59,11 +62,14 @@ public class Bubble : MonoBehaviour
 
 	void Update()
 	{
+		bool losingRider = currentRiders > _moveInfoCtrl.RideObjects.Count;
+		currentRiders = _moveInfoCtrl.RideObjects.Count;
+
 		var isRiding = _moveInfoCtrl.IsRiding();
 		if (isRiding)
 		{
-			_hasRidden = true;
 			_burstTimer -= Time.deltaTime;
+			_hasRidden = true;
 
 			if (_burstTimer < 1.5 && !_vibrating)
 			{
@@ -77,33 +83,17 @@ public class Bubble : MonoBehaviour
 				Destroy(gameObject);
 			}
 		}
-		else
-		{
-			if (_vibrateCoroutine != null)
-			{
-				StopCoroutine(_vibrateCoroutine);
-				_vibrateCoroutine = null;
-			}
-			_burstTimer = BurstTime;
-		}
 
-		if (!isRiding && _hasRidden)
+		if ((!isRiding && _hasRidden) || losingRider)
 		{
 			if (HasCrown)
 			{
 				CrownShieldValue--;
 
 				// TODO: Push back the player
-				// TODO: Update crown ownership
 			}
 
 			Destroy(gameObject);
-			return;
-
-			_burstTimer = BurstTime;
-
-			// TODO: Fix has it might be conflicting with other players currently ridding
-			_hasRidden = _moveInfoCtrl.RideObjects.Count > 0;
 		}
 	}
 
