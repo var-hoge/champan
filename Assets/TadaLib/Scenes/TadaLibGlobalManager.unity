@@ -148,11 +148,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee13316e3f38634caba3936fb30c93b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _charaImages:
-  - {fileID: -486324930278150927, guid: 29967b316a2ed69498090c833c2a9638, type: 3}
-  - {fileID: 931359185589539332, guid: 0a8e22c1ffb604e4e924a95e244eba17, type: 3}
-  - {fileID: 6679715460405503824, guid: 3750edd6fa48ea44689951ead5bb253b, type: 3}
-  - {fileID: -3998685992907457791, guid: bb48b94082b461646a7787087b71f4f0, type: 3}
+  _chara1Images:
+  - {fileID: -486324930278150927, guid: 143618bf5803e204781cfa2e19ce05ee, type: 3}
+  - {fileID: -1138549902689704535, guid: f18a594c90e173b48870717ecbbd8b63, type: 3}
+  - {fileID: -5271450377227151849, guid: 4e5306969778d5243a216632209b854c, type: 3}
+  _chara2Images:
+  - {fileID: 6679715460405503824, guid: 6cee3a845f5be3e419f7a1a318e406ea, type: 3}
+  - {fileID: 672251392533892004, guid: 2434fbe198dd21d419693f2a10e8fc51, type: 3}
+  - {fileID: 4626072066004957959, guid: 4c8a279e6cec59d43a22844948e7b1b3, type: 3}
+  _chara3Images:
+  - {fileID: -3998685992907457791, guid: 7a69bd05df55e67459e1e0f5c1f47af5, type: 3}
+  - {fileID: 9067177985881841387, guid: 57733d01d1b1c304da8170d1641b2a87, type: 3}
+  - {fileID: 1256440482106236332, guid: d410d8507d08aa34ab11f905e6a11cb7, type: 3}
+  _chara4Images:
+  - {fileID: 931359185589539332, guid: 8cb10ca91cf8a2f47afbd8c95b473f90, type: 3}
+  - {fileID: 359123737659422568, guid: 0539bb23f76fbd3458828807d853146a, type: 3}
+  - {fileID: 8226873738327407191, guid: 01ad34fd5f4e57645835ef5b69a05714, type: 3}
 --- !u!4 &271104967
 Transform:
   m_ObjectHideFlags: 0
