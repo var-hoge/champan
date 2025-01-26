@@ -1,4 +1,4 @@
-using DG.Tweening;
+using KanKikuchi.AudioManager;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -26,6 +26,8 @@ public class BobbleGenerator : MonoBehaviour
 	private void TeleportCrown()
 	{
 		Debug.Log($"TeleportCrown");
+		SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
+
 		if (Bubble.CrownShieldValue == 0)
 		{
 			// TODO: Game won by player, how to detect the player?
@@ -35,9 +37,6 @@ public class BobbleGenerator : MonoBehaviour
 
 		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
-		//Transform crown = Bubble.CrownBubble.CrownSpriteRenderer;
-		//crown.transform.SetParent(null);
-
 		List<Bubble> bubbles = (FindObjectsByType(typeof(Bubble), FindObjectsSortMode.None) as Bubble[]).ToList();
 		if (bubbles.Count == 0) return;
 
@@ -46,9 +45,7 @@ public class BobbleGenerator : MonoBehaviour
 			bubbles.Remove(Bubble.CrownBubble);
 		}
 
-		Bubble newCrown = bubbles[Random.Range(0, bubbles.Count - 1)];
-		//Bubble.SetupCrown();
-		//crown.DOMove()
+		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
 		Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
 	}
 }
