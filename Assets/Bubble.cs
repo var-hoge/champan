@@ -22,6 +22,8 @@ public class Bubble : MonoBehaviour
 
 	public Action OnDestroyEvent;
 
+	public bool IsSpawning { get; private set; }
+
 	[Header("Configurations")]
 	[SerializeField] private int crownStartShield;
 	[SerializeField] private BubbleShieldConfig[] shieldConfigs;
@@ -177,6 +179,7 @@ public class Bubble : MonoBehaviour
 
 	public void Init(float x)
 	{
+		IsSpawning = true;
 		GetComponent<Rigidbody2D>().AddForce(new Vector2(x, UnityEngine.Random.Range(15f, 90f)));
 		StartCoroutine(EnableAnimation());
 	}
@@ -185,5 +188,6 @@ public class Bubble : MonoBehaviour
 	{
 		yield return new WaitForSeconds(5f);
 		GetComponent<BubbleAnimator>().AnimationEnabled = true;
+		IsSpawning = false;
 	}
 }

@@ -42,6 +42,8 @@ public class BobbleGenerator : MonoBehaviour
 		List<Bubble> bubbles = (FindObjectsByType(typeof(Bubble), FindObjectsSortMode.None) as Bubble[]).ToList();
 		if (bubbles.Count == 0) return;
 
+		bubbles = bubbles.Where(x => !x.IsSpawning).ToList();
+
 		if (bubbles.Contains(Bubble.CrownBubble))
 		{
 			bubbles.Remove(Bubble.CrownBubble);

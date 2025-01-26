@@ -51,7 +51,7 @@ public class PlayerSpawner : MonoBehaviour
 			var camera = Camera.main;
 			var topRight = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, camera.nearClipPlane));
 			var x = Mathf.Clamp(player.transform.position.x, -topRight.x, topRight.x);
-			var y = topRight.y + 1;
+			var y = topRight.y + 0.5f;
 			var respawnBubble = Instantiate(_respawnBubble, new(x, y, 0), Quaternion.identity);
 			respawnBubble.Init(player);
 			player.transform.position = new Vector3(0, -30, 0);
