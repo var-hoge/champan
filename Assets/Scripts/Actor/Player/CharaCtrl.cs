@@ -30,6 +30,11 @@ namespace Scripts.Actor.Player
 
             _body.transform.localPosition = _offsets[charaIdx];
         }
+
+        private void Update()
+        {
+            
+        }
         #endregion
 
         #region privateフィールド
