@@ -13,7 +13,6 @@ public class PlayerInputHandler : MonoBehaviour
 	{
 		Vector2 value = callback.ReadValue<Vector2>();
 		OnMove?.Invoke(value);
-		Debug.Log($"Player {playerInput.playerIndex}: Move {value}");
 	}
 
 	public void DoAction(InputAction.CallbackContext callback)
@@ -21,6 +20,5 @@ public class PlayerInputHandler : MonoBehaviour
 		if (!callback.performed) return;
 
 		OnAction?.Invoke();
-		Debug.Log($"Player {playerInput.playerIndex}: Action");
 	}
 }

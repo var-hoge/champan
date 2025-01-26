@@ -29,6 +29,8 @@ public class BobbleGenerator : MonoBehaviour
 		if (Bubble.CrownShieldValue == 0)
 		{
 			// TODO: Game won by player, how to detect the player?
+			Debug.Log($"GAME OVER!");
+			return;
 		}
 
 		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;

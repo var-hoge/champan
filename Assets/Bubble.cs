@@ -59,8 +59,7 @@ public class Bubble : MonoBehaviour
 			_hasRidden = true;
 			_burstTimer -= Time.deltaTime;
 
-			if (_burstTimer < 1.5
-				&& !_vibrating)
+			if (_burstTimer < 1.5 && !_vibrating)
 			{
 				_vibrateCoroutine = Vibrate();
 				StartCoroutine(_vibrateCoroutine);
