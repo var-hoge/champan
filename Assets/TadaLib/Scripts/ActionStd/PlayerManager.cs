@@ -17,7 +17,7 @@ namespace TadaLib.ActionStd
         : BaseManagerProc<PlayerManager>
     {
         #region プロパティ
-        public int MaxPlayerCount => 2;
+        public int MaxPlayerCount => 4;
         public int MainPlayerNumber => 0;
 
         public IObservable<GameObject> GetMainPlayerAsync => _asyncMainPlayerSubject;
