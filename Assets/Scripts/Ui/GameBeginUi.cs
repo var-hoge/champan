@@ -9,6 +9,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Scripts;
+using KanKikuchi.AudioManager;
 
 namespace Ui
 {
@@ -24,6 +25,8 @@ namespace Ui
         #region メソッド
         public async UniTask CountDown()
         {
+            BGMManager.Instance.Stop();
+
             await UniTask.WaitForSeconds(1.0f);
 
             // TODO: ガウシアンブラーをかける
@@ -57,6 +60,8 @@ namespace Ui
             _main.sprite = _goSprite;
             _main.rectTransform.localScale = Vector3.one * 1.5f;
             _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
+
+            BGMManager.Instance.Play(BGMPath.FIGHT);
 
             // 説明は消す
             _description.gameObject.SetActive(false);

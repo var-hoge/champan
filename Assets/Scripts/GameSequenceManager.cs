@@ -44,7 +44,6 @@ namespace Scripts
         #region MonoBehavior の実装
         void Start()
         {
-            //_gameEndUi.GameEnd().Forget();
             _gameBeginUi.CountDown().Forget();
         }
         #endregion

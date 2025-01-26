@@ -29,10 +29,19 @@ namespace Ui
             GameSequenceManager.Instance.PhaseKind = GameSequenceManager.Phase.AfterBattle;
 
             var winPlayerIdx = GameSequenceManager.WinnerPlayerIdx;
-            var winCharaIdx = CharaSelectUiManager.PlayerUseCharaIdList(    winPlayerIdx);
+            var winCharaIdx = CharaSelectUiManager.PlayerUseCharaIdList(winPlayerIdx);
+
+            if (winCharaIdx == 3)
+            {
+                _chara.rectTransform.localPosition += new Vector3(30.0f, -50.0f, 0.0f);
+            }
 
             var goalUi = _charaVarietySprites[winPlayerIdx];
             var charaSprite = _charaSprites[winCharaIdx];
+
+            _chara.sprite = charaSprite;
+            _background.sprite = goalUi.BackSprite;
+            _description.sprite = goalUi.WinnerSprite;
 
             _ = _canvas.DOFade(1.0f, 0.1f);
 
@@ -44,28 +53,24 @@ namespace Ui
             await UniTask.WaitForSeconds(0.7f);
 
             _chara.gameObject.SetActive(true);
-            _chara.sprite = charaSprite;
             _chara.rectTransform.sizeDelta = charaSprite.textureRect.size;
 
-            _background.sprite = goalUi.BackSprite;
-
             _crown.gameObject.SetActive(true);
-            _description.sprite = goalUi.WinnerSprite;
 
             _chara.color.SetAlpha(0.0f);
             _crown.color.SetAlpha(0.0f);
             _ = _chara.DOFade(1.0f, 2.2f);
             _ = _crown.DOFade(1.0f, 2.2f);
 
-            var charaGoalPos = _chara.rectTransform.position;
-            _chara.rectTransform.position += Vector3.down * 50.0f;
+            var charaGoalPos = _chara.rectTransform.localPosition;
+            _chara.rectTransform.localPosition += Vector3.down * 50.0f;
 
-            _ = _chara.rectTransform.DOMove(charaGoalPos, 0.5f);
+            _ = _chara.rectTransform.DOLocalMove(charaGoalPos, 0.5f);
 
-            var crownGoalPos = _crown.rectTransform.position;
-            _chara.rectTransform.position += Vector3.up * 50.0f;
+            var crownGoalPos = _crown.rectTransform.localPosition;
+            _chara.rectTransform.localPosition += Vector3.up * 50.0f;
 
-            _ = _crown.rectTransform.DOMove(crownGoalPos, 0.5f);
+            _ = _crown.rectTransform.DOLocalMove(crownGoalPos, 0.5f);
 
             await UniTask.WaitForSeconds(0.5f);
 
@@ -75,8 +80,6 @@ namespace Ui
             _ = _background.rectTransform.DOLocalMoveY(0.0f, 0.3f);
 
             await UniTask.WaitForSeconds(10.0f);
-
-
 
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.5f, 0.5f);

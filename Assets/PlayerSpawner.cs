@@ -36,7 +36,7 @@ public class PlayerSpawner : MonoBehaviour
 	void Start()
 	{
 		_moveInfoCtrl = GetComponent<MoveInfoCtrl>();
-		BGMManager.Instance.Play(BGMPath.FIGHT, _BGMVolumeRate);
+		//BGMManager.Instance.Play(BGMPath.FIGHT, _BGMVolumeRate);
 	}
 
 	// Update is called once per frame
