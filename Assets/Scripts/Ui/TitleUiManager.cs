@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using KanKikuchi.AudioManager;
 
 namespace Ui
 {
@@ -23,14 +24,15 @@ namespace Ui
         #region メソッド
         private void Start()
         {
-            Staging().Forget();  
+            Staging().Forget();
+            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
         }
         #endregion
 
         #region privateフィールド
         #endregion
 
-        #region privateメソッド
+            #region privateメソッド
         public async UniTask Staging()
         {
             // 最低 2 秒は待つ

@@ -9,7 +9,7 @@ public class PlayerSpawner : MonoBehaviour
 	private RespawnBubble _respawnBubble = null;
 	[SerializeField] Bubble _bubble = null;
 	private MoveInfoCtrl _moveInfoCtrl = null;
-	[SerializeField] float _BGMVolumeRate = 0.7f;
+	[SerializeField] float _BGMVolumeRate = 1f;
 
 	[SerializeField] private int bubbleCountMin = 1;
 	[SerializeField] private int bubbleCountMax = 5;

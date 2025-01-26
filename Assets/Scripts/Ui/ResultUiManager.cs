@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using KanKikuchi.AudioManager;
 
 namespace Ui
 {
@@ -23,6 +24,7 @@ namespace Ui
         #region メソッド
         private void Start()
         {
+            BGMManager.Instance.Play(BGMPath.RESULT_SCREEN);
             Staging().Forget();
         }
         #endregion
