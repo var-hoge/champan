@@ -13,14 +13,18 @@ public class Bubble : MonoBehaviour
 	}
 
 	public static Bubble CrownBubble { get; set; }
-	public static int CrownShieldValue { get; private set; } = 4; // TODO: Make it exportable
+	public static int CrownShieldValue { get; private set; }
 
 	private const float BurstTime = 5f;
 
 	public Action OnDestroyEvent;
 
 	[Header("Configurations")]
+	[SerializeField] private int crownStartShield;
 	[SerializeField] private BubbleShieldConfig[] shieldConfigs;
+
+	[SerializeField] private float minSize = 2.2f;
+	[SerializeField] private float maxSize = 4.5f;
 
 	[Header("References")]
 	[SerializeField] private SpriteRenderer shieldSpriteRenderer;
@@ -44,6 +48,8 @@ public class Bubble : MonoBehaviour
 	{
 		_moveInfoCtrl = GetComponent<MoveInfoCtrl>();
 		visualRoot = transform.Find("VisualRoot").transform;
+
+		transform.localScale = Vector3.one * UnityEngine.Random.Range(minSize, maxSize);
 	}
 
 	void OnDestroy()
@@ -127,6 +133,10 @@ public class Bubble : MonoBehaviour
 		{
 			CrownBubble.RemoveCrown();
 		}
+		else
+		{
+			CrownShieldValue = bubble.crownStartShield;
+		}
 
 		CrownBubble = bubble;
 
@@ -148,11 +158,10 @@ public class Bubble : MonoBehaviour
 		BubbleShieldConfig config = default;
 		foreach (var shieldConfig in shieldConfigs)
 		{
-			if (shieldConfig.shieldLevel == shieldValue)
-			{
-				config = shieldConfig;
-				break;
-			}
+			if (shieldConfig.shieldLevel > shieldValue) continue;
+
+			config = shieldConfig;
+			break;
 		}
 
 		crownSpriteRenderer.gameObject.SetActive(true);
