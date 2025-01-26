@@ -41,14 +41,14 @@ namespace Ui
             var gameController = GameController.Instance;
             bool isPushed = false;
 
-            void OnActoinTrigged(UnityEngine.InputSystem.InputAction.CallbackContext context)
+            void OnActoinTrigged()
             {
                 isPushed = true;
             }
 
             for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
             {
-                gameController.GetPlayerInput(idx).onActionTriggered += OnActoinTrigged;
+                gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction += OnActoinTrigged;
             }
 
             while (!isPushed)
@@ -61,12 +61,12 @@ namespace Ui
             // コールバック解除
             for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
             {
-                gameController.GetPlayerInput(idx).onActionTriggered -= OnActoinTrigged;
+                gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction -= OnActoinTrigged;
             }
 
             // 次のシーンへ
 
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("PlayerSelect", 1.0f, 0.5f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
         }
         #endregion
     }

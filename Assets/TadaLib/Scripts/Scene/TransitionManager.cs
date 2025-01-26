@@ -62,19 +62,29 @@ namespace TadaLib.Scene
             };
             unloadScenes.AddRange(_reloadTargetScenes);
 
-            Scenes.UnloadScenesAsync(unloadScenes.ToArray());
+            var unloadScene = Scenes.UnloadScenesAsync(unloadScenes.ToArray());
+            await UniTask.Yield();
+            while (!unloadScene.IsDone)
+            {
+                await UniTask.Yield();
+            }
             //await Scenes.UnloadScenesAsync(unloadScenes.ToArray()).ToUniTask();
-            await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+
+            //await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
 
             var loadScenes = new List<string>();
             loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
             loadScenes.Add(nextScene);
 
-            Scenes.LoadScenesAsync(loadScenes.ToArray());
-
-            await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+            //await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
 
             //await Scenes.LoadScenesAsync(loadScenes.ToArray()).ToUniTask();
+            var loadScene = Scenes.LoadScenesAsync(loadScenes.ToArray());
+            await UniTask.Yield();
+            while (!loadScene.IsDone)
+            {
+                await UniTask.Yield();
+            }
 
             // nextScene を activeScene にする (メインはこれなので)
             UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.GetSceneByName(nextScene));
