@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1454391159777844493}
   - component: {fileID: 3999047945997374208}
-  - component: {fileID: 2947287036637578069}
   m_Layer: 0
   m_Name: PlayerSebTesting
   m_TagString: Untagged
@@ -60,7 +59,7 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2947287036637578069}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: Move
         m_Mode: 0
@@ -77,7 +76,7 @@ MonoBehaviour:
       Wireless Gamepad/hat,/Nintendo Wireless Gamepad1/hat,/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2947287036637578069}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
         m_MethodName: DoAction
         m_Mode: 0
@@ -103,16 +102,3 @@ MonoBehaviour:
   m_DefaultActionMap: Game
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &2947287036637578069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 724168241555381464}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e97217e5b2f84648862ade2e79f78a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerInput: {fileID: 3999047945997374208}

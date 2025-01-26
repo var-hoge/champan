@@ -1,24 +1,45 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BobbleGenerator : MonoBehaviour
 {
-    [SerializeField] private int _numOfBubble = 6;
-    [SerializeField] private GameObject _bubblePrafab;
+	[SerializeField] private int _numOfBubble = 6;
+	[SerializeField] private GameObject _bubblePrafab;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        for (var n = 0; n < _numOfBubble; ++n)
-        {
-            var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
-            var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
-            bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
-        }
-    }
+	void Start()
+	{
+		List<Bubble> bubbles = new();
+		for (var n = 0; n < _numOfBubble; ++n)
+		{
+			var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
+			var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
+			bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
+			bubbles.Add(bubble.GetComponent<Bubble>());
+		}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
+		Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
+	}
+
+	private void TeleportCrown()
+	{
+		Debug.Log($"TeleportCrown");
+
+		if (Bubble.CrownShieldValue == 0)
+		{
+			// TODO: Game won by player, how to detect the player?
+		}
+
+		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
+
+		List<Bubble> bubbles = (FindObjectsByType(typeof(Bubble), FindObjectsSortMode.None) as Bubble[]).ToList();
+		if (bubbles.Contains(Bubble.CrownBubble))
+		{
+			bubbles.Remove(Bubble.CrownBubble);
+		}
+
+		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
+		Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
+	}
 }

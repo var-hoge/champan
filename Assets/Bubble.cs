@@ -1,51 +1,45 @@
 using UnityEngine;
-using TadaLib.ActionStd;
-using System.Linq;
 using System.Collections;
+using System;
+using TadaLib.ActionStd;
 
 public class Bubble : MonoBehaviour
 {
-	[System.Serializable]
+	[Serializable]
 	private struct BubbleShieldConfig
 	{
 		public int shieldLevel;
-		public int probability;
 		public Sprite sprite;
 	}
 
+	public static Bubble CrownBubble { get; set; }
+	public static int CrownShieldValue { get; private set; } = 4; // TODO: Make it exportable
+
 	private const float BurstTime = 5f;
+
+	public Action OnDestroyEvent;
 
 	[Header("Configurations")]
 	[SerializeField] private BubbleShieldConfig[] shieldConfigs;
 
 	[Header("References")]
 	[SerializeField] private SpriteRenderer shieldSpriteRenderer;
+	[SerializeField] private SpriteRenderer crownSpriteRenderer;
 
 	private float _burstTimer = BurstTime;
 	private bool _hasRidden = false;
 	private MoveInfoCtrl _moveInfoCtrl = null;
-	private BubbleShieldConfig currentShieldConfig;
-	private int currentShieldValue;
+
+	private bool HasCrown => CrownBubble == this;
 
 	void Start()
 	{
 		_moveInfoCtrl = GetComponent<MoveInfoCtrl>();
+	}
 
-		int totalProbability = shieldConfigs.Sum(x => x.probability);
-		int pickProbability = Random.Range(0, totalProbability + 1);
-		int progressProbablity = 0;
-		foreach (var shieldConfig in shieldConfigs)
-		{
-			progressProbablity += shieldConfig.probability;
-			if (pickProbability <= progressProbablity)
-			{
-				currentShieldConfig = shieldConfig;
-				break;
-			}
-		}
-
-		currentShieldValue = currentShieldConfig.shieldLevel;
-		UpdateShield();
+	void OnDestroy()
+	{
+		OnDestroyEvent?.Invoke();
 	}
 
 	void Update()
@@ -64,45 +58,67 @@ public class Bubble : MonoBehaviour
 
 		if (!isRiding && _hasRidden)
 		{
-			currentShieldValue--;
-
-			if (currentShieldValue == 0)
+			if (HasCrown)
 			{
+				CrownShieldValue--;
+
+				// TODO: Push back the player
+				// TODO: Update crown ownership
+
 				Destroy(gameObject);
 				return;
 			}
 
-			UpdateShield();
-
 			_burstTimer = BurstTime;
-			_hasRidden = false;
+
+			// TODO: Fix has it might be conflicting with other players currently ridding
+			_hasRidden = _moveInfoCtrl.RideObjects.Count > 0;
 		}
 	}
 
-	private void UpdateShield()
+	public static void SetupCrown(Bubble bubble)
 	{
-		if (currentShieldValue <= 0)
+		if (CrownBubble != null)
 		{
-			shieldSpriteRenderer.gameObject.SetActive(false);
-			return;
+			CrownBubble.RemoveCrown();
 		}
+
+		CrownBubble = bubble;
+
+		bubble.SetupCrown(CrownShieldValue);
+	}
+
+	private void RemoveCrown()
+	{
+		// TODO: If supporting bubble shield, reset original shield here
+
+		crownSpriteRenderer.gameObject.SetActive(false);
+		shieldSpriteRenderer.gameObject.SetActive(false);
+	}
+
+	private void SetupCrown(int shieldValue)
+	{
+		gameObject.name = "BubbleCrown";
 
 		BubbleShieldConfig config = default;
 		foreach (var shieldConfig in shieldConfigs)
 		{
-			if (shieldConfig.shieldLevel == currentShieldValue)
+			if (shieldConfig.shieldLevel == shieldValue)
 			{
 				config = shieldConfig;
 				break;
 			}
 		}
 
+		crownSpriteRenderer.gameObject.SetActive(true);
+
+		shieldSpriteRenderer.gameObject.SetActive(true);
 		shieldSpriteRenderer.sprite = config.sprite;
 	}
 
 	public void Init(float x)
 	{
-		GetComponent<Rigidbody2D>().AddForce(new Vector2(x, Random.Range(15f, 90f)));
+		GetComponent<Rigidbody2D>().AddForce(new Vector2(x, UnityEngine.Random.Range(15f, 90f)));
 		StartCoroutine(EnableAnimation());
 	}
 
