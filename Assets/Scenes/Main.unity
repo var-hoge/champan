@@ -289,6 +289,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1196567346848327988, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 931359185589539332, guid: 0a8e22c1ffb604e4e924a95e244eba17, type: 3}
+    - target: {fileID: 3840975501573888102, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.61
+      objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
       value: 3
@@ -601,6 +609,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1196567346848327988, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 6679715460405503824, guid: 3750edd6fa48ea44689951ead5bb253b, type: 3}
+    - target: {fileID: 3840975501573888102, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.57
+      objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
       value: 1
@@ -665,6 +681,14 @@ PrefabInstance:
     - target: {fileID: 315043585835928836, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1196567346848327988, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3998685992907457791, guid: bb48b94082b461646a7787087b71f4f0, type: 3}
+    - target: {fileID: 3840975501573888102, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
