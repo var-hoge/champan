@@ -75,9 +75,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 6804539369617127628, guid: 16fcb7dc4e4c8164f85ac97d9709d0b8, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -234,6 +234,7 @@ MonoBehaviour:
     sprite: {fileID: -9130454481438517008, guid: e0405c6dce80e4340a461a541b3f2f14, type: 3}
   shieldSpriteRenderer: {fileID: 1809511879503199091}
   crownSpriteRenderer: {fileID: 5886293441360645613}
+  amplitude: 0.01
 --- !u!58 &2450477418945135004
 CircleCollider2D:
   m_ObjectHideFlags: 0
