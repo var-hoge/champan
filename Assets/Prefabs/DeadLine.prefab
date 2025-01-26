@@ -150,6 +150,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _respawnBubble: {fileID: 4435710263520774272, guid: 07961593aafa7624ba705d346c53ce80, type: 3}
   _bubble: {fileID: 6788831757223927687, guid: 3c36c27af2c81604390aa104daf23241, type: 3}
+  _BGMVolumeRate: 0.7
+  bubbleCountMin: 2
+  bubbleCountMax: 5
 --- !u!114 &9144701047376943238
 MonoBehaviour:
   m_ObjectHideFlags: 0
