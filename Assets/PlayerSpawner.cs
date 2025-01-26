@@ -1,6 +1,7 @@
 using UnityEngine;
 using TadaLib.ActionStd;
 using KanKikuchi.AudioManager;
+using System.Collections.Generic;
 
 public class PlayerSpawner : MonoBehaviour
 {
@@ -9,6 +10,24 @@ public class PlayerSpawner : MonoBehaviour
     [SerializeField] Bubble _bubble = null;
     private MoveInfoCtrl _moveInfoCtrl = null;
     [SerializeField] float _BGMVolumeRate = 0.7f;
+
+    private List<string> _SEPath = null;
+    private List<string> SEPath
+    {
+        get
+        {
+            if (_SEPath == null)
+            {
+                _SEPath = new();
+                for (var n = 1; n <= 9; ++n)
+                {
+                    var headNum = n < 10 ? "0" : null;
+                    _SEPath.Add($"SE/Player Death/Player_Death_{headNum}{n}");
+                }
+            }
+            return _SEPath;
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,6 +41,9 @@ public class PlayerSpawner : MonoBehaviour
     {
         foreach (var player in _moveInfoCtrl.RideObjects)
         {
+            var path = SEPath[Random.Range(0, SEPath.Count)];
+            SEManager.Instance.Play(path, 20f);
+
             // respawn player
             var camera = Camera.main;
             var topRight = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, camera.nearClipPlane));
