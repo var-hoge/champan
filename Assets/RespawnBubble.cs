@@ -1,3 +1,5 @@
+using KanKikuchi.AudioManager;
+using System.Collections.Generic;
 using TadaLib.Input;
 using UnityEngine;
 
@@ -8,6 +10,24 @@ public class RespawnBubble : MonoBehaviour
     private float _burstTimer = BurstTime;
 
     private const float BurstTime = 5f;
+
+    private List<string> _SEPath = null;
+    private List<string> SEPath
+    {
+        get
+        {
+            if (_SEPath == null)
+            {
+                _SEPath = new();
+                for (var n = 1; n <= 9; ++n)
+                {
+                    var headNum = n < 10 ? "0" : null;
+                    _SEPath.Add($"SE/Player Respawn/Player_Respawn_{headNum}{n}");
+                }
+            }
+            return _SEPath;
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -32,6 +52,8 @@ public class RespawnBubble : MonoBehaviour
 
         if (_burstTimer < 0)
         {
+            var path = SEPath[Random.Range(0, SEPath.Count)];
+            SEManager.Instance.Play(path, 20f);
             _player.position = transform.position;
             Destroy(gameObject);
         }
