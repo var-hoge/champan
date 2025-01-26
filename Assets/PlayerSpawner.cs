@@ -8,12 +8,13 @@ public class PlayerSpawner : MonoBehaviour
     private RespawnBubble _respawnBubble = null;
     [SerializeField] Bubble _bubble = null;
     private MoveInfoCtrl _moveInfoCtrl = null;
+    [SerializeField] float _BGMVolumeRate = 0.7f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
-        BGMManager.Instance.Play(BGMPath.FIGHT);
+        BGMManager.Instance.Play(BGMPath.FIGHT, _BGMVolumeRate);
     }
 
     // Update is called once per frame

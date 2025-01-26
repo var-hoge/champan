@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.ActionStd;
 using TadaLib.Input;
 using TadaLib.Extension;
+using KanKikuchi.AudioManager;
 
 namespace Scripts.Actor.Player.State
 {
@@ -68,6 +69,10 @@ namespace Scripts.Actor.Player.State
         // ステートが始まった時に呼ばれるメソッド
         public override void OnStart()
         {
+            // SE再生
+            var path = SEPath[Random.Range(0, SEPath.Count)];
+            SEManager.Instance.Play(path, 2f);
+
             var animator = obj.GetComponent<Animator>();
             //animator.Play("Jump");
             //animator.SetBool("IsGround", false);
@@ -155,6 +160,24 @@ namespace Scripts.Actor.Player.State
 
         [SerializeField]
         AudioClip _jumpSe;
+
+        private List<string> _SEPath = null;
+        private List<string> SEPath
+        {
+            get
+            {
+                if (_SEPath == null)
+                {
+                    _SEPath = new();
+                    for (var n = 1; n <=16; ++n)
+                    {
+                        var headNum = n < 10 ? "0" : null;
+                        _SEPath.Add($"SE/Player Jump/Player_Jump_{headNum}{n}");
+                    }
+                }
+                return _SEPath;
+            }
+        }
         #endregion
     }
 }
