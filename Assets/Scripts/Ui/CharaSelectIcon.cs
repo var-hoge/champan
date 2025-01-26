@@ -21,33 +21,39 @@ namespace Ui
         #endregion
 
         #region メソッド
-        private void Start()
+        public void Setup(CharaSelectUiManager manager, int charaIdx)
         {
-            _charaIdx = CharaSelectUiManager.PlayerUseCharaIdList[_playerIdx];
-
-            GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered += OnAction;
-        }
-
-        private void OnDestroy()
-        {
-            GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered -= OnAction;
+            _manager = manager;
+            _charaIdx = charaIdx;
+            GetComponent<RectTransform>().position = _manager.GetPickIconTransform(_playerIdx, _charaIdx).position;
+            GetComponent<RectTransform>().rotation = _manager.GetPickIconTransform(_playerIdx, _charaIdx).rotation;
         }
         #endregion
 
         #region privateフィールド
-        [SerializeField]
         CharaSelectUiManager _manager;
 
         [SerializeField]
         int _playerIdx = 0;
 
         int _charaIdx = 0;
+
+        float _moveInputValuePrev = 0.0f;
         #endregion
 
         #region privateメソッド
-        void OnMove(UnityEngine.InputSystem.InputAction.CallbackContext context)
+        void OnMove(Vector2 value)
         {
-            var value = context.ReadValue<Vector2>();
+            // 入力開始時だけ受け付ける
+            if ((value.x > 0.5f && _moveInputValuePrev > 0.5) ||
+                    (value.x < -0.5f && _moveInputValuePrev < -0.5f))
+            {
+                // 同じ
+                return;
+            }
+
+            _moveInputValuePrev = value.x;
+
             // 入力値が少ない場合はなし
             if (Mathf.Abs(value.x) < 0.5f)
             {
@@ -69,17 +75,45 @@ namespace Ui
 
             // TODO: 埋まってた場合はさらに移動する
             // TODO: 同じキャラの場合は動けない演出を加える
+            if (_charaIdx != nextCharaIdx)
+            {
+                _charaIdx = nextCharaIdx;
+                GetComponent<RectTransform>().DOKill();
+                GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _charaIdx).position, 0.2f);
+                GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _charaIdx).eulerAngles, 0.2f);
+            }
         }
 
-        void OnAction(UnityEngine.InputSystem.InputAction.CallbackContext context)
+        void OnAction()
         {
-            if(!_manager.NotifySelect(_playerIdx, _charaIdx))
+            if (!_manager.NotifySelect(_playerIdx, _charaIdx))
             {
                 // 選べなかった
                 return;
             }
 
             // 決定
+        }
+
+        private void Start()
+        {
+            _charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
+
+            GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnAction += OnAction;
+            GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnMove += OnMove;
+            //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered += OnAction;
+        }
+
+        private void OnDestroy()
+        {
+            var gameController = GameController.Instance;
+            if (gameController == null)
+            {
+                return;
+            }
+            gameController.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnAction -= OnAction;
+            gameController.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnMove -= OnMove;
+            //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered -= OnAction;
         }
         #endregion
     }
