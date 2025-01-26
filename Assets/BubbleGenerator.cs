@@ -11,7 +11,8 @@ public class BobbleGenerator : MonoBehaviour
         for (var n = 0; n < _numOfBubble; ++n)
         {
             var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
-            Instantiate(_bubblePrafab, position, Quaternion.identity);
+            var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
+            bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
         }
     }
 

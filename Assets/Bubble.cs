@@ -1,6 +1,7 @@
 using UnityEngine;
 using TadaLib.ActionStd;
 using System.Linq;
+using System.Collections;
 
 public class Bubble : MonoBehaviour
 {
@@ -97,5 +98,17 @@ public class Bubble : MonoBehaviour
 		}
 
 		shieldSpriteRenderer.sprite = config.sprite;
+	}
+
+	public void Init(float x)
+	{
+		GetComponent<Rigidbody2D>().AddForce(new Vector2(x, Random.Range(15f, 90f)));
+		StartCoroutine(EnableAnimation());
+	}
+
+	private IEnumerator EnableAnimation()
+	{
+		yield return new WaitForSeconds(5f);
+		GetComponent<BubbleAnimator>().AnimationEnabled = true;
 	}
 }
