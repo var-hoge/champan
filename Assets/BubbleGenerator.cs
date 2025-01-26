@@ -1,3 +1,4 @@
+using KanKikuchi.AudioManager;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class BobbleGenerator : MonoBehaviour
 	private void TeleportCrown()
 	{
 		Debug.Log($"TeleportCrown");
+		SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
 
 		if (Bubble.CrownShieldValue == 0)
 		{
