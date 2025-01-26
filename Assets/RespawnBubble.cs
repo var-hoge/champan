@@ -1,4 +1,6 @@
 using KanKikuchi.AudioManager;
+using Scripts.Actor;
+using Scripts.Actor.Player;
 using System.Collections.Generic;
 using TadaLib.Input;
 using UnityEngine;
@@ -55,6 +57,7 @@ public class RespawnBubble : MonoBehaviour
             var path = SEPath[Random.Range(0, SEPath.Count)];
             SEManager.Instance.Play(path, 20f);
             _player.position = transform.position;
+            _player.GetComponent<MoveCtrl>().SetVelocityForce(Vector3.zero);
             Destroy(gameObject);
         }
     }
@@ -64,5 +67,9 @@ public class RespawnBubble : MonoBehaviour
         _player = player.transform;
         var x = Random.Range(0f, 10f) * Mathf.Sign(_player.position.x) * -1;
         _rb.AddForce(new(x, -10));
+        _body.sprite = CharacterManager.Instance.GetCharaImage(_player.GetComponent<DataHolder>().CharaIdx);
     }
+
+    [SerializeField]
+    SpriteRenderer _body;
 }

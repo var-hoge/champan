@@ -6,14 +6,14 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
-using Scripts.Actor.Player;
+using Ui;
 
-namespace TadaLib.ActionStd
+namespace Scripts.Actor.Player
 {
     /// <summary>
-    /// PlayerRegistorator
+    /// CharaCtrl
     /// </summary>
-    public class PlayerRegistorator
+    public class CharaCtrl
         : MonoBehaviour
     {
         #region プロパティ
@@ -25,23 +25,22 @@ namespace TadaLib.ActionStd
         #region MonoBehavior の実装
         void Start()
         {
-#if UNITY_EDITOR
-            if (PlayerManager.Instance is null)
-            {
-                Assert.IsTrue(false, "PlayerManagerのGameObjectがシーン内にありません。");
-                return;
-            }
-#endif
-            PlayerManager.RegisterPlayer(gameObject, _number);
+            var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerNumber);
+            _body.sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
 
-            GetComponent<DataHolder>().PlayerIdx = _number;
+            _body.transform.localPosition = _offsets[charaIdx];
         }
         #endregion
 
         #region privateフィールド
         [SerializeField]
-        [Header("プレイヤーID")]
-        int _number = 0;
+        int _playerNumber = 0;
+
+        [SerializeField]
+        SpriteRenderer _body;
+
+        [SerializeField]
+        List<Vector3> _offsets;
         #endregion
 
         #region privateメソッド

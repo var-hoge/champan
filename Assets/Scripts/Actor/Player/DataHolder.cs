@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.Input;
 using TadaLib.Extension;
+using Ui;
 
 namespace Scripts.Actor.Player
 {
@@ -20,6 +21,8 @@ namespace Scripts.Actor.Player
         public Vector3 LastLandingPos { get; set; } = Vector3.zero;
         public Vector3 FaceVec { get; set; } = Vector3.right;
         public Vector2 Velocity { get; set; } = Vector3.zero;
+        public int CharaIdx => CharaSelectUiManager.PlayerUseCharaIdList(PlayerIdx);
+        public int PlayerIdx { get; set; } = 0;
         #endregion
 
         #region メソッド
