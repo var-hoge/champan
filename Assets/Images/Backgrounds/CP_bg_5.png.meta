@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 16fcb7dc4e4c8164f85ac97d9709d0b8
+guid: ad1522ad1bbf0404eb366faa7492609b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6804539369617127628
-    second: CP_bub_inline_2_0
+      213: -3481100731991514838
+    second: CP_bg_5_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CP_bub_inline_2_0
+      name: CP_bg_5_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 256
-        height: 256
+        width: 1920
+        height: 1080
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cc8703231849e6e50800000000000000
-      internalID: 6804539369617127628
+      spriteID: a212b42f355a0bfc0800000000000000
+      internalID: -3481100731991514838
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 3a812c9400b9b2443b38b44512913d34
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -134,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      CP_bub_inline_2_0: 6804539369617127628
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
