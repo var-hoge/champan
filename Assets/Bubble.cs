@@ -21,15 +21,22 @@ public class Bubble : MonoBehaviour
 	[Header("References")]
 	[SerializeField] private SpriteRenderer shieldSpriteRenderer;
 
+	[Header("Amplitude")]
+	[SerializeField] private float amplitude = 0.01f;
+
 	private float _burstTimer = BurstTime;
 	private bool _hasRidden = false;
 	private MoveInfoCtrl _moveInfoCtrl = null;
 	private BubbleShieldConfig currentShieldConfig;
 	private int currentShieldValue;
+	private Transform visualRoot;
+	private bool _vibrating = false;
+	private IEnumerator _vibrateCoroutine = null;
 
 	void Start()
 	{
 		_moveInfoCtrl = GetComponent<MoveInfoCtrl>();
+		visualRoot = transform.Find("VisualRoot").transform;
 
 		int totalProbability = shieldConfigs.Sum(x => x.probability);
 		int pickProbability = Random.Range(0, totalProbability + 1);
@@ -56,10 +63,27 @@ public class Bubble : MonoBehaviour
 			_hasRidden = true;
 			_burstTimer -= Time.deltaTime;
 
+			if (_burstTimer < 1.5
+				&& !_vibrating)
+            {
+				_vibrateCoroutine = Vibrate();
+				StartCoroutine(_vibrateCoroutine);
+				_vibrating = true;
+			}
+
 			if (_burstTimer < 0)
 			{
 				Destroy(gameObject);
 			}
+		}
+		else 
+        {
+			if (_vibrateCoroutine != null)
+            {
+				StopCoroutine(_vibrateCoroutine);
+				_vibrateCoroutine = null;
+			}
+			_burstTimer = BurstTime;
 		}
 
 		if (!isRiding && _hasRidden)
@@ -78,6 +102,17 @@ public class Bubble : MonoBehaviour
 			_hasRidden = false;
 		}
 	}
+
+	private IEnumerator Vibrate()
+    {
+		var sign = 1f;
+		while (true)
+        {
+			yield return new WaitForSeconds(0.03f);
+			visualRoot.localPosition = new(amplitude * sign, 0, 0);
+			sign *= -1;
+		}
+    }
 
 	private void UpdateShield()
 	{
