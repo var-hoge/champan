@@ -32,10 +32,16 @@ namespace Ui
             }
 
             // プレイヤーの頭上に移動させる
+            var screenPos = Camera.main.WorldToScreenPoint(player.transform.position);
+            //var uiPos = GetComponent<RectTransform>().InverseTransformPoint(screenPos);
+
+            GetComponent<RectTransform>().position = screenPos + Vector3.up * 175.0f;
         }
         #endregion
 
         #region privateフィールド
+        [SerializeField]
+        Canvas _canvas;
         [SerializeField]
         int _playerNumber = 0;
         #endregion
