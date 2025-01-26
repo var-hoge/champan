@@ -278,9 +278,9 @@ MonoBehaviour:
   _stateJump:
     _jumpPowerArray:
     - 18
-    - 22
+    - 15
     - 24
-    _gravityIgnoreMaxSec: 0.5
+    _gravityIgnoreMaxSec: 0.15
     _jumpEffectPrefab: {fileID: 0}
     _jumpSe: {fileID: 0}
   _stateFall:
@@ -310,11 +310,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a634ca68fd40a1c48a767ef69775ab1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxVelocity: {x: 14, y: 24}
-  _accelX: 37
-  _decelX: 94
-  _accelAirX: 28
-  _decelAirX: 55
+  _maxVelocity: {x: 11, y: 24}
+  _accelX: 30
+  _decelX: 90
+  _accelAirX: 30
+  _decelAirX: 60
   _gravity: -51
   _decelGravity: 55
 --- !u!114 &4084096041492405670
