@@ -98,13 +98,15 @@ namespace Ui
             {
                 SceneChange().Forget();
             }
-
-            // 同じcharacterを選択しているカーソルがある場合は別に移す
-            foreach (var cursor in _charaSelectIcons)
+            else
             {
-                if (cursor != null && cursor.SelectIdx == selectIdx)
+                // 同じcharacterを選択しているカーソルがある場合は別に移す
+                foreach (var cursor in _charaSelectIcons)
                 {
-                    cursor.ForceMove(true);
+                    if (cursor != null && cursor.SelectIdx == selectIdx)
+                    {
+                        cursor.ForceMove(true);
+                    }
                 }
             }
 

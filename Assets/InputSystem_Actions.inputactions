@@ -60,6 +60,39 @@
                 },
                 {
                     "name": "2D Vector",
+                    "id": "22c03d1a-2525-4644-a827-82ff55cd4d2b",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "left",
+                    "id": "210137c7-5549-476a-b891-64327bbf2043",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "a94ac841-18ba-463f-8227-9f45196e1628",
+                    "path": "<Keyboard>/6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "2D Vector",
                     "id": "d7be8f42-9d1b-45f2-a356-d244532887cc",
                     "path": "2DVector",
                     "interactions": "",
@@ -172,6 +205,28 @@
                     "name": "",
                     "id": "4b62ba10-f88b-4a16-be53-b85642c906a8",
                     "path": "<Keyboard>/numpad8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "496eb85e-8f22-4484-b106-1ca1bedfd17d",
+                    "path": "<Keyboard>/8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c8bf1f2d-ec55-4acb-8cca-f02c0edccd0d",
+                    "path": "<Keyboard>/5",
                     "interactions": "",
                     "processors": "",
                     "groups": ";8456",
