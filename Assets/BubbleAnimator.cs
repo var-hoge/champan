@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class BubbleAnimator : MonoBehaviour
+public class BubbleAnimator
+	: TadaLib.ProcSystem.BaseProc
+	, TadaLib.ProcSystem.IProcMove
 {
 	[SerializeField] private float minSpeed;
 	[SerializeField] private float maxSpeed;
@@ -35,7 +37,7 @@ public class BubbleAnimator : MonoBehaviour
 		distanceY = Random.Range(minDistance, maxDistance);
 	}
 
-	private void Update()
+	public void OnMove()
 	{
 		if (!AnimationEnabled)
         {
