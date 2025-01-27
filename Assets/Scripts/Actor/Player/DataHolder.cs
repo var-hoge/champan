@@ -25,6 +25,8 @@ namespace Scripts.Actor.Player
         public int PlayerIdx { get; set; } = 0;
         public Vector3 DummyPlayerPos { get; set; } = Vector3.zero;
         public bool IsValidDummyPlayerPos { get; set; } = false;
+
+        //public Bubble LastLandingBubble { get; set; } = null;
         #endregion
 
         #region メソッド
@@ -40,6 +42,14 @@ namespace Scripts.Actor.Player
         /// </summary>
         public void OnPostMove()
         {
+            //Bubble ridingBubble = null;
+            //var ridingMover = GetComponent<TadaLib.ActionStd.TadaRigidbody2D>().RidingMover;
+            //if (ridingMover != null)
+            //{
+            //    ridingMover.TryGetComponent<Bubble>(out ridingBubble);
+            //}
+            //LastLandingBubble = ridingBubble;
+
             if (GetComponent<TadaLib.ActionStd.TadaRigidbody2D>().IsGround)
             {
                 NoGroundDurationSec = 0.0f;
@@ -53,6 +63,7 @@ namespace Scripts.Actor.Player
             Velocity = GetComponent<MoveCtrl>().Velocity;
 
             IsJumpStartFrame = false;
+
         }
         #endregion
 

@@ -74,7 +74,7 @@ public class RespawnBubble : MonoBehaviour
     {
         _player = player.transform;
         var x = Random.Range(0f, 10f) * Mathf.Sign(_player.position.x) * -1;
-        _rb.AddForce(new(x, -10));
+        _rb.AddForce(new(x, -15));
         _body.sprite = CharacterManager.Instance.GetCharaImage(_player.GetComponent<DataHolder>().CharaIdx);
     }
 

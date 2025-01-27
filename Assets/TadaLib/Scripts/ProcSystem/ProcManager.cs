@@ -68,6 +68,11 @@ namespace TadaLib.ProcSystem
                 (proc as IProcMove)?.OnMove();
             }
 
+            foreach (var proc in _procManagerList[ManagerProcSection.BeforePhysicsMove])
+            {
+                proc.OnUpdate();
+            }
+
             foreach (var proc in _procListForUpdate)
             {
                 (proc as IProcPhysicsMove)?.OnPhysicsMove();

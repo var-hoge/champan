@@ -69,6 +69,13 @@ namespace Scripts.Actor.Player.State
         // ステートが始まった時に呼ばれるメソッド
         public override void OnStart()
         {
+            //// 最後に乗っていたバブルを割る
+            //var lastLandingBubble = obj.GetComponent<DataHolder>().LastLandingBubble;
+            //if (lastLandingBubble != null)
+            //{
+            //    lastLandingBubble.DoBurst(obj.GetComponent<DataHolder>().PlayerIdx);
+            //}
+
             // SE再生
             var path = SEPath[Random.Range(0, SEPath.Count)];
             SEManager.Instance.Play(path, 2f);

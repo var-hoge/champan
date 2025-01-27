@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.Extension;
+using Scripts.Actor.Player;
 
 namespace TadaLib.ActionStd
 {
@@ -60,6 +61,11 @@ namespace TadaLib.ActionStd
                 return _groundInfo;
             }
         }
+
+        /// <summary>
+        /// 乗っている地形
+        /// </summary>
+        public MoveInfoCtrl RidingMover => _ridingMover;
 
         #endregion
 

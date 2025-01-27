@@ -53,6 +53,13 @@ public class Bubble : MonoBehaviour
     public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
     private bool HasCrown => CrownBubble == this;
 
+    // Bust bubble
+    public void DoBurst(int playerIdx)
+    {
+        LastCrownRidePlayerIdx = playerIdx;
+        BurstImpl();
+    }
+
     void Start()
     {
         _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
@@ -88,6 +95,7 @@ public class Bubble : MonoBehaviour
             {
                 LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<DataHolder>().PlayerIdx;
             }
+
             _burstTimer -= Time.deltaTime;
             _hasRidden = true;
 
@@ -100,20 +108,13 @@ public class Bubble : MonoBehaviour
 
             if (_burstTimer < 0)
             {
-                Destroy(gameObject);
+                BurstImpl();
             }
         }
 
         if ((!isRiding && _hasRidden) || losingRider)
         {
-            if (HasCrown)
-            {
-                CrownShieldValue--;
-
-                // TODO: Push back the player
-            }
-
-            Destroy(gameObject);
+            BurstImpl();
         }
 
         // prevent bubble from staying at the bottom of the screen
@@ -202,5 +203,16 @@ public class Bubble : MonoBehaviour
         yield return new WaitForSeconds(5f);
         GetComponent<BubbleAnimator>().AnimationEnabled = true;
         IsSpawning = false;
+    }
+
+    private void BurstImpl()
+    {
+        if (HasCrown)
+        {
+            CrownShieldValue--;
+
+            // TODO: Push back the player
+        }
+        Destroy(gameObject);
     }
 }
