@@ -48,7 +48,7 @@ public class Bubble : MonoBehaviour
 	private IEnumerator _vibrateCoroutine = null;
 	private int currentRiders;
 
-	public static int LastRidePlayerIdx = 0;
+	public static int LastCrownRidePlayerIdx = 0;
 
 	public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
 	private bool HasCrown => CrownBubble == this;
@@ -84,7 +84,10 @@ public class Bubble : MonoBehaviour
 		var isRiding = _moveInfoCtrl.IsRiding();
 		if (isRiding)
 		{
-			LastRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<DataHolder>().PlayerIdx;
+			if (HasCrown)
+			{
+				LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<DataHolder>().PlayerIdx;
+			}
 			_burstTimer -= Time.deltaTime;
 			_hasRidden = true;
 

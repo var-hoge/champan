@@ -36,7 +36,7 @@ namespace Scripts
         #region メソッド
         public void GameOver()
         {
-            WinnerPlayerIdx = Bubble.LastRidePlayerIdx;
+            WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
             _gameEndUi.GameEnd(GetComponent<SimpleAnimation>()).Forget();
         }
         #endregion

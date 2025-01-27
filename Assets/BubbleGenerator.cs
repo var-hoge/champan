@@ -32,7 +32,7 @@ public class BobbleGenerator : MonoBehaviour
 
 		if (Bubble.CrownShieldValue == 0)
 		{
-			GameSequenceManager.WinnerPlayerIdx = Bubble.LastRidePlayerIdx;
+			GameSequenceManager.WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
 			GameSequenceManager.Instance.GameOver();
 			return;
 		}
