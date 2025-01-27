@@ -44,6 +44,8 @@ public class PlayerSpawner : MonoBehaviour
 	{
 		foreach (var player in _moveInfoCtrl.RideObjects)
 		{
+			player.GetComponent<Scripts.Actor.Player.DataHolder>().IsDead = true;
+
 			var path = SEPath[Random.Range(0, SEPath.Count)];
 			SEManager.Instance.Play(path, 20f);
 

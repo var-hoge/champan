@@ -23,6 +23,8 @@ namespace Scripts.Actor.Player
         public Vector2 Velocity { get; set; } = Vector3.zero;
         public int CharaIdx => CharaSelectUiManager.PlayerUseCharaIdList(PlayerIdx);
         public int PlayerIdx { get; set; } = 0;
+        public Vector3 DummyPlayerPos { get; set; } = Vector3.zero;
+        public bool IsValidDummyPlayerPos { get; set; } = false;
         #endregion
 
         #region メソッド

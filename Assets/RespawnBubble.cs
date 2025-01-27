@@ -45,6 +45,11 @@ public class RespawnBubble : MonoBehaviour
             return;
         }
 
+        var playerDataHolder = _player.GetComponent<DataHolder>();
+
+        playerDataHolder.IsValidDummyPlayerPos = true;
+        playerDataHolder.DummyPlayerPos = transform.position;
+
         _burstTimer -= Time.deltaTime;
 
         var force = Time.deltaTime * 10f;
@@ -54,6 +59,9 @@ public class RespawnBubble : MonoBehaviour
 
         if (_burstTimer < 0)
         {
+            playerDataHolder.IsDead = true;
+            playerDataHolder.IsValidDummyPlayerPos = false;
+
             var path = SEPath[Random.Range(0, SEPath.Count)];
             SEManager.Instance.Play(path, 20f);
             _player.position = transform.position;
