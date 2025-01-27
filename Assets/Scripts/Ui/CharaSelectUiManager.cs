@@ -40,23 +40,36 @@ namespace Ui
         #endregion
 
         #region メソッド
-        public RectTransform GetPickIconTransform(int playerIdx, int charaIdx)
+        public RectTransform GetPickIconTransform(int playerIdx, int selectIdx)
         {
-            return _charas[charaIdx].GetChild(playerIdx + 1).GetComponent<RectTransform>();
+            return _charas[selectIdx].GetChild(playerIdx + 1).GetComponent<RectTransform>();
         }
 
-        public bool NotifySelect(int playerIdx, int charaIdx)
+        public bool NotifySelect(int playerIdx, int selectIdx)
         {
             // すでに使われていたらダメ
-            if (_isUsedList[charaIdx])
+            if (_isUsedList[selectIdx])
             {
                 return false;
             }
 
-            // 使用済みにする
-            _isUsedList[charaIdx] = true;
+            // キャラクター ID に変換
+            // @memo: キャラクターセレクト画面のキャラの並びが ID と一致していないので変換が必要
+            var charaIdx = selectIdx switch
+            {
+                0 => 0,
+                1 => 3,
+                2 => 1,
+                3 => 2,
+                _ => throw new System.Exception()
+            };
 
-            // TODO: 使用済み演出
+            // キャラクター決定
+            _playerUseCharaIdList[playerIdx] = charaIdx;
+
+            // 使用済みにする
+            _isUsedList[selectIdx] = true;
+
             Destroy(_charaSelectIcons[playerIdx].gameObject);
 
             var sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
@@ -65,7 +78,6 @@ namespace Ui
             _charaPickedIcons[playerIdx].rectTransform.localScale = Vector3.one * 0.6f;
             _charaPickedIcons[playerIdx].rectTransform.localEulerAngles = new Vector3(0.0f, 0.0f, 25.0f);
             _charaPickedIcons[playerIdx].GetComponent<RectTransform>().DOPunchScale(Vector3.one * 2.0f, 0.1f);
-
 
             var isAllUsed = !_isUsedList.Any(a => !a);
 

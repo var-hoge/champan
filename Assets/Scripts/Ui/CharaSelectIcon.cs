@@ -21,12 +21,12 @@ namespace Ui
         #endregion
 
         #region メソッド
-        public void Setup(CharaSelectUiManager manager, int charaIdx)
+        public void Setup(CharaSelectUiManager manager, int selectIdx)
         {
             _manager = manager;
-            _charaIdx = charaIdx;
-            GetComponent<RectTransform>().position = _manager.GetPickIconTransform(_playerIdx, _charaIdx).position;
-            GetComponent<RectTransform>().rotation = _manager.GetPickIconTransform(_playerIdx, _charaIdx).rotation;
+            _selectIdx = selectIdx;
+            GetComponent<RectTransform>().position = _manager.GetPickIconTransform(_playerIdx, _selectIdx).position;
+            GetComponent<RectTransform>().rotation = _manager.GetPickIconTransform(_playerIdx, _selectIdx).rotation;
         }
         #endregion
 
@@ -36,7 +36,7 @@ namespace Ui
         [SerializeField]
         int _playerIdx = 0;
 
-        int _charaIdx = 0;
+        int _selectIdx = 0;
 
         float _moveInputValuePrev = 0.0f;
         #endregion
@@ -60,33 +60,33 @@ namespace Ui
                 return;
             }
 
-            var nextCharaIdx = _charaIdx;
+            var nextSelectIdx = _selectIdx;
 
             if (value.x < -0.0f)
             {
                 // 左に進む
-                nextCharaIdx = (_charaIdx - 1 + _manager.CharaMaxCount) % _manager.CharaMaxCount;
+                nextSelectIdx = (_selectIdx - 1 + _manager.CharaMaxCount) % _manager.CharaMaxCount;
             }
             else // (value.x > 0.0f)
             {
                 // 右に進む
-                nextCharaIdx = (_charaIdx + 1) % _manager.CharaMaxCount;
+                nextSelectIdx = (_selectIdx + 1) % _manager.CharaMaxCount;
             }
 
             // TODO: 埋まってた場合はさらに移動する
             // TODO: 同じキャラの場合は動けない演出を加える
-            if (_charaIdx != nextCharaIdx)
+            if (_selectIdx != nextSelectIdx)
             {
-                _charaIdx = nextCharaIdx;
+                _selectIdx = nextSelectIdx;
                 GetComponent<RectTransform>().DOKill();
-                GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _charaIdx).position, 0.2f);
-                GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _charaIdx).eulerAngles, 0.2f);
+                GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
+                GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
             }
         }
 
         void OnAction()
         {
-            if (!_manager.NotifySelect(_playerIdx, _charaIdx))
+            if (!_manager.NotifySelect(_playerIdx, _selectIdx))
             {
                 // 選べなかった
                 return;
@@ -97,7 +97,7 @@ namespace Ui
 
         private void Start()
         {
-            _charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
+            _selectIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
 
             GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnAction += OnAction;
             GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnMove += OnMove;
