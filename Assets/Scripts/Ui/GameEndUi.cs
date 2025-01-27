@@ -24,7 +24,7 @@ namespace Ui
         #endregion
 
         #region メソッド
-        public async UniTask GameEnd()
+        public async UniTask GameEnd(SimpleAnimation animation)
         {
             GameSequenceManager.Instance.PhaseKind = GameSequenceManager.Phase.AfterBattle;
 
@@ -33,6 +33,7 @@ namespace Ui
 
             if (winCharaIdx == 3)
             {
+                // キャラと王冠が被らないようにする
                 _chara.rectTransform.localPosition += new Vector3(30.0f, -50.0f, 0.0f);
             }
 
@@ -40,46 +41,13 @@ namespace Ui
             var charaSprite = _charaSprites[winCharaIdx];
 
             _chara.sprite = charaSprite;
+            _chara.rectTransform.sizeDelta = charaSprite.textureRect.size;
             _background.sprite = goalUi.BackSprite;
             _description.sprite = goalUi.WinnerSprite;
 
-            _ = _canvas.DOFade(1.0f, 0.1f);
+            animation.Play("GameEnd");
 
-            _background.gameObject.SetActive(true);
-            _background.rectTransform.localPosition = Vector3.down * 10.0f;
-
-            _ = _background.rectTransform.DOLocalMoveY(0.0f, 0.1f);
-
-            await UniTask.WaitForSeconds(0.7f);
-
-            _chara.gameObject.SetActive(true);
-            _chara.rectTransform.sizeDelta = charaSprite.textureRect.size;
-
-            _crown.gameObject.SetActive(true);
-
-            _chara.color.SetAlpha(0.0f);
-            _crown.color.SetAlpha(0.0f);
-            _ = _chara.DOFade(1.0f, 2.2f);
-            _ = _crown.DOFade(1.0f, 2.2f);
-
-            var charaGoalPos = _chara.rectTransform.localPosition;
-            _chara.rectTransform.localPosition += Vector3.down * 50.0f;
-
-            _ = _chara.rectTransform.DOLocalMove(charaGoalPos, 0.5f);
-
-            var crownGoalPos = _crown.rectTransform.localPosition;
-            _chara.rectTransform.localPosition += Vector3.up * 50.0f;
-
-            _ = _crown.rectTransform.DOLocalMove(crownGoalPos, 0.5f);
-
-            await UniTask.WaitForSeconds(0.5f);
-
-            _description.gameObject.SetActive(true);
-            _description.rectTransform.localPosition = Vector3.down * 15.0f;
-
-            _ = _background.rectTransform.DOLocalMoveY(0.0f, 0.3f);
-
-            await UniTask.WaitForSeconds(10.0f);
+            await UniTask.WaitForSeconds(15.0f);
 
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.5f, 0.5f);
@@ -117,6 +85,15 @@ namespace Ui
         #endregion
 
         #region privateメソッド
+        private void Start()
+        {
+            // 全て初期化
+            _canvas.alpha = 0.0f;
+            _background.gameObject.SetActive(false);
+            _chara.gameObject.SetActive(false);
+            _crown.gameObject.SetActive(false);
+            _description.gameObject.SetActive(false);
+        }
         #endregion
     }
 }

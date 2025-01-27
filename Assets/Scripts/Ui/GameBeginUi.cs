@@ -31,6 +31,8 @@ namespace Ui
 
             // TODO: ガウシアンブラーをかける
 
+            _ = _canvas.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
+
             _canvas.gameObject.SetActive(true);
 
             _main.gameObject.SetActive(false);
@@ -43,7 +45,7 @@ namespace Ui
 
             _ = _background.rectTransform.DOLocalMoveY(0.0f, 0.1f);
 
-            await UniTask.WaitForSeconds(0.5f);
+            await UniTask.WaitForSeconds(1.0f);
 
             _main.gameObject.SetActive(true);
 
