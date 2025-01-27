@@ -18,6 +18,7 @@ namespace Ui
         : MonoBehaviour
     {
         #region プロパティ
+        public int SelectIdx => _selectIdx;
         #endregion
 
         #region メソッド
@@ -27,6 +28,11 @@ namespace Ui
             _selectIdx = selectIdx;
             GetComponent<RectTransform>().position = _manager.GetPickIconTransform(_playerIdx, _selectIdx).position;
             GetComponent<RectTransform>().rotation = _manager.GetPickIconTransform(_playerIdx, _selectIdx).rotation;
+        }
+
+        public void ForceMove(bool isRight)
+        {
+            MoveImpl(isRight);
         }
         #endregion
 
@@ -60,28 +66,7 @@ namespace Ui
                 return;
             }
 
-            var nextSelectIdx = _selectIdx;
-
-            if (value.x < -0.0f)
-            {
-                // 左に進む
-                nextSelectIdx = (_selectIdx - 1 + _manager.CharaMaxCount) % _manager.CharaMaxCount;
-            }
-            else // (value.x > 0.0f)
-            {
-                // 右に進む
-                nextSelectIdx = (_selectIdx + 1) % _manager.CharaMaxCount;
-            }
-
-            // TODO: 埋まってた場合はさらに移動する
-            // TODO: 同じキャラの場合は動けない演出を加える
-            if (_selectIdx != nextSelectIdx)
-            {
-                _selectIdx = nextSelectIdx;
-                GetComponent<RectTransform>().DOKill();
-                GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
-                GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
-            }
+            MoveImpl(value.x > 0.0f);
         }
 
         void OnAction()
@@ -114,6 +99,30 @@ namespace Ui
             gameController.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnAction -= OnAction;
             gameController.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnMove -= OnMove;
             //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered -= OnAction;
+        }
+
+        void MoveImpl(bool isRight)
+        {
+            var addIdx = isRight ? 1 : -1;
+
+            var nextSelectIdx = _selectIdx;
+            while (true)
+            {
+                nextSelectIdx = (nextSelectIdx + addIdx + _manager.CharaMaxCount) % _manager.CharaMaxCount;
+
+                if(!_manager.IsUsed(nextSelectIdx))
+                {
+                    break;
+                }
+            }
+
+            if (_selectIdx != nextSelectIdx)
+            {
+                _selectIdx = nextSelectIdx;
+                GetComponent<RectTransform>().DOKill();
+                GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
+                GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
+            }
         }
         #endregion
     }

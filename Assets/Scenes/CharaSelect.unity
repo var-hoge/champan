@@ -2633,6 +2633,7 @@ MonoBehaviour:
   - {fileID: 211676605}
   - {fileID: 1744597732}
   - {fileID: 643625989}
+  _selectedCharaSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
 --- !u!4 &1316101434
 Transform:
   m_ObjectHideFlags: 0

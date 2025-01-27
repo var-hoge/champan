@@ -25,7 +25,7 @@ namespace Ui
         // 各プレイヤーの使用キャラクター
         public static int PlayerUseCharaIdList(int playerIdx)
         {
-            if(_playerUseCharaIdList == null)
+            if (_playerUseCharaIdList == null)
             {
                 _playerUseCharaIdList = new List<int>();
                 for (int idx = 0; idx < 4; idx++)
@@ -43,6 +43,11 @@ namespace Ui
         public RectTransform GetPickIconTransform(int playerIdx, int selectIdx)
         {
             return _charas[selectIdx].GetChild(playerIdx + 1).GetComponent<RectTransform>();
+        }
+
+        public bool IsUsed(int selectIdx)
+        {
+            return _isUsedList[selectIdx];
         }
 
         public bool NotifySelect(int playerIdx, int selectIdx)
@@ -77,13 +82,30 @@ namespace Ui
             _charaPickedIcons[playerIdx].rectTransform.sizeDelta = sprite.textureRect.size;
             _charaPickedIcons[playerIdx].rectTransform.localScale = Vector3.one * 0.6f;
             _charaPickedIcons[playerIdx].rectTransform.localEulerAngles = new Vector3(0.0f, 0.0f, 25.0f);
-            _charaPickedIcons[playerIdx].GetComponent<RectTransform>().DOPunchScale(Vector3.one * 2.0f, 0.1f);
+            _charaPickedIcons[playerIdx].GetComponent<RectTransform>().DOPunchScale(Vector3.one * 1.5f, 0.1f);
+
+            var selectableCharaImage = _charas[selectIdx].GetChild(0).GetComponent<UnityEngine.UI.Image>();
+            selectableCharaImage.sprite = _selectedCharaSprite;
+            selectableCharaImage.rectTransform.sizeDelta = _selectedCharaSprite.textureRect.size;
+            selectableCharaImage.rectTransform.localScale *= 1.3f;
+            selectableCharaImage.rectTransform.DOShakePosition(0.20f, 5.0f, 5, fadeOut: true);
+            selectableCharaImage.rectTransform.DOScale(selectableCharaImage.rectTransform.localScale * 1.2f, 0.25f).SetEase(Ease.OutQuint);
+            selectableCharaImage.rectTransform.DOShakeRotation(0.20f, 20.0f, 30, fadeOut: true);
 
             var isAllUsed = !_isUsedList.Any(a => !a);
 
             if (isAllUsed)
             {
                 SceneChange().Forget();
+            }
+
+            // 同じcharacterを選択しているカーソルがある場合は別に移す
+            foreach (var cursor in _charaSelectIcons)
+            {
+                if (cursor != null && cursor.SelectIdx == selectIdx)
+                {
+                    cursor.ForceMove(true);
+                }
             }
 
             return true;
@@ -111,6 +133,9 @@ namespace Ui
 
         [SerializeField]
         List<UnityEngine.UI.Image> _charaPickedIcons;
+
+        [SerializeField]
+        Sprite _selectedCharaSprite;
         #endregion
 
         #region privateメソッド
