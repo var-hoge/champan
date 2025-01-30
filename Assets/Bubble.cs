@@ -18,8 +18,6 @@ public class Bubble : MonoBehaviour
     public static Bubble CrownBubble { get; set; }
     public static int CrownShieldValue { get; private set; }
 
-    private const float BurstTime = 5f;
-
     public Action OnDestroyEvent;
 
     public bool IsSpawning { get; private set; }
@@ -38,6 +36,9 @@ public class Bubble : MonoBehaviour
     [Header("Amplitude")]
     [SerializeField] private float amplitude = 0.01f;
 
+    [Header("Burst Time")]
+    [SerializeField] private float burstTime = 5f;
+
     private float _burstTimer;
     private bool _hasRidden = false;
     private MoveInfoCtrl _moveInfoCtrl = null;
@@ -49,6 +50,7 @@ public class Bubble : MonoBehaviour
     private int currentRiders;
 
     public static int LastCrownRidePlayerIdx = 0;
+    private static Vector3 TopRight = Vector3.positiveInfinity;
 
     public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
     private bool HasCrown => CrownBubble == this;
@@ -65,12 +67,18 @@ public class Bubble : MonoBehaviour
         _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
         visualRoot = transform.Find("VisualRoot").transform;
 
-        _burstTimer = BurstTime;
+        _burstTimer = burstTime;
 
         if (TryGetComponent(out SortingGroup sortingGroup))
             sortingGroup.sortingOrder = UnityEngine.Random.Range(0, 10000);
 
         transform.localScale = Vector3.one * UnityEngine.Random.Range(minSize, maxSize);
+
+        if (TopRight.Equals(Vector3.positiveInfinity))
+        {
+            var camera = Camera.main;
+            TopRight = camera.ScreenToWorldPoint(new(Screen.width, Screen.height, camera.nearClipPlane));
+        }
     }
 
     void OnDestroy()
@@ -194,7 +202,8 @@ public class Bubble : MonoBehaviour
     public void Init(float x)
     {
         IsSpawning = true;
-        GetComponent<Rigidbody2D>().AddForce(new Vector2(x, UnityEngine.Random.Range(15f, 90f)));
+        var y = UnityEngine.Random.Range(15f, 90f);
+        GetComponent<Rigidbody2D>().AddForce(new(x, y));
         StartCoroutine(EnableAnimation());
     }
 
@@ -214,5 +223,14 @@ public class Bubble : MonoBehaviour
             // TODO: Push back the player
         }
         Destroy(gameObject);
+    }
+
+    public bool IsOnScreen()
+    {
+        var pos = transform.position;
+        return pos.x > -TopRight.x
+            && pos.x < TopRight.x
+            && pos.y > -TopRight.y
+            && pos.y < TopRight.y;
     }
 }
