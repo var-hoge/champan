@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 498f840c449f2ad4799d27cba549c22c
+guid: d9e42a2bb106cab4bb63b8151b79f2c6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5562401291040319336
-    second: CP_title_logo_0
+      213: -954694051722420664
+    second: CP_title_ui_2_1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CP_title_logo_0
+      name: CP_title_ui_2_1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 966
-        height: 686
+        x: 82
+        y: 21
+        width: 124
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8981e552f716ec2b0800000000000000
-      internalID: -5562401291040319336
+      spriteID: 84e18e171de30c2f0800000000000000
+      internalID: -954694051722420664
       vertices: []
       indices: 
       edges: []
