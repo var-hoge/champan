@@ -40,6 +40,7 @@ public class Bubble : MonoBehaviour
     [SerializeField] private float burstTime = 5f;
 
     private float _burstTimer;
+    private float _burstGracePeriod = 0.05f;
     private bool _hasRidden = false;
     private MoveInfoCtrl _moveInfoCtrl = null;
     private BubbleShieldConfig currentShieldConfig;
@@ -104,6 +105,11 @@ public class Bubble : MonoBehaviour
                 LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<DataHolder>().PlayerIdx;
             }
 
+            if (_burstTimer == burstTime)
+            {
+                GetComponent<BubbleAnimator>().AnimationEnabled = true;
+            }
+
             _burstTimer -= Time.deltaTime;
             _hasRidden = true;
 
@@ -120,7 +126,10 @@ public class Bubble : MonoBehaviour
             }
         }
 
-        if ((!isRiding && _hasRidden) || losingRider)
+        _burstGracePeriod = (!isRiding && _hasRidden) || losingRider
+                            ? _burstGracePeriod - Time.deltaTime
+                            : 0.05f;
+        if (_burstGracePeriod < 0)
         {
             BurstImpl();
         }
