@@ -88,6 +88,45 @@ namespace Ui
             }
         }
 
+        // ロールバックできるように、もとの実装を残している
+        //public async UniTask Staging()
+        //{
+        //    // 最低 2 秒は待つ
+
+        //    await UniTask.WaitForSeconds(2.0f);
+
+        //    // 誰かがボタンを押したら次へ
+        //    var gameController = GameController.Instance;
+        //    bool isPushed = false;
+
+        //    void OnActoinTrigged()
+        //    {
+        //        isPushed = true;
+        //    }
+
+        //    for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
+        //    {
+        //        gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction += OnActoinTrigged;
+        //    }
+
+        //    while (!isPushed)
+        //    {
+        //        await UniTask.Yield();
+        //    }
+
+        //    // TODO: UI が動く
+
+        //    // コールバック解除
+        //    for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
+        //    {
+        //        gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction -= OnActoinTrigged;
+        //    }
+
+        //    // 次のシーンへ
+
+        //    TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
+        //}
+
 
         #endregion
     }
