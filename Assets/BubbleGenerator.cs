@@ -15,10 +15,7 @@ public class BobbleGenerator : MonoBehaviour
 		List<Bubble> bubbles = new();
 		for (var n = 0; n < _numOfBubble; ++n)
 		{
-			var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
-			var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
-			bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
-			bubbles.Add(bubble.GetComponent<Bubble>());
+			bubbles.Add(Generate());
 		}
 
 		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
@@ -45,16 +42,26 @@ public class BobbleGenerator : MonoBehaviour
 		var bubbles = FindObjectsByType<Bubble>(FindObjectsSortMode.None)
 						.Where(bubble => !bubble.IsSpawning && bubble.IsOnScreen())
 						.ToList();
-		if (bubbles.Count == 0) return;
 
 		if (bubbles.Contains(Bubble.CrownBubble))
 		{
 			bubbles.Remove(Bubble.CrownBubble);
 		}
 
-		Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
+		var target = (bubbles.Count == 0)
+						? Generate()
+						: bubbles[Random.Range(0, bubbles.Count - 1)];
+		Bubble.SetupCrown(target);
 		crown.DOMove(Bubble.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
 
 		Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
+	}
+
+	private Bubble Generate()
+    {
+		var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
+		var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
+		bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
+		return bubble.GetComponent<Bubble>();
 	}
 }
