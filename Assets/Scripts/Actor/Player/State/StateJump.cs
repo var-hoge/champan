@@ -7,6 +7,7 @@ using TadaLib.ActionStd;
 using TadaLib.Input;
 using TadaLib.Extension;
 using KanKikuchi.AudioManager;
+using System.Linq;
 
 namespace Scripts.Actor.Player.State
 {
@@ -169,22 +170,7 @@ namespace Scripts.Actor.Player.State
         AudioClip _jumpSe;
 
         private List<string> _SEPath = null;
-        private List<string> SEPath
-        {
-            get
-            {
-                if (_SEPath == null)
-                {
-                    _SEPath = new();
-                    for (var n = 1; n <=16; ++n)
-                    {
-                        var headNum = n < 10 ? "0" : null;
-                        _SEPath.Add($"SE/Player Jump/Player_Jump_{headNum}{n}");
-                    }
-                }
-                return _SEPath;
-            }
-        }
+        private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Jump/Player_Jump_", 16).ToList();
         #endregion
     }
 }

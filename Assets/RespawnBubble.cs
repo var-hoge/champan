@@ -2,6 +2,7 @@ using KanKikuchi.AudioManager;
 using Scripts.Actor;
 using Scripts.Actor.Player;
 using System.Collections.Generic;
+using System.Linq;
 using TadaLib.Input;
 using UnityEngine;
 
@@ -14,22 +15,7 @@ public class RespawnBubble : MonoBehaviour
     private const float BurstTime = 5f;
 
     private List<string> _SEPath = null;
-    private List<string> SEPath
-    {
-        get
-        {
-            if (_SEPath == null)
-            {
-                _SEPath = new();
-                for (var n = 1; n <= 9; ++n)
-                {
-                    var headNum = n < 10 ? "0" : null;
-                    _SEPath.Add($"SE/Player Respawn/Player_Respawn_{headNum}{n}");
-                }
-            }
-            return _SEPath;
-        }
-    }
+    private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Respawn/Player_Respawn_", 9).ToList();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()

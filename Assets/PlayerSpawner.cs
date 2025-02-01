@@ -2,6 +2,7 @@ using UnityEngine;
 using TadaLib.ActionStd;
 using KanKikuchi.AudioManager;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerSpawner : MonoBehaviour
 {
@@ -15,22 +16,7 @@ public class PlayerSpawner : MonoBehaviour
 	[SerializeField] private int bubbleCountMax = 5;
 
 	private List<string> _SEPath = null;
-	private List<string> SEPath
-	{
-		get
-		{
-			if (_SEPath == null)
-			{
-				_SEPath = new();
-				for (var n = 1; n <= 9; ++n)
-				{
-					var headNum = n < 10 ? "0" : null;
-					_SEPath.Add($"SE/Player Death/Player_Death_{headNum}{n}");
-				}
-			}
-			return _SEPath;
-		}
-	}
+	private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Death/Player_Death_", 9).ToList();
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()

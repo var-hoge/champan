@@ -5,6 +5,9 @@ using TadaLib.ActionStd;
 using Scripts;
 using UnityEngine.Rendering;
 using Scripts.Actor.Player;
+using System.Collections.Generic;
+using System.Linq;
+using KanKikuchi.AudioManager;
 
 public class Bubble : MonoBehaviour
 {
@@ -55,6 +58,9 @@ public class Bubble : MonoBehaviour
 
     public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
     private bool HasCrown => CrownBubble == this;
+
+    private List<string> _SEPath = null;
+    private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_",11).ToList();
 
     // Bust bubble
     public void DoBurst(int playerIdx)
@@ -107,6 +113,7 @@ public class Bubble : MonoBehaviour
 
             if (_burstTimer == burstTime)
             {
+                PlaySE();
                 GetComponent<BubbleAnimator>().AnimationEnabled = true;
             }
 
@@ -143,6 +150,12 @@ public class Bubble : MonoBehaviour
                 GetComponent<Rigidbody2D>().AddForce(Vector2.up * 1f * Time.timeScale);
             }
         }
+    }
+
+    private void PlaySE()
+    {
+        var path = SEPath[UnityEngine.Random.Range(0, SEPath.Count)];
+        SEManager.Instance.Play(path, 20f);
     }
 
     private IEnumerator Vibrate()
@@ -231,6 +244,8 @@ public class Bubble : MonoBehaviour
 
             // TODO: Push back the player
         }
+
+        PlaySE();
         Destroy(gameObject);
     }
 

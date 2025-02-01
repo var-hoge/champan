@@ -55,4 +55,12 @@ public class GameController : TadaLib.Util.SingletonMonoBehaviour<GameController
 		DontDestroyOnLoad(playerInput);
 		_playerInputs.Add(playerInput);
 	}
+
+	public static IEnumerable<string> GetSEPath(string path, int count)
+	{
+		for (var n = 1; n <= count; ++n)
+		{
+			yield return (n < 10) ? $"{path}0{n}" : $"{path}{n}";
+		}
+	}
 }
