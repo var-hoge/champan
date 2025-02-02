@@ -106,6 +106,7 @@ namespace TadaLib.ActionStd
 
             // 今回の初期移動量
             var diff = (Vector2)(toPos - fromPos);
+            var skipGroundCheck = diff.y > Time.deltaTime * 0.5f;
             // 移動床の移動差分を加える
             if (_ridingMover != null)
             {
@@ -136,89 +137,98 @@ namespace TadaLib.ActionStd
                 IsThroughMode = isThroghMode,
             };
 
-            // (X+&X-)/Y+/Y-/(X+&X-)の順にチェックする
-            // 壁押し出しの差分
-            var wallDiffX = 0.0f;
+            // このゲームでは不要なので壁判定をなくす
+
+            //// (X+&X-)/Y+/Y-/(X+&X-)の順にチェックする
+            //// 壁押し出しの差分
+            //var wallDiffX = 0.0f;
+            //{
+            //    // 移動する壁対策で、先に左右チェックをする
+            //    // ただし、登れない坂道(壁)のみで移動する
+            //    var wallDiff = Vector2.zero;
+            //    IsRightCollide = CheckRightCollide(ref wallDiff, collideInfo, isIgnoreSlope: true);
+            //    IsLeftCollide = false;
+            //    if (!IsRightCollide)
+            //    {
+            //        IsLeftCollide = CheckLeftCollide(ref wallDiff, collideInfo, isIgnoreSlope: true);
+            //    }
+            //    // ここで生じたdiff差分は先に計算する
+            //    if (IsRightCollide || IsLeftCollide)
+            //    {
+            //        wallDiffX = wallDiff.x;
+            //        if (Mathf.Abs(wallDiffX) > kEpsilon)
+            //        {
+            //            var origin = collideInfo.Origin;
+            //            origin.x += wallDiffX;
+            //            collideInfo.Origin = origin;
+            //        }
+            //    }
+            //}
+
+            // 上向き速度が一定以上あるときは着地しない
+            IsGround = skipGroundCheck ? false : CheckGroundCollide(ref diff, collideInfo);
+            if (!IsGround)
             {
-                // 移動する壁対策で、先に左右チェックをする
-                // ただし、登れない坂道(壁)のみで移動する
-                var wallDiff = Vector2.zero;
-                IsRightCollide = CheckRightCollide(ref wallDiff, collideInfo, isIgnoreSlope: true);
-                IsLeftCollide = false;
-                if (!IsRightCollide)
-                {
-                    IsLeftCollide = CheckLeftCollide(ref wallDiff, collideInfo, isIgnoreSlope: true);
-                }
-                // ここで生じたdiff差分は先に計算する
-                if (IsRightCollide || IsLeftCollide)
-                {
-                    wallDiffX = wallDiff.x;
-                    if (Mathf.Abs(wallDiffX) > kEpsilon)
-                    {
-                        var origin = collideInfo.Origin;
-                        origin.x += wallDiffX;
-                        collideInfo.Origin = origin;
-                    }
-                }
-
+                _ridingMover = null;
             }
-
-            IsGround = CheckGroundCollide(ref diff, collideInfo);
             // 地面でヒットしていたら天井チェックは省く
             // このゲームでは不要なので天井判定をなくす
             IsTopCollide = !IsGround && false;// CheckTopCollide(ref diff, collideInfo);
-            {
-                var diffByRtCk = diff;
-                var diffByLtCk = diff;
-                IsRightCollide |= CheckRightCollide(ref diffByRtCk, collideInfo);
-                IsLeftCollide |= CheckLeftCollide(ref diffByLtCk, collideInfo);
 
-                if (IsLeftCollide && IsRightCollide)
-                {
-                    // 左右両方に接触していた場合は、移動元の方向に押し出す
+            // このゲームでは不要なので壁判定をなくす
 
-                    if (diff.x >= 0.0f)
-                    {
-                        // 左 → 右 の移動なら、右壁ヒットを優先する
-                        // 右壁ヒットを優先する 
-                        diff = diffByRtCk;
-                        if (Mathf.Abs(diff.x) > collideInfo.HitBoxHalfSize.x * 0.75f)
-                        {
-                            // 押し出し距離が足りない場合は極端に押し出す
-                            // @todo: こんなことをしなくてよいように、押し出し距離の上限を伸ばす(rayを飛ばす始点を変更する)
-                            diff.x *= 2.0f;
-                        }
-                        IsLeftCollide = false;
-                    }
-                    else
-                    {
-                        diff = diffByLtCk;
-                        if (Mathf.Abs(diff.x) > collideInfo.HitBoxHalfSize.x * 0.75f)
-                        {
-                            // 押し出し距離が足りない場合は極端に押し出す
-                            // @todo: こんなことをしなくてよいように、押し出し距離の上限を伸ばす(rayを飛ばす始点を変更する)
-                            diff.x *= 2.0f;
-                        }
-                        IsRightCollide = false;
-                    }
-                }
-                else if (IsLeftCollide)
-                {
-                    diff = diffByLtCk;
-                }
-                else // IsRightCollide
-                {
-                    diff = diffByRtCk;
-                }
-            }
+            //{
+            //    var diffByRtCk = diff;
+            //    var diffByLtCk = diff;
+            //    IsRightCollide |= CheckRightCollide(ref diffByRtCk, collideInfo);
+            //    IsLeftCollide |= CheckLeftCollide(ref diffByLtCk, collideInfo);
 
-            {
-                // Nearチェック
-                var diffDummy = diff + Vector2.right * _nearCollideDistance;
-                IsRightNearCollide = CheckRightCollide(ref diffDummy, collideInfo, isUseGizmos: false);
-                diffDummy = diff + Vector2.left * _nearCollideDistance;
-                IsLeftNearCollide = CheckLeftCollide(ref diffDummy, collideInfo, isUseGizmos: false);
-            }
+            //    if (IsLeftCollide && IsRightCollide)
+            //    {
+            //        // 左右両方に接触していた場合は、移動元の方向に押し出す
+
+            //        if (diff.x >= 0.0f)
+            //        {
+            //            // 左 → 右 の移動なら、右壁ヒットを優先する
+            //            // 右壁ヒットを優先する 
+            //            diff = diffByRtCk;
+            //            if (Mathf.Abs(diff.x) > collideInfo.HitBoxHalfSize.x * 0.75f)
+            //            {
+            //                // 押し出し距離が足りない場合は極端に押し出す
+            //                // @todo: こんなことをしなくてよいように、押し出し距離の上限を伸ばす(rayを飛ばす始点を変更する)
+            //                diff.x *= 2.0f;
+            //            }
+            //            IsLeftCollide = false;
+            //        }
+            //        else
+            //        {
+            //            diff = diffByLtCk;
+            //            if (Mathf.Abs(diff.x) > collideInfo.HitBoxHalfSize.x * 0.75f)
+            //            {
+            //                // 押し出し距離が足りない場合は極端に押し出す
+            //                // @todo: こんなことをしなくてよいように、押し出し距離の上限を伸ばす(rayを飛ばす始点を変更する)
+            //                diff.x *= 2.0f;
+            //            }
+            //            IsRightCollide = false;
+            //        }
+            //    }
+            //    else if (IsLeftCollide)
+            //    {
+            //        diff = diffByLtCk;
+            //    }
+            //    else // IsRightCollide
+            //    {
+            //        diff = diffByRtCk;
+            //    }
+            //}
+
+            //{
+            //    // Nearチェック
+            //    var diffDummy = diff + Vector2.right * _nearCollideDistance;
+            //    IsRightNearCollide = CheckRightCollide(ref diffDummy, collideInfo, isUseGizmos: false);
+            //    diffDummy = diff + Vector2.left * _nearCollideDistance;
+            //    IsLeftNearCollide = CheckLeftCollide(ref diffDummy, collideInfo, isUseGizmos: false);
+            //}
 
             // レイヤーマスクの同期を解除
             gameObject.layer = tmpLayer;
@@ -226,7 +236,7 @@ namespace TadaLib.ActionStd
 
             _ridingMover?.RegisterRidedFrame(gameObject);
 
-            transform.position = _beforeMovePos + (Vector3)diff + Vector3.right * wallDiffX;
+            transform.position = _beforeMovePos + (Vector3)diff;// + Vector3.right * wallDiffX;
             _disableGroundAdsorptionOunce = false;
 
             //Debug.Log($"{IsLeftCollide}, {IsRightCollide}, {IsGround}, {IsTopCollide}");

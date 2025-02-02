@@ -17,8 +17,8 @@ namespace TadaLib.Dbg
             //DontDestroyOnLoad(_debugCanvas);
 
 #if UNITY_EDITOR
-            //_debugCanvas.SetActive(false);
-            _debugCanvas.SetActive(true);
+            _debugCanvas.SetActive(false);
+            //_debugCanvas.SetActive(true);
 #else
         _debugCanvas.SetActive(false);
 #endif

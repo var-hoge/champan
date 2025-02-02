@@ -15,7 +15,7 @@ namespace TadaLib.Sys
         Player = 1 << 1,
         LandCollision = 1 << 9,
         ThroughLandCollision = 1 << 10,
-        GimmickLandCollision = 1 << 11,
+        GimmickLandCollision = 1 << 12, // 11 が他で使われてたので変更
 
         TERM,
 
