@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Scripts.Actor;
 using System.Linq;
+using UnityEditor;
 
 namespace Ui
 {
@@ -42,7 +43,7 @@ namespace Ui
         #region メソッド
         public RectTransform GetPickIconTransform(int playerIdx, int selectIdx)
         {
-            return _charas[selectIdx].GetChild(playerIdx + 1).GetComponent<RectTransform>();
+            return _charas[selectIdx].GetPickIconTransform(playerIdx);
         }
 
         public bool IsUsed(int selectIdx)
@@ -58,39 +59,20 @@ namespace Ui
                 return false;
             }
 
+            // 使用済みにする
+            _isUsedList[selectIdx] = true;
+
             // キャラクター ID に変換
-            // @memo: キャラクターセレクト画面のキャラの並びが ID と一致していないので変換が必要
-            var charaIdx = selectIdx switch
-            {
-                0 => 0,
-                1 => 3,
-                2 => 1,
-                3 => 2,
-                _ => throw new System.Exception()
-            };
+            var charaIdx = SelectIdxToCharaIdx(selectIdx);
 
             // キャラクター決定
             _playerUseCharaIdList[playerIdx] = charaIdx;
 
-            // 使用済みにする
-            _isUsedList[selectIdx] = true;
-
-            Destroy(_charaSelectIcons[playerIdx].gameObject);
-
-            var sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
-            _charaPickedIcons[playerIdx].sprite = sprite;
-            _charaPickedIcons[playerIdx].rectTransform.sizeDelta = sprite.textureRect.size;
-            _charaPickedIcons[playerIdx].rectTransform.localScale = Vector3.one * 0.6f;
-            _charaPickedIcons[playerIdx].rectTransform.localEulerAngles = new Vector3(0.0f, 0.0f, 25.0f);
-            _charaPickedIcons[playerIdx].GetComponent<RectTransform>().DOPunchScale(Vector3.one * 1.5f, 0.1f);
-
-            var selectableCharaImage = _charas[selectIdx].GetChild(0).GetComponent<UnityEngine.UI.Image>();
-            selectableCharaImage.sprite = _selectedCharaSprite;
-            selectableCharaImage.rectTransform.sizeDelta = _selectedCharaSprite.textureRect.size;
-            selectableCharaImage.rectTransform.localScale *= 1.3f;
-            selectableCharaImage.rectTransform.DOShakePosition(0.20f, 5.0f, 5, fadeOut: true);
-            selectableCharaImage.rectTransform.DOScale(selectableCharaImage.rectTransform.localScale * 1.2f, 0.25f).SetEase(Ease.OutQuint);
-            selectableCharaImage.rectTransform.DOShakeRotation(0.20f, 20.0f, 30, fadeOut: true);
+            _charas[selectIdx].OnSelected(() =>
+            {
+                // アニメーションが完了したら設定
+                _charaPickedIcons[playerIdx].SetChara(charaIdx);
+            });
 
             var isAllUsed = !_isUsedList.Any(a => !a);
 
@@ -101,14 +83,31 @@ namespace Ui
             else
             {
                 // 同じcharacterを選択しているカーソルがある場合は別に移す
-                foreach (var cursor in _charaSelectIcons)
+                foreach (var cursor in _charaSelectCursors)
                 {
-                    if (cursor != null && cursor.SelectIdx == selectIdx)
+                    if (playerIdx != cursor.PlayerIdx && cursor.SelectIdx == selectIdx)
                     {
                         cursor.ForceMove(true);
                     }
                 }
             }
+
+            return true;
+        }
+
+        public bool NotifyCancelSelect(int playerIdx, int selectIdx)
+        {
+            if (_isSceneChanging)
+            {
+                return false;
+            }
+
+            Debug.Assert(_isUsedList[selectIdx]);
+
+            _isUsedList[selectIdx] = false;
+
+            _charaPickedIcons[playerIdx].UnsetChara();
+            _charas[selectIdx].OnCancelSelected();
 
             return true;
         }
@@ -119,33 +118,62 @@ namespace Ui
             for (int idx = 0; idx < CharaMaxCount; idx++)
             {
                 _isUsedList.Add(false);
-                _charaSelectIcons[idx].Setup(this, PlayerUseCharaIdList(idx));
+                _charaSelectCursors[idx].Setup(this, PlayerUseCharaIdList(idx));
             }
         }
         #endregion
 
         #region privateフィールド
         [SerializeField]
-        List<RectTransform> _charas;
+        List<CharaSelectChara> _charas;
 
         List<bool> _isUsedList = new();
 
         [SerializeField]
-        List<CharaSelectCursor> _charaSelectIcons;
+        List<CharaSelectCursor> _charaSelectCursors;
 
         [SerializeField]
-        List<UnityEngine.UI.Image> _charaPickedIcons;
+        List<PlayerIconSlot> _charaPickedIcons;
 
         [SerializeField]
         Sprite _selectedCharaSprite;
+
+        bool _isSceneChanging = false;
         #endregion
 
         #region privateメソッド
         async UniTask SceneChange()
         {
+            _isSceneChanging = true;
+
             await UniTask.WaitForSeconds(2.0f);
 
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 1.0f, 1.0f);
+        }
+
+        // キャラクター ID に変換
+        // @memo: キャラクターセレクト画面のキャラの並びが ID と一致していないので変換が必要
+        int SelectIdxToCharaIdx(int selectIdx)
+        {
+            return selectIdx switch
+            {
+                0 => 0,
+                1 => 3,
+                2 => 1,
+                3 => 2,
+                _ => throw new System.Exception()
+            };
+        }
+        int CharaIdxToSelectIdx(int charaIdx)
+        {
+            return charaIdx switch
+            {
+                0 => 0,
+                1 => 2,
+                2 => 3,
+                3 => 1,
+                _ => throw new System.Exception()
+            };
         }
         #endregion
     }

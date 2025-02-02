@@ -19,6 +19,9 @@ namespace Ui
     {
         #region プロパティ
         public int SelectIdx => _selectIdx;
+        public int PlayerIdx => _playerIdx;
+
+        public bool IsSelectDone { private set; get; } = false;
         #endregion
 
         #region メソッド
@@ -42,6 +45,9 @@ namespace Ui
         [SerializeField]
         int _playerIdx = 0;
 
+        [SerializeField]
+        UnityEngine.UI.Image _body;
+
         int _selectIdx = 0;
 
         float _moveInputValuePrev = 0.0f;
@@ -50,6 +56,11 @@ namespace Ui
         #region privateメソッド
         void OnMove(Vector2 value)
         {
+            if (IsSelectDone)
+            {
+                return;
+            }
+
             // 入力開始時だけ受け付ける
             if ((value.x > 0.5f && _moveInputValuePrev > 0.5) ||
                     (value.x < -0.5f && _moveInputValuePrev < -0.5f))
@@ -71,6 +82,19 @@ namespace Ui
 
         void OnAction()
         {
+            if (IsSelectDone)
+            {
+                if (!_manager.NotifyCancelSelect(_playerIdx, _selectIdx))
+                {
+                    // キャンセルできなかった
+                    return;
+                }
+
+                OnCancelSelect();
+
+                return;
+            }
+
             if (!_manager.NotifySelect(_playerIdx, _selectIdx))
             {
                 // 選べなかった
@@ -78,6 +102,7 @@ namespace Ui
             }
 
             // 決定
+            OnSelect();
         }
 
         private void Start()
@@ -110,7 +135,7 @@ namespace Ui
             {
                 nextSelectIdx = (nextSelectIdx + addIdx + _manager.CharaMaxCount) % _manager.CharaMaxCount;
 
-                if(!_manager.IsUsed(nextSelectIdx))
+                if (!_manager.IsUsed(nextSelectIdx))
                 {
                     break;
                 }
@@ -123,6 +148,24 @@ namespace Ui
                 GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
                 GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
             }
+        }
+
+        void OnSelect()
+        {
+            Debug.Assert(!IsSelectDone);
+
+            IsSelectDone = true;
+
+            _body.enabled = false;
+        }
+
+        void OnCancelSelect()
+        {
+            Debug.Assert(IsSelectDone);
+
+            IsSelectDone = false;
+
+            _body.enabled = true;
         }
         #endregion
     }
