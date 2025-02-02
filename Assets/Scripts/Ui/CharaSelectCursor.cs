@@ -14,7 +14,7 @@ namespace Ui
     /// <summary>
     /// GameBeginUi
     /// </summary>
-    public class CharaSelectIcon
+    public class CharaSelectCursor
         : MonoBehaviour
     {
         #region プロパティ

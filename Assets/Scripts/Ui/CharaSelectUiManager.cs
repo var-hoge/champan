@@ -131,7 +131,7 @@ namespace Ui
         List<bool> _isUsedList = new();
 
         [SerializeField]
-        List<CharaSelectIcon> _charaSelectIcons;
+        List<CharaSelectCursor> _charaSelectIcons;
 
         [SerializeField]
         List<UnityEngine.UI.Image> _charaPickedIcons;

@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 129883392}
   - component: {fileID: 129883394}
   m_Layer: 5
-  m_Name: PickIcon2
+  m_Name: CharaSelectCursor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1178,7 +1178,7 @@ GameObject:
   - component: {fileID: 559046371}
   - component: {fileID: 559046370}
   m_Layer: 5
-  m_Name: PickIcon4
+  m_Name: CharaSelectCursor4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1908,7 +1908,7 @@ GameObject:
   - component: {fileID: 838674005}
   - component: {fileID: 838674007}
   m_Layer: 5
-  m_Name: PickIcon3
+  m_Name: CharaSelectCursor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3086,7 +3086,7 @@ GameObject:
   - component: {fileID: 1501076206}
   - component: {fileID: 1501076208}
   m_Layer: 5
-  m_Name: PickIcon1
+  m_Name: CharaSelectCursor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
