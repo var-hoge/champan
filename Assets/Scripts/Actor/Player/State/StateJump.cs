@@ -88,6 +88,8 @@ namespace Scripts.Actor.Player.State
             var moveCtrl = obj.GetComponent<MoveCtrl>();
             moveCtrl.SetVelocityForceY(speedY);
             moveCtrl.GravityRateState = 0.0f;
+            // 地面吸着を無効
+            obj.GetComponent<TadaRigidbody2D>().DisableGroundAdsorptionOnce();
             _gravityTimer = new TadaLib.Util.Timer(_gravityIgnoreMaxSec);
 
             _isJumpButtonReleasedOnce = false;

@@ -42,10 +42,11 @@ public class Bubble : MonoBehaviour
     [Header("Burst Time")]
     [SerializeField] private float burstTime = 5f;
 
+    [SerializeField] private MoveInfoCtrl _moveInfoCtrl;
+
     private float _burstTimer;
     private float _burstGracePeriod = 0.05f;
     private bool _hasRidden = false;
-    private MoveInfoCtrl _moveInfoCtrl = null;
     private BubbleShieldConfig currentShieldConfig;
     private int currentShieldValue;
     private Transform visualRoot;
@@ -60,7 +61,7 @@ public class Bubble : MonoBehaviour
     private bool HasCrown => CrownBubble == this;
 
     private List<string> _SEPath = null;
-    private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_",11).ToList();
+    private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
 
     // Bust bubble
     public void DoBurst(int playerIdx)
@@ -71,7 +72,6 @@ public class Bubble : MonoBehaviour
 
     void Start()
     {
-        _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
         visualRoot = transform.Find("VisualRoot").transform;
 
         _burstTimer = burstTime;
@@ -133,10 +133,18 @@ public class Bubble : MonoBehaviour
             }
         }
 
-        _burstGracePeriod = (!isRiding && _hasRidden) || losingRider
-                            ? _burstGracePeriod - Time.deltaTime
-                            : 0.05f;
-        if (_burstGracePeriod < 0)
+
+        // プレイヤーの着地挙動が安定したので、下記はコメントアウト
+
+        //_burstGracePeriod = ((!isRiding && _hasRidden) || losingRider)
+        //                    ? _burstGracePeriod - Time.deltaTime
+        //                    : 0.05f;
+        //if (_burstGracePeriod < 0)
+        //{
+        //    BurstImpl();
+        //}
+
+        if ((!isRiding && _hasRidden) || losingRider)
         {
             BurstImpl();
         }

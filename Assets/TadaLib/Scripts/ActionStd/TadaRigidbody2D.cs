@@ -70,6 +70,10 @@ namespace TadaLib.ActionStd
         #endregion
 
         #region メソッド
+        public void DisableGroundAdsorptionOnce()
+        {
+            _disableGroundAdsorptionOunce = true;
+        }
         #endregion
 
         #region TadaLib.ProcSystem.IProcUpdate の実装
@@ -103,7 +107,10 @@ namespace TadaLib.ActionStd
             // 今回の初期移動量
             var diff = (Vector2)(toPos - fromPos);
             // 移動床の移動差分を加える
-            diff += _ridingMover?.MoveDiff ?? Vector2.zero;
+            if (_ridingMover != null)
+            {
+                diff += _ridingMover.MoveDiff;
+            }
 
             var hitBox = GetComponent<BoxCollider2D>();
             var scale = transform.localScale;
@@ -158,7 +165,8 @@ namespace TadaLib.ActionStd
 
             IsGround = CheckGroundCollide(ref diff, collideInfo);
             // 地面でヒットしていたら天井チェックは省く
-            IsTopCollide = !IsGround && CheckTopCollide(ref diff, collideInfo);
+            // このゲームでは不要なので天井判定をなくす
+            IsTopCollide = !IsGround && false;// CheckTopCollide(ref diff, collideInfo);
             {
                 var diffByRtCk = diff;
                 var diffByLtCk = diff;
@@ -219,6 +227,7 @@ namespace TadaLib.ActionStd
             _ridingMover?.RegisterRidedFrame(gameObject);
 
             transform.position = _beforeMovePos + (Vector3)diff + Vector3.right * wallDiffX;
+            _disableGroundAdsorptionOunce = false;
 
             //Debug.Log($"{IsLeftCollide}, {IsRightCollide}, {IsGround}, {IsTopCollide}");
         }
@@ -233,6 +242,15 @@ namespace TadaLib.ActionStd
             Debug.DrawLine(from, hit ? hit.point : to);
 #endif
             return hit;
+        }
+        // レイキャストを飛ばす(+ Debugの線を引く)
+        RaycastHit2D[] LinecastAllWithGizmos(Vector2 from, Vector2 to, int layerMask)
+        {
+            var hits = Physics2D.LinecastAll(from, to, layerMask);
+#if UNITY_EDITOR
+            Debug.DrawLine(from, hits.Length >= 1 ? hits[0].point : to);
+#endif
+            return hits;
         }
 
         /// <summary>
@@ -250,7 +268,7 @@ namespace TadaLib.ActionStd
                 (int)Sys.LayerMask.AllLandCollisions;
             var rayLength = info.HitBoxHalfSize.y + 1.5f; // 下り坂を考慮して余裕を持たせる(下り坂の法線を取得するため)
 
-            var offsetY = -info.HitBoxHalfSize.y * 0.25f; // 上方向への瞬間移動を弱めるために、チェック判定を下にずらす
+            var offsetY = 0.0f;// -info.HitBoxHalfSize.y * 0.25f; // 上方向への瞬間移動を弱めるために、チェック判定を下にずらす
 
             var origin = info.Origin;
             origin.y += offsetY;
@@ -262,11 +280,17 @@ namespace TadaLib.ActionStd
 
             // めり込んでいる分を上に持ち上げる
             var distanceToFoot = info.HitBoxHalfSize.y + offsetY;
-            var newDiffY = diff.y;
+            var candidateDiffY = float.MinValue;
 
             // 3つのレイのうち、ヒット座標との距離が最も短いのを採用する
             var mostTopHit = new RaycastHit2D();
+            //var hits = new RaycastHit2D[hitDownLeft.Length + hitDownCenter.Length + hitDownRight.Length];
+            //System.Array.Copy(hitDownLeft, 0, hits, 0, hitDownLeft.Length);
+            //System.Array.Copy(hitDownCenter, 0, hits, hits.Length, hitDownCenter.Length);
+            //System.Array.Copy(hitDownRight, 0, hits, hits.Length, hitDownRight.Length);
+
             foreach (var hit in new List<RaycastHit2D>() { hitDownLeft, hitDownCenter, hitDownRight })
+                //foreach (var hit in hits)
             {
                 if (!hit)
                 {
@@ -274,7 +298,7 @@ namespace TadaLib.ActionStd
                 }
 
                 var moveDiffToGround = distanceToFoot - hit.distance;
-                if (newDiffY > moveDiffToGround)
+                if (candidateDiffY > moveDiffToGround)
                 {
                     continue;
                 }
@@ -298,22 +322,27 @@ namespace TadaLib.ActionStd
                 }
 
                 // 更新
-                newDiffY = moveDiffToGround;
+                candidateDiffY = moveDiffToGround;
                 mostTopHit = hit;
             }
 
-            if (mostTopHit)
+            var isSameMover = mostTopHit && (_ridingMover == mostTopHit.collider.GetComponent<MoveInfoCtrl>());
+            var isGroundAdsorption = isSameMover && !_disableGroundAdsorptionOunce;
+            var isHit = mostTopHit &&
+                (isGroundAdsorption || candidateDiffY >= diff.y); // 前回地面にいたなら吸着させる
+
+            if (isHit)
             {
                 // 登れない勾配なら接地判定はなし
                 {
-                    var slopeRad = CalcSlopeRad(mostTopHit.normal);
-                    if (!IsEnableClimbRad(slopeRad))
-                    {
-                        return false;
-                    }
+                    //var slopeRad = CalcSlopeRad(mostTopHit.normal);
+                    //if (!IsEnableClimbRad(slopeRad))
+                    //{
+                    //    return false;
+                    //}
                 }
 
-                diff.y = newDiffY;
+                diff.y = candidateDiffY;
                 // 移動床に乗っている場合は登録
                 var landObj = mostTopHit.collider.gameObject;
                 _ridingMover = landObj.GetComponent<MoveInfoCtrl>();
@@ -321,18 +350,19 @@ namespace TadaLib.ActionStd
                 // 坂道挙動
                 // 進行方向の傾斜を見る
                 var useHit = new RaycastHit2D();
-                if (hitDownLeft && diff.x < kEpsilon)
-                {
-                    useHit = hitDownLeft;
-                }
-                else if (hitDownRight && diff.x > kEpsilon)
-                {
-                    useHit = hitDownRight;
-                }
-                else if (hitDownCenter)
-                {
-                    useHit = hitDownCenter;
-                }
+                useHit = mostTopHit;
+                //if (hitDownLeft && diff.x < kEpsilon)
+                //{
+                //    useHit = hitDownLeft;
+                //}
+                //else if (hitDownRight && diff.x > kEpsilon)
+                //{
+                //    useHit = hitDownRight;
+                //}
+                //else if (hitDownCenter)
+                //{
+                //    useHit = hitDownCenter;
+                //}
 
                 // 見つからないときもある
                 if (useHit)
@@ -340,7 +370,7 @@ namespace TadaLib.ActionStd
                     var theta = CalcSlopeRad(useHit.normal) - Mathf.PI * 0.5f;
 
                     // X軸の移動分を傾斜に応じて分配する
-                    diff.y += diff.x * Mathf.Sin(theta);
+                    //diff.y += diff.x * Mathf.Sin(theta);
                     diff.x *= Mathf.Cos(theta);
 
                     // 地面情報登録
@@ -369,7 +399,6 @@ namespace TadaLib.ActionStd
                     Dbg.InstantPointDrawer.Add(mostTopHit.point);
 #endif
                 }
-
                 return true;
             }
 
@@ -711,6 +740,8 @@ namespace TadaLib.ActionStd
         [SerializeField]
         float _nearCollideDistance = 0.1f;
 
+        bool _disableGroundAdsorptionOunce = false;
+
 #if UNITY_EDITOR
         struct GizmosData
         {
@@ -737,7 +768,7 @@ namespace TadaLib.ActionStd
 
             Gizmos.color = Color.white;
             Gizmos.DrawWireCube((Vector2)fromPos + offset, hitBox.size);
-            
+
             Gizmos.color = Color.blue;
             foreach (var data in _gizmosDataList)
             {
