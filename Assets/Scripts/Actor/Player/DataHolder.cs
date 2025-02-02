@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Input;
 using TadaLib.Extension;
 using Ui;
+using TadaLib.Dbg;
 
 namespace Scripts.Actor.Player
 {
@@ -68,6 +69,20 @@ namespace Scripts.Actor.Player
         #endregion
 
         #region privateメソッド
+        void Start()
+        {
+#if UNITY_EDITOR
+            //TadaLib.Dbg.DebugBoxManager.Display(this);
+            if (PlayerIdx == 0)
+            {
+                DebugTextManager.Display(this, 1);
+            }
+#endif
+        }
+        public override string ToString()
+        {
+            return $"IsGround: {GetComponent<TadaLib.ActionStd.TadaRigidbody2D>().IsGround}\nState: {GetComponent<TadaLib.ActionStd.StateMachine>().CurrentStateName}";
+        }
         #endregion
 
         #region privateフィールド

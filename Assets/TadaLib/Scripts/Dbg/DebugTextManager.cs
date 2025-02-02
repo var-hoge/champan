@@ -13,7 +13,6 @@ namespace TadaLib.Dbg
 
         void Start()
         {
-            _debugElements = new List<DebugElement>();
             _debugText.text = string.Empty;
             //DontDestroyOnLoad(_debugCanvas);
 
