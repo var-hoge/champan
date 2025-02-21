@@ -8,6 +8,7 @@ using Scripts.Actor.Player;
 using System.Collections.Generic;
 using System.Linq;
 using KanKikuchi.AudioManager;
+using DG.Tweening;
 
 public class Bubble : MonoBehaviour
 {
@@ -43,6 +44,8 @@ public class Bubble : MonoBehaviour
     [SerializeField] private float burstTime = 5f;
 
     [SerializeField] private MoveInfoCtrl _moveInfoCtrl;
+
+    [SerializeField] private GameObject _bubPopEff;
 
     private float _burstTimer;
     private float _burstGracePeriod = 0.05f;
@@ -223,7 +226,7 @@ public class Bubble : MonoBehaviour
             break;
         }
 
-        crownSpriteRenderer.gameObject.SetActive(true);
+        crownSpriteRenderer.transform.DOScale(Vector3.one, 0.15f);
 
         shieldSpriteRenderer.gameObject.SetActive(true);
         shieldSpriteRenderer.sprite = config.sprite;
@@ -246,15 +249,21 @@ public class Bubble : MonoBehaviour
 
     private void BurstImpl()
     {
+        PlaySE();
         if (HasCrown)
         {
-            CrownShieldValue--;
-
+            transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+            {
+                CrownShieldValue--;
+                Destroy(gameObject);
+            });
             // TODO: Push back the player
         }
-
-        PlaySE();
-        Destroy(gameObject);
+        else
+        {
+            Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+            Destroy(gameObject);
+        }
     }
 
     public bool IsOnScreen()

@@ -24,7 +24,7 @@ public class BobbleGenerator : MonoBehaviour
 
 	private void TeleportCrown()
 	{
-		Debug.Log($"TeleportCrown");
+		Debug.Log($"TeleportCrown\nCrownShieldValue : {Bubble.CrownShieldValue}");
 		SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
 
 		if (Bubble.CrownShieldValue == 0)
