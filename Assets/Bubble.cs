@@ -142,7 +142,8 @@ public class Bubble : MonoBehaviour
 
             // 複数のプレイヤーが乗っている場合、乗っている全てのプレイヤーを飛ばす
             var players = _moveInfoCtrl.RideObjects;
-            if (players.Count > 1)
+            var count = HasCrown ? 0 : 1;
+            if (players.Count > count)
             {
                 foreach (var player in players)
                 {
