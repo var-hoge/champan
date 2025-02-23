@@ -48,7 +48,7 @@ namespace Ui
             await UniTask.WaitForSeconds(1.0f);
 
             _main.gameObject.SetActive(true);
-
+            SEManager.Instance.Play(SEPath.COUNTDOWN);
             foreach (var sprite in _countDownSprites)
             {
                 _main.sprite = sprite;

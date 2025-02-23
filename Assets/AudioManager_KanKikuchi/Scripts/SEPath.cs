@@ -16,6 +16,7 @@ public static class SEPath{
 	public const string BUBBLE_JUMP_09          = "SE/Bubble Jump/Bubble_Jump_09";
 	public const string BUBBLE_JUMP_10          = "SE/Bubble Jump/Bubble_Jump_10";
 	public const string BUBBLE_JUMP_11          = "SE/Bubble Jump/Bubble_Jump_11";
+	public const string COUNTDOWN               = "SE/Crown Bubble/countdown";
 	public const string CROWN_BUBBLE_JUMP       = "SE/Crown Bubble/Crown_Bubble_Jump";
 	public const string CROWN_BUBBLE_REPOSITION = "SE/Crown Bubble/Crown_Bubble_Reposition";
 	public const string JINGLE10                = "SE/Jingle/jingle10";
