@@ -43,6 +43,8 @@ public class Bubble : MonoBehaviour
     [Header("Burst Time")]
     [SerializeField] private float burstTime = 5f;
 
+    [SerializeField] float blowPower = 12.0f;
+
     [SerializeField] private MoveInfoCtrl _moveInfoCtrl;
 
     [SerializeField] private GameObject _bubPopEff;
@@ -106,7 +108,7 @@ public class Bubble : MonoBehaviour
         bool losingRider = currentRiders > _moveInfoCtrl.RideObjects.Count;
         currentRiders = _moveInfoCtrl.RideObjects.Count;
 
-        var isRiding = _moveInfoCtrl.IsRiding();
+        var isRiding = _moveInfoCtrl.IsRidden();
         if (isRiding)
         {
             if (HasCrown)
@@ -133,6 +135,16 @@ public class Bubble : MonoBehaviour
             if (_burstTimer < 0)
             {
                 BurstImpl();
+            }
+
+            // 複数のプレイヤーが乗っている場合、乗っている全てのプレイヤーを飛ばす
+            var players = _moveInfoCtrl.RideObjects;
+            if (players.Count > 1)
+            {
+                foreach (var player in players)
+                {
+                    Blow(player);
+                }
             }
         }
 
@@ -161,6 +173,29 @@ public class Bubble : MonoBehaviour
                 GetComponent<Rigidbody2D>().AddForce(Vector2.up * 1f * Time.timeScale);
             }
         }
+    }
+
+    /// <summary>
+    /// オブジェクトを飛ばす
+    /// </summary>
+    /// <param name="obj">オブジェクト</param>
+    private void Blow(GameObject obj)
+    {
+        var dirDiff = obj.transform.position - transform.position;
+        dirDiff.z = 0.0f;
+        var dirUnit = dirDiff.normalized;
+        // x 軸方向の成分を強める
+        dirUnit.x += Mathf.Sign(dirUnit.x) * 0.5f;
+        dirUnit = dirUnit.normalized;
+        if (dirUnit.sqrMagnitude < 0.0001f)
+        {
+            // 座標が一致していたなら適当な方向に飛ばす
+            dirUnit = Vector3.right;
+        }
+
+        var moveCtrl = obj.GetComponent<Scripts.Actor.Player.MoveCtrl>();
+        moveCtrl.SetVelocityForce(dirUnit * blowPower);
+        moveCtrl.SetUncontrollableTime(0.3f);
     }
 
     private void PlaySE()

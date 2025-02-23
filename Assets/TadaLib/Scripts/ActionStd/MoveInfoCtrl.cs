@@ -24,7 +24,7 @@ namespace TadaLib.ActionStd
             _rideObjects.Add(obj);
         }
 
-        public bool IsRiding()
+        public bool IsRidden()
         {
             return _rideObjects.Count > 0;
         }
