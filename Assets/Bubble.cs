@@ -52,6 +52,7 @@ public class Bubble : MonoBehaviour
     private float _burstTimer;
     private float _burstGracePeriod = 0.05f;
     private bool _hasRidden = false;
+    private bool _isBursting = false;
     private BubbleShieldConfig currentShieldConfig;
     private int currentShieldValue;
     private Transform visualRoot;
@@ -100,7 +101,8 @@ public class Bubble : MonoBehaviour
 
     void Update()
     {
-        if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+        if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle
+            || _isBursting)
         {
             return;
         }
@@ -284,6 +286,7 @@ public class Bubble : MonoBehaviour
 
     private void BurstImpl()
     {
+        _isBursting = true;
         PlaySE();
         if (HasCrown)
         {
@@ -296,8 +299,11 @@ public class Bubble : MonoBehaviour
         }
         else
         {
-            Instantiate(_bubPopEff, transform.position, Quaternion.identity);
-            Destroy(gameObject);
+            transform.DOScale(transform.localScale * 1.15f, 0.1f).OnComplete(() =>
+            {
+                Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+                Destroy(gameObject);
+            });
         }
     }
 

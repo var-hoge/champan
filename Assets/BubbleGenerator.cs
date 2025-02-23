@@ -27,7 +27,7 @@ public class BobbleGenerator : MonoBehaviour
 		Debug.Log($"TeleportCrown\nCrownShieldValue : {Bubble.CrownShieldValue}");
 		SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
 
-		if (Bubble.CrownShieldValue == 0)
+		if (Bubble.CrownShieldValue <= 0)
 		{
 			GameSequenceManager.WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
 			GameSequenceManager.Instance.GameOver();
