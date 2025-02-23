@@ -736,7 +736,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7026085021158514042, guid: 7b09877d92409924abe9942be8a44e9b, type: 3}
       propertyPath: m_SortingLayerID
-      value: 1929157823
+      value: 373824115
       objectReference: {fileID: 0}
     - target: {fileID: 7943430937346459303, guid: 7b09877d92409924abe9942be8a44e9b, type: 3}
       propertyPath: playOnAwake

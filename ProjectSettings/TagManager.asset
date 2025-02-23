@@ -53,5 +53,8 @@ TagManager:
   - name: TopFront
     uniqueID: 874687129
     locked: 0
+  - name: Particles
+    uniqueID: 373824115
+    locked: 0
   m_RenderingLayers:
   - Default
