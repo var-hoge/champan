@@ -247,7 +247,7 @@ public class Bubble : MonoBehaviour
         shieldSpriteRenderer.gameObject.SetActive(true);
         shieldSpriteRenderer.sprite = config.sprite;
 
-        GetComponent<ParticleSystem>().Play(true);
+        GetComponentInChildren<ParticleSystem>().Play(true);
     }
 
     public void Init(float x)
