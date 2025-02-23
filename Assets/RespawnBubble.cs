@@ -20,6 +20,7 @@ public class RespawnBubble : MonoBehaviour
     private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Respawn/Player_Respawn_", 9).ToList();
 
     [SerializeField] private GameObject _bubPopEff;
+    [SerializeField] float blowPower = 12.0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -51,6 +52,10 @@ public class RespawnBubble : MonoBehaviour
         if (_burstTimer < 0
             || _moveInfoCtrl.IsRidden())
         {
+            foreach (var obj in _moveInfoCtrl.RideObjects)
+            {
+                BubbleUtil.Blow(obj, transform.position, blowPower);
+            }
             Respawn(playerDataHolder);
         }
     }

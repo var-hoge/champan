@@ -145,7 +145,7 @@ public class Bubble : MonoBehaviour
             {
                 foreach (var player in players)
                 {
-                    Blow(player);
+                    BubbleUtil.Blow(player, transform.position, blowPower);
                 }
             }
         }
@@ -175,29 +175,6 @@ public class Bubble : MonoBehaviour
                 GetComponent<Rigidbody2D>().AddForce(Vector2.up * 1f * Time.timeScale);
             }
         }
-    }
-
-    /// <summary>
-    /// オブジェクトを飛ばす
-    /// </summary>
-    /// <param name="obj">オブジェクト</param>
-    private void Blow(GameObject obj)
-    {
-        var dirDiff = obj.transform.position - transform.position;
-        dirDiff.z = 0.0f;
-        var dirUnit = dirDiff.normalized;
-        // x 軸方向の成分を強める
-        dirUnit.x += Mathf.Sign(dirUnit.x) * 0.5f;
-        dirUnit = dirUnit.normalized;
-        if (dirUnit.sqrMagnitude < 0.0001f)
-        {
-            // 座標が一致していたなら適当な方向に飛ばす
-            dirUnit = Vector3.right;
-        }
-
-        var moveCtrl = obj.GetComponent<Scripts.Actor.Player.MoveCtrl>();
-        moveCtrl.SetVelocityForce(dirUnit * blowPower);
-        moveCtrl.SetUncontrollableTime(0.3f);
     }
 
     private void PlaySE()
