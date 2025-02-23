@@ -16,17 +16,13 @@ namespace TadaLib.ActionStd
         #region プロパティ
         public Vector2 MoveDiff => (Vector2)transform.position - _PosPrev;
         public List<GameObject> RideObjects => _rideObjects;
+        public bool IsRidden => _rideObjects.Count > 0;
         #endregion
 
         #region メソッド
         public void RegisterRidedFrame(GameObject obj)
         {
             _rideObjects.Add(obj);
-        }
-
-        public bool IsRidden()
-        {
-            return _rideObjects.Count > 0;
         }
 
         public bool IsRidedByPlayer()

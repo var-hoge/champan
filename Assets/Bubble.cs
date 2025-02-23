@@ -68,6 +68,8 @@ public class Bubble : MonoBehaviour
 
     private List<string> _SEPath = null;
     private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
+    private bool IsRidden => _moveInfoCtrl.IsRidden;
+    public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
 
     // Bust bubble
     public void DoBurst(int playerIdx)
@@ -110,8 +112,7 @@ public class Bubble : MonoBehaviour
         bool losingRider = currentRiders > _moveInfoCtrl.RideObjects.Count;
         currentRiders = _moveInfoCtrl.RideObjects.Count;
 
-        var isRiding = _moveInfoCtrl.IsRidden();
-        if (isRiding)
+        if (IsRidden)
         {
             if (HasCrown)
             {
@@ -161,7 +162,7 @@ public class Bubble : MonoBehaviour
         //    BurstImpl();
         //}
 
-        if ((!isRiding && _hasRidden) || losingRider)
+        if ((!IsRidden && _hasRidden) || losingRider)
         {
             BurstImpl();
         }

@@ -40,7 +40,7 @@ public class BobbleGenerator : MonoBehaviour
 		Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
 		var bubbles = FindObjectsByType<Bubble>(FindObjectsSortMode.None)
-						.Where(bubble => !bubble.IsSpawning && bubble.IsOnScreen())
+						.Where(bubble => bubble.TeleportCrown)
 						.ToList();
 
 		if (bubbles.Contains(Bubble.CrownBubble))

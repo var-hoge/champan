@@ -50,7 +50,7 @@ public class RespawnBubble : MonoBehaviour
         _rb.AddForce(new(axisX * force, 0.0f));
 
         if (_burstTimer < 0
-            || _moveInfoCtrl.IsRidden())
+            || _moveInfoCtrl.IsRidden)
         {
             foreach (var obj in _moveInfoCtrl.RideObjects)
             {
