@@ -1694,6 +1694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26808b386a513b14f80af894c4257b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetFrameRate: 60
   PhaseKind: 0
   _gameBeginUi: {fileID: 532531927}
   _gameEndUi: {fileID: 691802119}

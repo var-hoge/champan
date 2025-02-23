@@ -16,6 +16,8 @@ namespace Scripts
     public class GameSequenceManager
         : TadaLib.Util.SingletonMonoBehaviour<GameSequenceManager>
     {
+        [SerializeField] private int TargetFrameRate = 60;
+
         #region 型定義
         public enum Phase
         {
@@ -42,6 +44,12 @@ namespace Scripts
         #endregion
 
         #region MonoBehavior の実装
+
+        void Awake()
+        {
+            Application.targetFrameRate = TargetFrameRate;
+        }
+
         void Start()
         {
             _gameBeginUi.CountDown().Forget();
