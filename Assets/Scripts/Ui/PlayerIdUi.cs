@@ -41,24 +41,32 @@ namespace Ui
             var offsetY = 170.0f;
             var angle = 0.0f;
 
+            if (!_isDummyPrev && isDummyValid)
+            {
+                // 風船中に UI の方向が変わらないようにする
+                _angleRate = screenPos.x > Screen.width / 2 ? -1.0f : 1.0f;
+            }
+            _isDummyPrev = isDummyValid;
+
             // 画面内に収めるよう努力する
             if (isDummyValid)
             {
-                offsetY = 100.0f;
+                offsetY = 90.0f;
                 if (screenPos.y + offsetY > Screen.height)
                 {
                     var diff = screenPos.y + offsetY - Screen.height;
-                    angle = TadaLib.Util.InterpUtil.Linier(0.0f, 60.0f, Mathf.Min(1.0f, diff / offsetY));
+                    var rate = Mathf.Clamp01(diff / offsetY);
+                    angle = TadaLib.Util.InterpUtil.Linier(0.0f, 60.0f, rate);
+                    angle *= _angleRate;
 
-                    if (screenPos.x > Screen.width / 2)
-                    {
-                        angle = -angle;
-                    }
+                    offsetY = TadaLib.Util.InterpUtil.Linier(40.0f, offsetY, 1.0f - rate);
                 }
             }
 
+            _offsetY = TadaLib.Util.InterpUtil.Linier(_offsetY, offsetY, 0.1f, Time.deltaTime);
+
             GetComponent<RectTransform>().localEulerAngles = new Vector3(0.0f, 0.0f, -angle);
-            GetComponent<RectTransform>().position = screenPos + offsetY * new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0.0f);
+            GetComponent<RectTransform>().position = screenPos + _offsetY * new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0.0f);
         }
         #endregion
 
@@ -67,6 +75,9 @@ namespace Ui
         Canvas _canvas;
         [SerializeField]
         int _playerNumber = 0;
+        float _angleRate = 1.0f;
+        bool _isDummyPrev = false;
+        float _offsetY = 170.0f;
         #endregion
 
         #region privateメソッド
