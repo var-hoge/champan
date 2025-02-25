@@ -46,6 +46,12 @@ namespace Scripts.Actor.Player
             var rotVec3 = transform.localEulerAngles;
 
             var velocityX = GetComponent<MoveCtrl>().Velocity.x;
+            // 試合開始前に方向を変更できるようにする
+            if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.BeforeBattle)
+            {
+                velocityX = InputUtil.GetAxis(gameObject).x;
+            }
+
             if (Mathf.Abs(velocityX) >= 1.0f)
             {
                 rotVec3.y = velocityX < 0.0f ? 180.0f : 0.0f;

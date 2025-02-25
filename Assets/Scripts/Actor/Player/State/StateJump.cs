@@ -32,6 +32,12 @@ namespace Scripts.Actor.Player.State
         #region static関数
         public static bool TryChangeState(GameObject obj, JumpPowerKind jumpPowerKind)
         {
+            // 試合中じゃないと使えない
+            if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+            {
+                return false;
+            }
+
             // 地上にいないと使えない
             if (!obj.GetComponent<TadaRigidbody2D>().IsGround)
             {
