@@ -51,7 +51,7 @@ public class Bubble : MonoBehaviour
 
     [Header("Crown Effect")]
     [SerializeField] private ParticleSystem[] crownParticles;
-    [SerializeField] private ParticleSystem crownParticleRing;
+    [SerializeField] private ParticleSystem crownGlitter;
 
     private float _burstTimer;
     private float _burstGracePeriod = 0.05f;
@@ -252,13 +252,13 @@ public class Bubble : MonoBehaviour
         shieldSpriteRenderer.sprite = config.sprite;
 
         // エフェクトの再生
-        foreach (var particle in crownParticles)
-        {
-            particle.Play(false);
-        }
+        crownGlitter.Play(false);
         if (shieldValue <= 1)
         {
-            crownParticleRing.Play(false);
+            foreach (var particle in crownParticles)
+            {
+                particle.Play(false);
+            }
         }
     }
 

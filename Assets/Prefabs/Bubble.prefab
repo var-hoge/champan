@@ -449,7 +449,8 @@ MonoBehaviour:
   - {fileID: 3259724051852106308}
   - {fileID: 9045816559642870397}
   - {fileID: 9045816559642909609}
-  crownParticleRing: {fileID: 9045816559642870601}
+  - {fileID: 9045816559642870601}
+  crownGlitter: {fileID: 3259724051852106308}
 --- !u!114 &1157802686218243822
 MonoBehaviour:
   m_ObjectHideFlags: 0
