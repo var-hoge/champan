@@ -9,6 +9,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Scripts.Actor;
+using KanKikuchi.AudioManager;
 
 namespace Ui
 {
@@ -24,6 +25,7 @@ namespace Ui
         #region メソッド
         public void OnSelected(System.Action onAnimCompleted)
         {
+            SEManager.Instance.Play(_sePath);
             _body.rectTransform.DOKill();
             _body.rectTransform.localScale = _localScaleDefault;
             _body.rectTransform.localPosition = _localPositionDefault;
@@ -69,6 +71,9 @@ namespace Ui
 
         [SerializeField]
         Sprite _selectedSprite;
+
+        [SerializeField]
+        string _sePath;
 
         Sprite _unselectedSprite;
         Vector3 _localScaleDefault;
