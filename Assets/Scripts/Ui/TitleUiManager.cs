@@ -30,8 +30,10 @@ namespace Ui
         #endregion
 
         #region privateフィールド
+        [SerializeField] private Transform _start;
         [SerializeField] private GameObject _startOnImage;
         [SerializeField] private GameObject _startOffImage;
+        [SerializeField] private Transform _exit;
         [SerializeField] private GameObject _exitOnImage;
         [SerializeField] private GameObject _exitOffImage;
         #endregion
@@ -40,13 +42,15 @@ namespace Ui
         public async UniTask Staging()
         {
             // 最低 2 秒は待つ
-
-            await UniTask.WaitForSeconds(2.0f);
+            await UniTask.WaitForSeconds(1f);
+            SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
+            await UniTask.WaitForSeconds(1f);
 
             var gameController = GameController.Instance;
             var inputHandler = gameController.GetPlayerInput(0).GetComponent<PlayerInputHandler>();
             var isPushed = false;
             var isStartSelected = true;
+            var isInputValid = true;
             inputHandler.OnAction += OnActoinTrigged;
             inputHandler.OnMove += OnMove;
 
@@ -56,6 +60,8 @@ namespace Ui
                 {
                     if (isStartSelected)
                     {
+                        // SE再生
+                        SEManager.Instance.Play(SEPath.MENU_VALIDATION);
                         inputHandler.OnAction -= OnActoinTrigged;
                         inputHandler.OnMove -= OnMove;
                         TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
@@ -80,11 +86,25 @@ namespace Ui
 
             void OnMove(Vector2 value)
             {
+                if (!isInputValid || value.x == 0)
+                {
+                    isInputValid = true;
+                    return;
+                }
+
+                isInputValid = false;
                 isStartSelected = !isStartSelected;
+                // 表示イメージの切替
                 _startOnImage.SetActive(isStartSelected);
                 _startOffImage.SetActive(!isStartSelected);
                 _exitOnImage.SetActive(!isStartSelected);
                 _exitOffImage.SetActive(isStartSelected);
+                // 文字サイズの設定
+                var (startValue, exitvalue) = isStartSelected ? (1.1f, 1f) : (1f, 1.1f);
+                _start.DOScale(Vector3.one * startValue, 0.1f);
+                _exit.DOScale(Vector3.one * exitvalue, 0.1f);
+                // SE再生
+                SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
             }
         }
 
