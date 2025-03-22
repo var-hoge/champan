@@ -76,6 +76,8 @@ namespace Scripts.Actor.Player.State
         // ステートが始まった時に呼ばれるメソッド
         public override void OnStart()
         {
+            obj.GetComponent<DataHolder>().JumpPower = _jumpPowerArray[(int)_jumpPower];
+
             //// 最後に乗っていたバブルを割る
             //var lastLandingBubble = obj.GetComponent<DataHolder>().LastLandingBubble;
             //if (lastLandingBubble != null)

@@ -26,6 +26,9 @@ namespace Scripts.Actor.Player
         public int PlayerIdx { get; set; } = 0;
         public Vector3 DummyPlayerPos { get; set; } = Vector3.zero;
         public bool IsValidDummyPlayerPos { get; set; } = false;
+        public Vector2 MaxVelocity { get; set; } = Vector2.zero;
+        public float JumpPower { get; set; } = 10.0f;
+        public float Gravity { get; set; } = -10.0f;
 
         //public Bubble LastLandingBubble { get; set; } = null;
         #endregion
@@ -61,7 +64,10 @@ namespace Scripts.Actor.Player
                 NoGroundDurationSec += gameObject.DeltaTime();
             }
 
-            Velocity = GetComponent<MoveCtrl>().Velocity;
+            var moveCtrl = GetComponent<MoveCtrl>();
+            Velocity = moveCtrl.Velocity;
+            MaxVelocity = moveCtrl.MaxVelocity;
+            Gravity = moveCtrl.Gravity;
 
             IsJumpStartFrame = false;
 

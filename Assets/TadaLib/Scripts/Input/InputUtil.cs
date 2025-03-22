@@ -73,10 +73,18 @@ namespace TadaLib.Input
         {
             var inputs = obj.GetComponents<IInput>();
 
-            // 一つしか持たない想定
-            UnityEngine.Assertions.Assert.IsTrue(inputs.Length <= 1);
+            //// 一つしか持たない想定
+            //UnityEngine.Assertions.Assert.IsTrue(inputs.Length <= 1);
 
-            return inputs.Length == 0 ? null : inputs[0];
+            foreach (var input in inputs)
+            {
+                if (input is MonoBehaviour { enabled: true })
+                {
+                    return input;
+                }
+            }
+
+            return null;
         }
 
         static void SetInputEnable(bool isEnable)

@@ -68,7 +68,7 @@ public class Bubble : MonoBehaviour
     private static Vector3 TopRight = Vector3.positiveInfinity;
 
     public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
-    private bool HasCrown => CrownBubble == this;
+    public bool HasCrown => CrownBubble == this;
 
     private List<string> _SEPath = null;
     private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();

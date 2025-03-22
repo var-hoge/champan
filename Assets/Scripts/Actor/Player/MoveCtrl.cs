@@ -29,6 +29,7 @@ namespace Scripts.Actor.Player
         public float MaxVelocityRateYState { get; set; } = 1.0f;
         public Vector2 MaxVelocityIgnoreRate => _maxVelocity;
         public Vector2 MaxVelocity => new Vector2(_maxVelocity.x * MaxVelocityRateXState, _maxVelocity.y * MaxVelocityRateYState);
+        public float Gravity => _gravity;
         #endregion
 
         #region メソッド
