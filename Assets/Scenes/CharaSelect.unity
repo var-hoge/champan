@@ -731,6 +731,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 1318156215}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
+  _sePath: SE/Character Selection/Player_Selection_KaniPan
 --- !u!1 &274588125
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1327,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 382515768}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
+  _sePath: SE/Character Selection/Player_Selection_NekoPan
 --- !u!1 &620420665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2868,6 +2870,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 2146925569}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
+  _sePath: SE/Character Selection/Player_Selection_FuransuPan
 --- !u!1 &1362255315
 GameObject:
   m_ObjectHideFlags: 0
@@ -3547,6 +3550,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 1013480729}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
+  _sePath: SE/Character Selection/Player_Selection_MelonPan
 --- !u!1 &1904685464
 GameObject:
   m_ObjectHideFlags: 0
