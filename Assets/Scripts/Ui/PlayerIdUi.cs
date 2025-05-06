@@ -38,7 +38,7 @@ namespace Ui
 
             var screenPos = Camera.main.WorldToScreenPoint(playerPos);
 
-            var offsetY = 170.0f;
+            var offsetY = 300.0f;
             var angle = 0.0f;
 
             if (!_isDummyPrev && isDummyValid)
@@ -51,7 +51,7 @@ namespace Ui
             // 画面内に収めるよう努力する
             if (isDummyValid)
             {
-                offsetY = 90.0f;
+                offsetY = 180.0f;
                 if (screenPos.y + offsetY > Screen.height)
                 {
                     var diff = screenPos.y + offsetY - Screen.height;
