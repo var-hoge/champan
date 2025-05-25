@@ -454,6 +454,7 @@ MonoBehaviour:
   - {fileID: 281096425162966653}
   - {fileID: -1627742856467030430}
   - {fileID: 8278163354050315580}
+  - {fileID: 7024997993917408870}
 --- !u!114 &281096425162966653
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -612,6 +613,22 @@ MonoBehaviour:
   cropToFit:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &7024997993917408870
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a854ee2c044284c954a91a8d842d6a, type: 3}
+  m_Name: BlurSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  strength:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &8148554286307483627
 MonoBehaviour:
   m_ObjectHideFlags: 3
