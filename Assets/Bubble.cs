@@ -73,6 +73,7 @@ public class Bubble : MonoBehaviour
     private List<string> _SEPath = null;
     private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
     private bool IsRidden => _moveInfoCtrl.IsRidden;
+    private bool _isRidenPrev = false;
     public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
 
     // Bust bubble
@@ -98,6 +99,8 @@ public class Bubble : MonoBehaviour
             var camera = Camera.main;
             TopRight = camera.ScreenToWorldPoint(new(Screen.width, Screen.height, camera.nearClipPlane));
         }
+
+        _isRidenPrev = true;
     }
 
     void OnDestroy()
@@ -118,6 +121,12 @@ public class Bubble : MonoBehaviour
 
         if (IsRidden)
         {
+            if (!_isRidenPrev)
+            {
+                _isRidenPrev = true;
+                GetComponent<BubbleAnimator>().OnRide();
+            }
+
             if (HasCrown)
             {
                 LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<DataHolder>().PlayerIdx;
@@ -154,6 +163,10 @@ public class Bubble : MonoBehaviour
                     BubbleUtil.Blow(player, transform.position, blowPower);
                 }
             }
+        }
+        else
+        {
+            _isRidenPrev = false;
         }
 
 
