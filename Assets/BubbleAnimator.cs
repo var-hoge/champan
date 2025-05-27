@@ -68,10 +68,10 @@ public class BubbleAnimator
 
     public void OnRide()
     {
-        PlayRideAnimation(rideAnimAplitude, transform.localScale.y);
+        PlayRideAnimation(rideAnimAplitude, transform.localScale.y, isFirst: true);
     }
 
-    void PlayRideAnimation(float aplitude, float originScale)
+    void PlayRideAnimation(float aplitude, float originScale, bool isFirst = false)
     {
         if (aplitude < 0.01f)
         {
@@ -85,7 +85,7 @@ public class BubbleAnimator
         Ease ease = Ease.Linear;
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOScaleY(originScale * (rideEndScaleRate - width * aplitude), rideAnimDurationSec * 0.5f).SetEase(ease));
+        seq.Append(transform.DOScaleY(originScale * (rideEndScaleRate - width * aplitude), rideAnimDurationSec * 0.5f * (isFirst ? 0.5f : 1.0f)).SetEase(ease));
         seq.Append(transform.DOScaleY(originScale * (rideEndScaleRate + width * aplitude), rideAnimDurationSec * 0.5f).SetEase(ease));
 
         seq.OnComplete(() =>
