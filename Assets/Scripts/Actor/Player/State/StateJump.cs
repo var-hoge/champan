@@ -33,9 +33,12 @@ namespace Scripts.Actor.Player.State
         public static bool TryChangeState(GameObject obj, JumpPowerKind jumpPowerKind)
         {
             // 試合中じゃないと使えない
-            if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+            if (GameSequenceManager.Instance != null)
             {
-                return false;
+                if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+                {
+                    return false;
+                }
             }
 
             // 地上にいないと使えない

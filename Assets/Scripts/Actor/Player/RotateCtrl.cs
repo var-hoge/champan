@@ -47,9 +47,12 @@ namespace Scripts.Actor.Player
 
             var velocityX = GetComponent<MoveCtrl>().Velocity.x;
             // 試合開始前に方向を変更できるようにする
-            if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.BeforeBattle)
+            if (GameSequenceManager.Instance != null)
             {
-                velocityX = InputUtil.GetAxis(gameObject).x;
+                if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.BeforeBattle)
+                {
+                    velocityX = InputUtil.GetAxis(gameObject).x;
+                }
             }
 
             if (Mathf.Abs(velocityX) >= 1.0f)

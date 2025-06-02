@@ -33,6 +33,29 @@ namespace Ui
             GetComponent<RectTransform>().rotation = _manager.GetPickIconTransform(_playerIdx, _selectIdx).rotation;
         }
 
+        public void Show()
+        {
+            var rectTransform = GetComponent<RectTransform>();
+            var initScale = rectTransform.localScale;
+            rectTransform.localScale = Vector3.zero;
+            GetComponent<RectTransform>().DOScale(initScale, 0.4f).SetEase(Ease.OutBack);
+            GetComponent<UnityEngine.UI.Image>().DOFade(1.0f, 0.2f);
+
+            _manager.NotifyCursorOver(_playerIdx, _selectIdx);
+
+            _isReady = true;
+        }
+
+        public void AddMoveCallback(System.Action callback)
+        {
+            _moveCallbacks.Add(callback);
+        }
+
+        public void AddSelectCallbac(System.Action callback)
+        {
+            _selectCallbacks.Add(callback);
+        }
+
         public void ForceMove(bool isRight)
         {
             MoveImpl(isRight);
@@ -51,11 +74,20 @@ namespace Ui
         int _selectIdx = 0;
 
         float _moveInputValuePrev = 0.0f;
+        bool _isReady = false;
+
+        List<System.Action> _moveCallbacks = new List<System.Action>();
+        List<System.Action> _selectCallbacks = new List<System.Action>();
         #endregion
 
         #region privateメソッド
         void OnMove(Vector2 value)
         {
+            if (!_isReady)
+            {
+                return;
+            }
+
             if (IsSelectDone)
             {
                 return;
@@ -82,17 +114,23 @@ namespace Ui
 
         void OnAction()
         {
+            if (!_isReady)
+            {
+                return;
+            }
+
             if (IsSelectDone)
             {
-                if (!_manager.NotifyCancelSelect(_playerIdx, _selectIdx))
-                {
-                    // キャンセルできなかった
-                    return;
-                }
-
-                OnCancelSelect();
-
                 return;
+                //if (!_manager.NotifyCancelSelect(_playerIdx, _selectIdx))
+                //{
+                //    // キャンセルできなかった
+                //    return;
+                //}
+
+                //OnCancelSelect();
+
+                //return;
             }
 
             if (!_manager.NotifySelect(_playerIdx, _selectIdx))
@@ -112,6 +150,10 @@ namespace Ui
             GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnAction += OnAction;
             GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<PlayerInputHandler>().OnMove += OnMove;
             //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered += OnAction;
+
+            // 最初は非表示
+            var image = GetComponent<UnityEngine.UI.Image>();
+            image.color = image.color.SetAlpha(0.0f);
         }
 
         private void OnDestroy()
@@ -147,6 +189,13 @@ namespace Ui
                 GetComponent<RectTransform>().DOKill();
                 GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
                 GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
+
+                _manager.NotifyCursorOver(_playerIdx, _selectIdx);
+
+                foreach (var callback in _moveCallbacks)
+                {
+                    callback();
+                }
             }
         }
 
@@ -157,6 +206,11 @@ namespace Ui
             IsSelectDone = true;
 
             _body.enabled = false;
+
+            foreach(var callback in _selectCallbacks)
+            {
+                callback();
+            }
         }
 
         void OnCancelSelect()

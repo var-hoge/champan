@@ -78,13 +78,14 @@ namespace Scripts.Actor.Player
         void Start()
         {
 #if UNITY_EDITOR
-            //TadaLib.Dbg.DebugBoxManager.Display(this);
             if (PlayerIdx == 0)
             {
-                DebugTextManager.Display(this, 1);
+                var elem = DebugTextManager.Display(this, 1);
+                elem.AddRemoveTrigger(this);
             }
 #endif
         }
+
         public override string ToString()
         {
             return $"IsGround: {GetComponent<TadaLib.ActionStd.TadaRigidbody2D>().IsGround}\nState: {GetComponent<TadaLib.ActionStd.StateMachine>().CurrentStateName}";

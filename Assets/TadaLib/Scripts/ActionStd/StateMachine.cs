@@ -186,10 +186,9 @@ namespace TadaLib.ActionStd
         /// </summary>
         public void OnUpdate()
         {
-            Assert.IsTrue(_stateQueue.Count >= 1, "初期のステートが登録されていません");
-
-            _state.OnUpdate(); // ステートの状態を更新
-            _state.PrvTimerUpdate(gameObject.DeltaTime()); // ステート経過時間を更新
+            //Assert.IsTrue(_stateQueue.Count >= 1, "初期のステートが登録されていません");
+            _state?.OnUpdate(); // ステートの状態を更新
+            _state?.PrvTimerUpdate(gameObject.DeltaTime()); // ステート経過時間を更新
 
             CheckState(); // ステートの変更要求があるか確かめる
         }

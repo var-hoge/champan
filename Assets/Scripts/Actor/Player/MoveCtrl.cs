@@ -134,9 +134,12 @@ namespace Scripts.Actor.Player
                 var accelX = isGround ? _accelX : _accelAirX;
                 var decelX = isGround ? _decelX : _decelAirX;
                 var axisX = InputUtil.GetAxis(gameObject, AxisCode.Horizontal);
-                if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+                if (GameSequenceManager.Instance != null)
                 {
-                    axisX = 0.0f;
+                    if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle)
+                    {
+                        axisX = 0.0f;
+                    }
                 }
                 if (IsUncontrollable || IsUncontrollableState || !_uncontrollableTimer.IsTimout)
                 {

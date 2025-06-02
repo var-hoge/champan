@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using Scripts.Actor.Player;
+using Scripts;
 
 namespace TadaLib.ActionStd
 {
@@ -300,7 +301,7 @@ namespace TadaLib.ActionStd
             //System.Array.Copy(hitDownRight, 0, hits, hits.Length, hitDownRight.Length);
 
             foreach (var hit in new List<RaycastHit2D>() { hitDownLeft, hitDownCenter, hitDownRight })
-                //foreach (var hit in hits)
+            //foreach (var hit in hits)
             {
                 if (!hit)
                 {
@@ -338,6 +339,11 @@ namespace TadaLib.ActionStd
 
             var isSameMover = mostTopHit && (_ridingMover == mostTopHit.collider.GetComponent<MoveInfoCtrl>());
             var isGroundAdsorption = isSameMover && !_disableGroundAdsorptionOunce;
+            if (GameSequenceManager.Instance == null)
+            {
+                // 特定場面では地面吸着を無効化
+                isGroundAdsorption = false;
+            }
             var isHit = mostTopHit &&
                 (isGroundAdsorption || candidateDiffY >= diff.y); // 前回地面にいたなら吸着させる
 

@@ -22,14 +22,22 @@ namespace Ui
         #endregion
 
         #region メソッド
+        void Start()
+        {
+            GetComponent<UnityEngine.UI.Image>().enabled = false;
+        }
+
         public void OnPostMove()
         {
             var player = TadaLib.ActionStd.PlayerManager.TryGetPlayer(_playerNumber);
 
             if (player == null)
             {
+                GetComponent<UnityEngine.UI.Image>().enabled = false;
                 return;
             }
+
+            GetComponent<UnityEngine.UI.Image>().enabled = true;
 
             // プレイヤーの頭上に移動させる
             var dataHolder = player.GetComponent<Scripts.Actor.Player.DataHolder>();

@@ -51,6 +51,15 @@ namespace Ui
             return _isUsedList[selectIdx];
         }
 
+        public void NotifyCursorOver(int playerIdx, int selectIdx)
+        {
+            // キャラクター ID に変換
+            var charaIdx = SelectIdxToCharaIdx(selectIdx);
+
+            // キャラクター仮決定
+            _playerUseCharaIdList[playerIdx] = charaIdx;
+        }
+
         public bool NotifySelect(int playerIdx, int selectIdx)
         {
             // すでに使われていたらダメ
@@ -90,6 +99,13 @@ namespace Ui
                         cursor.ForceMove(true);
                     }
                 }
+            }
+
+            // スタートエリアを出現
+            if (!_startArea.activeSelf)
+            {
+                // @todo: アニメ
+                _startArea.gameObject.SetActive(true);
             }
 
             return true;
@@ -137,6 +153,9 @@ namespace Ui
 
         [SerializeField]
         Sprite _selectedCharaSprite;
+
+        [SerializeField]
+        GameObject _startArea;
 
         bool _isSceneChanging = false;
         #endregion
