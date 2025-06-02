@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.Extension;
-using Scripts.Actor.Player;
-using Scripts;
 
 namespace TadaLib.ActionStd
 {
@@ -339,7 +337,7 @@ namespace TadaLib.ActionStd
 
             var isSameMover = mostTopHit && (_ridingMover == mostTopHit.collider.GetComponent<MoveInfoCtrl>());
             var isGroundAdsorption = isSameMover && !_disableGroundAdsorptionOunce;
-            if (GameSequenceManager.Instance == null)
+            if (App.GameSequenceManager.Instance == null)
             {
                 // 特定場面では地面吸着を無効化
                 isGroundAdsorption = false;

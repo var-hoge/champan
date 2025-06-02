@@ -7,13 +7,13 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 
-namespace TadaLib.ActionStd
+namespace App.Ui.CharaSelect
 {
     /// <summary>
-    /// PlayerRegistorator
+    /// PlayerSelectSlotManager
     /// </summary>
-    public class PlayerRegistorator
-        : MonoBehaviour
+    public class PlayerSelectSlotManager
+        : BaseManagerProc<PlayerSelectSlotManager>
     {
         #region プロパティ
         #endregion
@@ -24,23 +24,20 @@ namespace TadaLib.ActionStd
         #region MonoBehavior の実装
         void Start()
         {
-#if UNITY_EDITOR
-            if (PlayerManager.Instance is null)
+            for (int idx = 0; idx < transform.childCount; ++idx)
             {
-                Assert.IsTrue(false, "PlayerManagerのGameObjectがシーン内にありません。");
-                return;
+                var child = transform.GetChild(idx);
+                if (child.GetComponent<PlayerSelectSlot>() is { } obj)
+                {
+                    _players.Add(obj);
+                }
             }
-#endif
-            PlayerManager.RegisterPlayer(gameObject, _number);
-
-            GetComponent<App.Actor.Player.DataHolder>().PlayerIdx = _number;
         }
         #endregion
 
         #region privateフィールド
         [SerializeField]
-        [Header("プレイヤーID")]
-        int _number = 0;
+        List<PlayerSelectSlot> _players = new List<PlayerSelectSlot>();
         #endregion
 
         #region privateメソッド

@@ -1,5 +1,4 @@
-﻿using Scripts;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -182,7 +181,7 @@ namespace TadaLib.Input
             }
             else
             {
-                _inputSystemInput = GameController.Instance.GetPlayerInput(_playerIdx);
+                _inputSystemInput = App.GameController.Instance.GetPlayerInput(_playerIdx);
             }
 
             // 初期化
