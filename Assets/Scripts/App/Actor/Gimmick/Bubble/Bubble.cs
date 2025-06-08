@@ -283,7 +283,10 @@ namespace App.Actor.Gimmick.Bubble
             }
 
             // シールドの残数を表示
-            DisplayShieldCount(shieldValue);
+            if (shieldValue > 1)
+            {
+                DisplayShieldCount(shieldValue);
+            }
         }
 
         /// <summary>
