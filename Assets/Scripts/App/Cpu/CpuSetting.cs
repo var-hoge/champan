@@ -14,8 +14,10 @@ namespace App.Cpu
     /// CpuSetting
     /// </summary>
     [CreateAssetMenu(fileName = nameof(CpuSetting), menuName = "ScriptableObjects/Cpu/CpuSetting")]
-    public class CpuSetting : ScriptableObject
+    public class CpuSetting
+        : ScriptableObject
     {
+        [Header("チェックが付いているとCPUになります。")]
         public bool IsCpuPlayer0 = false;
         public bool IsCpuPlayer1 = true;
         public bool IsCpuPlayer2 = true;
