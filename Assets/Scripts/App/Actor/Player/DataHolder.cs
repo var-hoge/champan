@@ -21,8 +21,8 @@ namespace App.Actor.Player
         public Vector3 LastLandingPos { get; set; } = Vector3.zero;
         public Vector3 FaceVec { get; set; } = Vector3.right;
         public Vector2 Velocity { get; set; } = Vector3.zero;
+        public int PlayerIdx => _playerIdx;
         public int CharaIdx => Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(PlayerIdx);
-        public int PlayerIdx { get; set; } = 0;
         public Vector3 DummyPlayerPos { get; set; } = Vector3.zero;
         public bool IsValidDummyPlayerPos { get; set; } = false;
         public Vector2 MaxVelocity { get; set; } = Vector2.zero;
@@ -92,6 +92,8 @@ namespace App.Actor.Player
         #endregion
 
         #region privateフィールド
+        [SerializeField]
+        int _playerIdx = 0;
         #endregion
     }
 }

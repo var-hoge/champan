@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using App.Actor.Player;
 
 namespace TadaLib.ActionStd
 {
@@ -31,16 +32,11 @@ namespace TadaLib.ActionStd
                 return;
             }
 #endif
-            PlayerManager.RegisterPlayer(gameObject, _number);
-
-            GetComponent<App.Actor.Player.DataHolder>().PlayerIdx = _number;
+            PlayerManager.RegisterPlayer(gameObject, GetComponent<DataHolder>().PlayerIdx);
         }
         #endregion
 
         #region privateフィールド
-        [SerializeField]
-        [Header("プレイヤーID")]
-        int _number = 0;
         #endregion
 
         #region privateメソッド

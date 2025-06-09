@@ -78,6 +78,11 @@ namespace TadaLib.Input
 
             foreach (var input in inputs)
             {
+                if (!input.ActionEnabled)
+                {
+                    continue;
+                }
+
                 if (input is MonoBehaviour { enabled: true })
                 {
                     return input;

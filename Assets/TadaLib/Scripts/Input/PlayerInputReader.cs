@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using App.Cpu;
 using UnityEngine;
 
 namespace TadaLib.Input
@@ -175,14 +176,9 @@ namespace TadaLib.Input
         #region MonoBehavior の実装
         void Start()
         {
-            if (_playerIdx == -1)
-            {
-                _inputSystemInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
-            }
-            else
-            {
-                _inputSystemInput = App.GameController.Instance.GetPlayerInput(_playerIdx);
-            }
+            var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
+
+            _inputSystemInput = App.GameController.Instance.GetPlayerInput(playerIdx);
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
@@ -195,6 +191,9 @@ namespace TadaLib.Input
             {
                 _axisDict.Add(code, 0.0f);
             }
+
+
+            ActionEnabled = !CpuManager.Instance.IsCpu(playerIdx);
         }
         #endregion
 
@@ -272,9 +271,6 @@ namespace TadaLib.Input
                 IsPushed = isPushed;
             }
         }
-
-        [SerializeField]
-        int _playerIdx = -1;
 
         const float MaxBuffSec = 0.5f;
         UnityEngine.InputSystem.PlayerInput _inputSystemInput = null;

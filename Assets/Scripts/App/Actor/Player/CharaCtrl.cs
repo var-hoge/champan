@@ -24,7 +24,8 @@ namespace App.Actor.Player
         #region MonoBehavior の実装
         void Start()
         {
-            var charaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(_playerNumber);
+            var playerIdx = GetComponent<DataHolder>().PlayerIdx;
+            var charaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(playerIdx);
             _body.sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
 
             _body.transform.localPosition = _offsets[charaIdx];
@@ -37,9 +38,6 @@ namespace App.Actor.Player
         #endregion
 
         #region privateフィールド
-        [SerializeField]
-        int _playerNumber = 0;
-
         [SerializeField]
         SpriteRenderer _body;
 

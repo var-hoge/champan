@@ -114,6 +114,9 @@ namespace App.Cpu
             _jumppingTimer = new TadaLib.Util.Timer(0.2f);
             _nextInput = new InputData();
             _nextInputPrev = new InputData();
+
+            var playerIdx = GetComponent<Actor.Player.DataHolder>().PlayerIdx;
+            ActionEnabled = CpuManager.Instance.IsCpu(playerIdx);
         }
         #endregion
 

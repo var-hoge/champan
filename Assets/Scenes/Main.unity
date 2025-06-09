@@ -376,7 +376,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 117224329}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fa2a5198e5bc02479be64b1b8e3b455, type: 3}
   m_Name: 
@@ -762,13 +762,17 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.61
       objectReference: {fileID: 0}
+    - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _playerIdx
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
@@ -2752,13 +2756,17 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.57
       objectReference: {fileID: 0}
+    - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _playerIdx
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
@@ -3362,13 +3370,17 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.6
       objectReference: {fileID: 0}
+    - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _playerIdx
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5259226107377835526, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _playerIdx
