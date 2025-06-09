@@ -34,8 +34,7 @@ namespace App.Ui.CharaSelect
             _body.rectTransform.DOPunchScale(Vector3.one * 0.5f, 0.15f)
                 .OnComplete(() =>
                 {
-                    _body.sprite = _selectedSprite;
-                    _body.rectTransform.sizeDelta = _selectedSprite.textureRect.size;
+                    _body.SetSprite(_selectedSprite);
                     _body.rectTransform.localScale = _localScaleDefault * 1.3f;
                     _body.rectTransform.localEulerAngles = new Vector3(0.0f, 0.0f, Random.Range(0.0f, 360.0f));
                     _body.rectTransform.DOShakePosition(0.20f, 5.0f, 5, fadeOut: true);
@@ -49,8 +48,7 @@ namespace App.Ui.CharaSelect
         public void OnCancelSelected()
         {
             _body.rectTransform.DOKill();
-            _body.sprite = _unselectedSprite;
-            _body.rectTransform.sizeDelta = _unselectedSprite.textureRect.size;
+            _body.SetSprite(_unselectedSprite);
             _body.rectTransform.localScale = _localScaleDefault;
             _body.rectTransform.localPosition = _localPositionDefault;
             _body.rectTransform.localEulerAngles = _localEulerAnglesDefault;

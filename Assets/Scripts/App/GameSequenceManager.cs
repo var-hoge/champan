@@ -39,7 +39,21 @@ namespace App
         public void GameOver()
         {
             WinnerPlayerIdx = Actor.Gimmick.Bubble.Bubble.LastCrownRidePlayerIdx;
-            _gameEndUi.GameEnd(GetComponent<SimpleAnimation>()).Forget();
+
+            var gameMatchManager = GameMatchManager.Instance;
+            gameMatchManager.AddWinScore(WinnerPlayerIdx);
+            if (gameMatchManager.TryGetWinner(out var playerIdx))
+            {
+                Debug.Assert(playerIdx == WinnerPlayerIdx);
+                // ゲーム終了！
+                _gameEndUi.GameEnd(GetComponent<SimpleAnimation>(), WinnerPlayerIdx).Forget();
+            }
+            else
+            {
+                // ラウンドが続く
+                _gameEndUi.GameEndWithContinue(GetComponent<SimpleAnimation>(), WinnerPlayerIdx).Forget();
+            }
+
         }
         #endregion
 

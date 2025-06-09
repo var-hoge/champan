@@ -25,15 +25,14 @@ namespace App.Actor.Gimmick.Bubble
 
         private void TeleportCrown()
         {
-            Debug.Log($"TeleportCrown\nCrownShieldValue : {Bubble.CrownShieldValue}");
-            SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
-
             if (Bubble.CrownShieldValue <= 0)
             {
-                GameSequenceManager.WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
-                GameSequenceManager.Instance.GameOver();
+                Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
                 return;
             }
+
+            Debug.Log($"TeleportCrown\nCrownShieldValue : {Bubble.CrownShieldValue}");
+            SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
 
             Transform crown = Bubble.CrownBubble.CrownSpriteRenderer;
             crown.SetParent(null);

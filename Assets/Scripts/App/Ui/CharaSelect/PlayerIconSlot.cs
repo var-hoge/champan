@@ -26,8 +26,7 @@ namespace App.Ui.CharaSelect
         public void SetChara(int charaIdx)
         {
             var sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
-            _body.sprite = sprite;
-            _body.rectTransform.sizeDelta = sprite.textureRect.size;
+            _body.SetSprite(sprite);
             _body.rectTransform.localScale = Vector3.one * 0.6f;
             _body.rectTransform.localEulerAngles = new Vector3(0.0f, 0.0f, 25.0f);
             _body.rectTransform.DOPunchScale(Vector3.one * 1.5f, 0.1f);
@@ -37,8 +36,7 @@ namespace App.Ui.CharaSelect
         {
             _body.rectTransform.DOKill();
 
-            _body.sprite = _unselectedSprite;
-            _body.rectTransform.sizeDelta = _unselectedSprite.textureRect.size;
+            _body.SetSprite(_unselectedSprite);
             _body.rectTransform.localScale = _localScaleDefault;
             _body.rectTransform.localEulerAngles = _localEulerAnglesDefault;
         }

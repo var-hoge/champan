@@ -20,6 +20,11 @@ namespace App.Actor
             return hoge[Random.Range(0, hoge.Count)];
         }
 
+        public Sprite GetCharaMainVisualImage(int charaIdx)
+        {
+            return _charaMainVisualImages[charaIdx];
+        }
+
         [SerializeField]
         List<Sprite> _chara1Images;
         [SerializeField]
@@ -29,6 +34,8 @@ namespace App.Actor
         [SerializeField]
         List<Sprite> _chara4Images;
 
+        [SerializeField]
+        List<Sprite> _charaMainVisualImages;
 
         private List<Sprite>[] _images = null;
         private List<Sprite>[] Images

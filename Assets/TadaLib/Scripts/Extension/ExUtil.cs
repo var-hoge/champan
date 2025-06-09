@@ -35,5 +35,13 @@ namespace TadaLib.Extension
             return color;
         }
         #endregion
+
+        #region Image
+        public static void SetSprite(this UnityEngine.UI.Image target, Sprite sprite)
+        {
+            target.sprite = sprite;
+            target.rectTransform.sizeDelta = sprite.textureRect.size;
+        }
+        #endregion
     }
 }

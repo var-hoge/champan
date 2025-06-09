@@ -77,9 +77,12 @@ namespace App.Actor.Gimmick.Bubble
         public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
 
         // Bust bubble
-        public void DoBurst(int playerIdx)
+        public void DoBurst(int playerIdx = -1)
         {
-            LastCrownRidePlayerIdx = playerIdx;
+            if (playerIdx >= 0)
+            {
+                LastCrownRidePlayerIdx = playerIdx;
+            }
             BurstImpl();
         }
 
@@ -296,12 +299,32 @@ namespace App.Actor.Gimmick.Bubble
             PlaySE();
             if (HasCrown)
             {
-                transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+                if (CrownShieldValue == 1)
                 {
-                    CrownShieldValue--;
-                    Destroy(gameObject);
-                });
-                // TODO: Push back the player
+                    // ÅŒã‚Ì‰‰o
+                    if (Bubble.CrownShieldValue == 1)
+                    {
+                        Bubble.CrownShieldValue--;
+
+                        GameSequenceManager.WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
+                        GameSequenceManager.Instance.GameOver();
+
+                        transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+                        {
+                            CrownShieldValue--;
+                            Destroy(gameObject);
+                        });
+                        return;
+                    }
+                }
+                else
+                {
+                    transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+                    {
+                        CrownShieldValue--;
+                        Destroy(gameObject);
+                    });
+                }
             }
             else
             {

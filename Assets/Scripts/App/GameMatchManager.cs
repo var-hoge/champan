@@ -20,15 +20,69 @@ namespace App
         /// <summary>
         /// ゲームに勝利するための勝ち点
         /// </summary>
-        public int WinCountToMatchFinish { private set; get; }
+        public int WinCountToMatchFinish { private set; get; } = 3;
         #endregion
 
+        /// <summary>
+        /// ゲームに勝利するための勝ち点の設定
+        /// </summary>
+        /// <param name="count"></param>
         #region メソッド
         public void SetWinCountToMatchFinish(int count)
         {
+            Debug.Assert(count >= 1);
             WinCountToMatchFinish = count;
         }
 
+        /// <summary>
+        /// 指定したプレイヤーの勝ち点を追加
+        /// </summary>
+        /// <param name="playerIdx"></param>
+        public void AddWinScore(int playerIdx)
+        {
+            _winCounts[playerIdx]++;
+        }
+
+        /// <summary>
+        /// 各プレイヤーの勝ち点をリセット
+        /// </summary>
+        public void ResetPlayersWinCount()
+        {
+            for (int idx = 0; idx < _winCounts.Count; ++idx)
+            {
+                _winCounts[idx] = 0;
+            }
+        }
+
+        /// <summary>
+        /// 存在するなら、ゲームに勝利したプレイヤー番号を取得
+        /// </summary>
+        /// <param name="playerIdx"></param>
+        /// <returns>勝者が存在するなら true, 存在しないなら false</returns>
+        public bool TryGetWinner(out int playerIdx)
+        {
+            for (int idx = 0; idx < _winCounts.Count; ++idx)
+            {
+                if (_winCounts[idx] == WinCountToMatchFinish)
+                {
+                    playerIdx = idx;
+                    return true;
+                }
+            }
+
+            playerIdx = -1;
+            return false;
+        }
+
+        /// <summary>
+        /// プレイヤーの勝ち点を取得
+        /// </summary>
+        /// <param name="playerIdx"></param>
+        /// <returns></returns>
+        public int GetWinCount(int playerIdx)
+        {
+            return _winCounts[playerIdx];
+        }
         #endregion
 
         #region MonoBehavior の実装
@@ -38,10 +92,6 @@ namespace App
             {
                 _winCounts.Add(0);
             }
-        }
-
-        void Update()
-        {
         }
         #endregion
 

@@ -109,8 +109,7 @@ namespace App.Ui.CharaSelect
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
-            _chara.rectTransform.sizeDelta = charaImage.textureRect.size;
-            _chara.sprite = charaImage;
+            _chara.SetSprite(charaImage);
 
             _chara.rectTransform.localScale = Vector3.zero;
             _chara.rectTransform.DOScale(1.2f, 0.4f).SetEase(Ease.OutBack);
@@ -125,8 +124,7 @@ namespace App.Ui.CharaSelect
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
-            _chara.rectTransform.sizeDelta = charaImage.textureRect.size;
-            _chara.sprite = charaImage;
+            _chara.SetSprite(charaImage);
         }
 
         void OnCharaSelected()
