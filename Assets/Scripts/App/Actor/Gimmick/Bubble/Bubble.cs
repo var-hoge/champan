@@ -55,6 +55,8 @@ namespace App.Actor.Gimmick.Bubble
         [SerializeField] private ParticleSystem[] crownParticles;
         [SerializeField] private ParticleSystem crownGlitter;
 
+        [SerializeField] private Sprite InactiveShieldSprite;
+
         private float _burstTimer;
         private float _burstGracePeriod = 0.05f;
         private bool _hasRidden = false;
@@ -305,7 +307,7 @@ namespace App.Actor.Gimmick.Bubble
                 if (n > shieldValue)
                 {
                     // TODO::ƒCƒ[ƒW‚ªŠ®¬‚µ‚½‚ç‚±‚±‚ÅSprite‚ğİ’è
-                    shieldCount.GetComponent<SpriteRenderer>().color = Color.white;
+                    shieldCount.GetComponent<SpriteRenderer>().sprite = InactiveShieldSprite;
                 }
             }
         }

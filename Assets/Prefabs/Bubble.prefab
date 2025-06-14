@@ -453,6 +453,7 @@ MonoBehaviour:
   - {fileID: 9045816559642909609}
   - {fileID: 9045816559642870601}
   crownGlitter: {fileID: 3259724051852106308}
+  InactiveShieldSprite: {fileID: -6300594927631368995, guid: bb26c2cc0886bf1429b426b5a4ba970e, type: 3}
 --- !u!114 &1157802686218243822
 MonoBehaviour:
   m_ObjectHideFlags: 0
