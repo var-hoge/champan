@@ -79,6 +79,7 @@ namespace App.Actor.Gimmick.Bubble
         private bool IsRidden => _moveInfoCtrl.IsRidden;
         private bool _isRidenPrev = false;
         public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
+        private bool IsCrownBubble => shieldSpriteRenderer.gameObject.activeSelf;
 
         // Bust bubble
         public void DoBurst(int playerIdx)
@@ -200,7 +201,7 @@ namespace App.Actor.Gimmick.Bubble
             }
 
             // クラウンバブルの場合、シールドを回転
-            if (shieldSpriteRenderer.gameObject.activeSelf)
+            if (IsCrownBubble)
             {
                 _shieldCountRoot.Rotate(Vector3.forward, Time.deltaTime * 15f);
             }
