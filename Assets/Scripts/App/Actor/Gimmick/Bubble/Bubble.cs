@@ -306,7 +306,6 @@ namespace App.Actor.Gimmick.Bubble
 
                 if (n > shieldValue)
                 {
-                    // TODO::ƒCƒ[ƒW‚ªŠ®¬‚µ‚½‚ç‚±‚±‚ÅSprite‚ğİ’è
                     shieldCount.GetComponent<SpriteRenderer>().sprite = InactiveShieldSprite;
                 }
             }
