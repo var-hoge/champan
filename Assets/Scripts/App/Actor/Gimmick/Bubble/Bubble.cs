@@ -48,10 +48,14 @@ namespace App.Actor.Gimmick.Bubble
         [SerializeField] private MoveInfoCtrl _moveInfoCtrl;
 
         [SerializeField] private GameObject _bubPopEff;
+        [SerializeField] private Transform _shieldCountRoot;
+        [SerializeField] private GameObject _shieldCountPrefab;
 
         [Header("Crown Effect")]
         [SerializeField] private ParticleSystem[] crownParticles;
         [SerializeField] private ParticleSystem crownGlitter;
+
+        [SerializeField] private Sprite InactiveShieldSprite;
 
         private float _burstTimer;
         private float _burstGracePeriod = 0.05f;
@@ -75,6 +79,7 @@ namespace App.Actor.Gimmick.Bubble
         private bool IsRidden => _moveInfoCtrl.IsRidden;
         private bool _isRidenPrev = false;
         public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
+        private bool IsCrownBubble => shieldSpriteRenderer.gameObject.activeSelf;
 
         // Bust bubble
         public void DoBurst(int playerIdx = -1)
@@ -197,6 +202,12 @@ namespace App.Actor.Gimmick.Bubble
                     GetComponent<Rigidbody2D>().AddForce(Vector2.up * 1f * Time.timeScale);
                 }
             }
+
+            // クラウンバブルの場合、シールドを回転
+            if (IsCrownBubble)
+            {
+                _shieldCountRoot.Rotate(Vector3.forward, Time.deltaTime * 15f);
+            }
         }
 
         private void PlaySE()
@@ -274,6 +285,32 @@ namespace App.Actor.Gimmick.Bubble
                 foreach (var particle in crownParticles)
                 {
                     particle.Play(false);
+                }
+            }
+
+            // シールドの残数を表示
+            if (shieldValue > 1)
+            {
+                DisplayShieldCount(shieldValue);
+            }
+        }
+
+        /// <summary>
+        /// シールドの残数を表示
+        /// </summary>
+        /// <param name="shieldValue">シールドの残数</param>
+        private void DisplayShieldCount(int shieldValue)
+        {
+            var angle = -360 / 5f;
+            for (var n = 1; n <= 5; ++n)
+            {
+                var shieldCount = Instantiate(_shieldCountPrefab, _shieldCountRoot).transform;
+                shieldCount.localPosition = Vector3.up * 0.7f;
+                shieldCount.RotateAround(_shieldCountRoot.position, Vector3.forward, angle * n);
+
+                if (n > shieldValue)
+                {
+                    shieldCount.GetComponent<SpriteRenderer>().sprite = InactiveShieldSprite;
                 }
             }
         }

@@ -445,12 +445,15 @@ MonoBehaviour:
   blowPower: 30
   _moveInfoCtrl: {fileID: 2411988068338451430}
   _bubPopEff: {fileID: 3220368770406111458, guid: 2edb08e734c9ccd44850bec0d66aba3b, type: 3}
+  _shieldCountRoot: {fileID: 5611870513187391303}
+  _shieldCountPrefab: {fileID: 5355697843671386033, guid: 8339097f7a2c3674a853df76375feca9, type: 3}
   crownParticles:
   - {fileID: 3259724051852106308}
   - {fileID: 9045816559642870397}
   - {fileID: 9045816559642909609}
   - {fileID: 9045816559642870601}
   crownGlitter: {fileID: 3259724051852106308}
+  InactiveShieldSprite: {fileID: -6300594927631368995, guid: bb26c2cc0886bf1429b426b5a4ba970e, type: 3}
 --- !u!114 &1157802686218243822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -655,6 +658,37 @@ MonoBehaviour:
   - {fileID: -1717888412633368228, guid: a3ca0f4577716734cb9735f9cbe882d0, type: 3}
   - {fileID: 8168903327556774430, guid: 591d8db772b60dc45a3e07a50b2767b2, type: 3}
   - {fileID: 5485582096018297686, guid: 94f665f57d8842d409b189ff638e73fb, type: 3}
+--- !u!1 &8137162481322682284
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5611870513187391303}
+  m_Layer: 0
+  m_Name: ShieldCountRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5611870513187391303
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8137162481322682284}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 839203822113743155}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8902986967717663801
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,6 +721,7 @@ Transform:
   - {fileID: 8140593273235157413}
   - {fileID: 356312812984868109}
   - {fileID: 6286004602059883277}
+  - {fileID: 5611870513187391303}
   - {fileID: 9028705123090943179}
   m_Father: {fileID: 2955566541520583920}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
