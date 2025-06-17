@@ -786,6 +786,10 @@ PrefabInstance:
       propertyPath: m_DefaultControlScheme
       value: 8456
       objectReference: {fileID: 0}
+    - target: {fileID: 8526105088913582177, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 931359185589539332, guid: 0a8e22c1ffb604e4e924a95e244eba17, type: 3}
     - target: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Name
       value: Player_4P
@@ -2780,6 +2784,10 @@ PrefabInstance:
       propertyPath: m_DefaultControlScheme
       value: WASD
       objectReference: {fileID: 0}
+    - target: {fileID: 8526105088913582177, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 6679715460405503824, guid: 3750edd6fa48ea44689951ead5bb253b, type: 3}
     - target: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Name
       value: Player_2P
@@ -3394,6 +3402,10 @@ PrefabInstance:
       propertyPath: m_DefaultControlScheme
       value: IJKL
       objectReference: {fileID: 0}
+    - target: {fileID: 8526105088913582177, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3998685992907457791, guid: bb48b94082b461646a7787087b71f4f0, type: 3}
     - target: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_Name
       value: Player_3P
