@@ -25,7 +25,18 @@ namespace App.Ui.CharaSelect
 
             if (IsFinished())
             {
+                foreach (var starParticle in _starParticles.GetComponentsInChildren<ParticleSystem>())
+                {
+                    starParticle.Play();
+                }
+
                 _isFinished = true;
+                StartCoroutine(StartTransition());
+            }
+
+            IEnumerator StartTransition()
+            {
+                yield return new WaitForSeconds(1.5f);
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.5f, 0.5f);
             }
         }
@@ -61,6 +72,9 @@ namespace App.Ui.CharaSelect
 
         [SerializeField]
         Transform _playerParents;
+
+        [SerializeField]
+        private GameObject _starParticles;
 
         bool _isFinished = false;
     }
