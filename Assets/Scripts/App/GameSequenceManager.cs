@@ -28,7 +28,7 @@ namespace App
         #endregion
 
         #region プロパティ
-        public Phase PhaseKind = Phase.BeforeBattle;
+        public Phase PhaseKind { get; set; } = Phase.BeforeBattle;
         public static int WinnerPlayerIdx = 0;
         #endregion
 

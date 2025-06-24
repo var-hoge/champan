@@ -40,31 +40,30 @@ namespace App.Ui.Main
             await UniTask.WaitForSeconds(2.0f);
 
             // 誰かがボタンを押したら次へ
-            var gameController = GameController.Instance;
+            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
             bool isPushed = false;
-
-            void OnActoinTrigged()
-            {
-                isPushed = true;
-            }
-
-            for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
-            {
-                gameController.GetPlayerInput(idx).GetComponent<Input.PlayerInputHandler>().OnAction += OnActoinTrigged;
-            }
 
             while (!isPushed)
             {
+                var isEnd = false;
+                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                {
+                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                    {
+                        isEnd = true;
+                        break;
+                    }
+                }
+
+                if (isEnd)
+                {
+                    break;
+                }
+
                 await UniTask.Yield();
             }
 
             // TODO: UI が動く
-
-            // コールバック解除
-            for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
-            {
-                gameController.GetPlayerInput(idx).GetComponent<Input.PlayerInputHandler>().OnAction -= OnActoinTrigged;
-            }
 
             // 次のシーンへ
 

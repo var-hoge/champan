@@ -17,7 +17,7 @@ namespace App.Actor.Gimmick.RespawnBubble
         private const float BurstTime = 3f;
 
         private List<string> _SEPath = null;
-        private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Respawn/Player_Respawn_", 9).ToList();
+        private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Player Respawn/Player_Respawn_", 9).ToList();
 
         [SerializeField] private GameObject _bubPopEff;
         [SerializeField] float blowPower = 12.0f;
@@ -38,6 +38,12 @@ namespace App.Actor.Gimmick.RespawnBubble
             }
 
             var playerDataHolder = _player.GetComponent<Player.DataHolder>();
+
+            if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
+            {
+                Respawn(playerDataHolder);
+                return;
+            }
 
             playerDataHolder.IsValidDummyPlayerPos = true;
             playerDataHolder.DummyPlayerPos = transform.position;

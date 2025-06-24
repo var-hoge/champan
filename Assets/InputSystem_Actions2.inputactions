@@ -1,5 +1,5 @@
 {
-    "name": "InputSystem_Actions",
+    "name": "InputSystem_Actions2",
     "maps": [
         {
             "name": "Game",
@@ -192,17 +192,6 @@
                 },
                 {
                     "name": "",
-                    "id": "67184712-afa8-4e49-811f-6214f5b90bcc",
-                    "path": "<HID::Nintendo Wireless Gamepad>/hat",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "097cc447-2134-4c8a-886f-918aec232632",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
@@ -269,22 +258,22 @@
                 },
                 {
                     "name": "",
-                    "id": "2d9bf045-9f14-493b-9e17-d25fe00cf016",
-                    "path": "<Keyboard>/upArrow",
+                    "id": "1cdf495b-1667-4fa7-aad4-2523e6ae49f3",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Arrows",
+                    "groups": ";WASD",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "1cdf495b-1667-4fa7-aad4-2523e6ae49f3",
-                    "path": "<Keyboard>/w",
+                    "id": "1a9e770e-46aa-4733-8cdb-99bd0c288d69",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": "WASD",
+                    "groups": ";Arrows",
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -293,105 +282,6 @@
                     "name": "",
                     "id": "45fcb193-aa05-41d6-b3bd-4d9d9b457290",
                     "path": "<Joystick>/trigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Arrows;WASD;IJKL;8456",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9a29435a-7963-4ca4-9beb-346b3659f4e8",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button2",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1db42815-0a10-4c46-b692-6f95169cb9c1",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button3",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1e60b093-0a5d-4aaa-94c4-6f091cc2f1f2",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button4",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0d272343-ac5a-4c7c-a4b2-31e940172285",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button5",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b4129f4e-b4f2-4f54-a9b9-82a55d48b12e",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button6",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "22ae4963-e03f-4c0c-9692-7b6709224dff",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button9",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ef2024dc-49e6-492f-8a2a-885464a9f8cb",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button10",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "97949c8a-6d12-46b0-b0ad-f5a2a2e0bd91",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button15",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";GamePad",
-                    "action": "Action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b92f4b63-0fab-4b51-afe0-6e6c4dff49d6",
-                    "path": "<HID::Nintendo Wireless Gamepad>/button16",
                     "interactions": "",
                     "processors": "",
                     "groups": ";GamePad",
@@ -455,11 +345,6 @@
                     "devicePath": "<Keyboard>",
                     "isOptional": false,
                     "isOR": false
-                },
-                {
-                    "devicePath": "<Joystick>",
-                    "isOptional": true,
-                    "isOR": false
                 }
             ]
         },
@@ -470,11 +355,6 @@
                 {
                     "devicePath": "<Keyboard>",
                     "isOptional": false,
-                    "isOR": false
-                },
-                {
-                    "devicePath": "<Joystick>",
-                    "isOptional": true,
                     "isOR": false
                 }
             ]
@@ -487,11 +367,6 @@
                     "devicePath": "<Keyboard>",
                     "isOptional": false,
                     "isOR": false
-                },
-                {
-                    "devicePath": "<Joystick>",
-                    "isOptional": true,
-                    "isOR": false
                 }
             ]
         },
@@ -503,11 +378,6 @@
                     "devicePath": "<Keyboard>",
                     "isOptional": false,
                     "isOR": false
-                },
-                {
-                    "devicePath": "<Joystick>",
-                    "isOptional": true,
-                    "isOR": false
                 }
             ]
         },
@@ -517,7 +387,12 @@
             "devices": [
                 {
                     "devicePath": "<Gamepad>",
-                    "isOptional": false,
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Joystick>",
+                    "isOptional": true,
                     "isOR": false
                 }
             ]

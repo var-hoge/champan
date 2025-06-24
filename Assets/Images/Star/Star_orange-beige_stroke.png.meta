@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Star_orange-beige_stroke_0: 6500701961004952853
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

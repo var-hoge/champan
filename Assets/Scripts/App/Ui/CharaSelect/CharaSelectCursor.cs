@@ -147,9 +147,9 @@ namespace App.Ui.CharaSelect
         {
             _selectIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
 
-            GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<Input.PlayerInputHandler>().OnAction += OnAction;
-            GameController.Instance.GetPlayerInput(_playerIdx).GetComponent<Input.PlayerInputHandler>().OnMove += OnMove;
-            //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered += OnAction;
+            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
+            inputProxy.OnAction += OnAction;
+            inputProxy.OnMove += OnMove;
 
             // 最初は非表示
             var image = GetComponent<UnityEngine.UI.Image>();
@@ -158,14 +158,14 @@ namespace App.Ui.CharaSelect
 
         private void OnDestroy()
         {
-            var gameController = GameController.Instance;
-            if (gameController == null)
+            if (TadaLib.Input.PlayerInputManager.Instance == null)
             {
                 return;
             }
-            gameController.GetPlayerInput(_playerIdx).GetComponent<Input.PlayerInputHandler>().OnAction -= OnAction;
-            gameController.GetPlayerInput(_playerIdx).GetComponent<Input.PlayerInputHandler>().OnMove -= OnMove;
-            //GameController.Instance.GetPlayerInput(_playerIdx).onActionTriggered -= OnAction;
+
+            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
+            inputProxy.OnAction -= OnAction;
+            inputProxy.OnMove -= OnMove;
         }
 
         void MoveImpl(bool isRight)
@@ -207,7 +207,7 @@ namespace App.Ui.CharaSelect
 
             _body.enabled = false;
 
-            foreach(var callback in _selectCallbacks)
+            foreach (var callback in _selectCallbacks)
             {
                 callback();
             }

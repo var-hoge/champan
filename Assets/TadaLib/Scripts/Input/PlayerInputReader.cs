@@ -178,7 +178,7 @@ namespace TadaLib.Input
         {
             var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
 
-            _inputSystemInput = App.GameController.Instance.GetPlayerInput(playerIdx);
+            _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx);
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
@@ -214,8 +214,7 @@ namespace TadaLib.Input
             {
                 var list = _buttonDict[code];
 
-                //list.AddFirst(new ButtonData(_inputSystemInput.actions[code.ToString()].IsPressed(), Time.unscaledTime));
-                list.AddFirst(new ButtonData(_inputSystemInput.actions["Action"].IsPressed(), Time.unscaledTime));
+                list.AddFirst(new ButtonData(_playerInputProxy.IsPressed(code), Time.unscaledTime));
 
                 while (list.Count >= 2)
                 {
@@ -229,9 +228,8 @@ namespace TadaLib.Input
             }
 
 
-            var moveVec2 = _inputSystemInput.actions["Move"].ReadValue<Vector2>();
-            _axisDict[AxisCode.Horizontal] = AdjustAxis(moveVec2.x);
-            _axisDict[AxisCode.Vertical] = AdjustAxis(moveVec2.y);
+            _axisDict[AxisCode.Horizontal] = AdjustAxis(_playerInputProxy.Axis(AxisCode.Horizontal));
+            _axisDict[AxisCode.Vertical] = AdjustAxis(_playerInputProxy.Axis(AxisCode.Vertical));
         }
         #endregion
 
@@ -273,7 +271,7 @@ namespace TadaLib.Input
         }
 
         const float MaxBuffSec = 0.5f;
-        UnityEngine.InputSystem.PlayerInput _inputSystemInput = null;
+        TadaLib.Input.PlayerInputProxy _playerInputProxy = null;
         Dictionary<ButtonCode, LinkedList<ButtonData>> _buttonDict = new Dictionary<ButtonCode, LinkedList<ButtonData>>();
         Dictionary<AxisCode, float> _axisDict = new Dictionary<AxisCode, float>();
 

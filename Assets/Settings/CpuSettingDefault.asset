@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: CpuSettingDefault
   m_EditorClassIdentifier: 
   IsCpuPlayer0: 0
-  IsCpuPlayer1: 1
-  IsCpuPlayer2: 1
-  IsCpuPlayer3: 1
+  IsCpuPlayer1: 0
+  IsCpuPlayer2: 0
+  IsCpuPlayer3: 0

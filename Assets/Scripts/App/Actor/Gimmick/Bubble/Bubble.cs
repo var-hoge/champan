@@ -75,7 +75,7 @@ namespace App.Actor.Gimmick.Bubble
         public bool HasCrown => CrownBubble == this;
 
         private List<string> _SEPath = null;
-        private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
+        private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
         private bool IsRidden => _moveInfoCtrl.IsRidden;
         private bool _isRidenPrev = false;
         public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;

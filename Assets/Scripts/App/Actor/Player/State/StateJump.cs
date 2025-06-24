@@ -183,7 +183,7 @@ namespace App.Actor.Player.State
         AudioClip _jumpSe;
 
         private List<string> _SEPath = null;
-        private List<string> SEPath => _SEPath ??= GameController.GetSEPath("SE/Player Jump/Player_Jump_", 16).ToList();
+        private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Player Jump/Player_Jump_", 16).ToList();
         #endregion
     }
 }

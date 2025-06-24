@@ -28,7 +28,7 @@ namespace App.Ui.CharaSelect
         #region MonoBehavior の実装
         void Start()
         {
-            _inputSystemInput = GameController.Instance.GetPlayerInput(_playerIdx);
+            _inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
             _cursor.AddMoveCallback(() => OnCharaChanged());
             _cursor.AddSelectCallbac(() => OnCharaSelected());
         }
@@ -78,7 +78,7 @@ namespace App.Ui.CharaSelect
         GameObject _player;
 
         Phase _phase = Phase.WaitingForEntry;
-        UnityEngine.InputSystem.PlayerInput _inputSystemInput = null;
+        TadaLib.Input.PlayerInputProxy _inputProxy = null;
 
         #endregion
 
@@ -86,7 +86,7 @@ namespace App.Ui.CharaSelect
         void WaitingForEntry()
         {
             // ボタン入力待ち
-            if (_inputSystemInput.actions["Action"].IsPressed())
+            if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {
                 _phase = Phase.InCharacterSelection;
 

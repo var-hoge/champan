@@ -46,13 +46,12 @@ namespace App.Ui.Title
             SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
             await UniTask.WaitForSeconds(1f);
 
-            var gameController = GameController.Instance;
-            var inputHandler = gameController.GetPlayerInput(0).GetComponent<Input.PlayerInputHandler>();
+            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(0);
             var isPushed = false;
             var isStartSelected = true;
             var isInputValid = true;
-            inputHandler.OnAction += OnActoinTrigged;
-            inputHandler.OnMove += OnMove;
+            inputProxy.OnAction += OnActoinTrigged;
+            inputProxy.OnMove += OnMove;
 
             while (true)
             {
@@ -62,8 +61,8 @@ namespace App.Ui.Title
                     {
                         // SE再生
                         SEManager.Instance.Play(SEPath.MENU_VALIDATION);
-                        inputHandler.OnAction -= OnActoinTrigged;
-                        inputHandler.OnMove -= OnMove;
+                        inputProxy.OnAction -= OnActoinTrigged;
+                        inputProxy.OnMove -= OnMove;
                         TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
                         break;
                     }

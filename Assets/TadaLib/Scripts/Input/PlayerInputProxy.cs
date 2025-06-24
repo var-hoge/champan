@@ -4,46 +4,109 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.Extension;
+using TadaLib.ActionStd;
 using UniRx;
+using UnityEngine.InputSystem;
+using System;
 
 namespace TadaLib.Input
 {
     /// <summary>
-    /// プレイヤー入力の仲介者
+    /// PlayerInputProxy
     /// </summary>
     public class PlayerInputProxy
-        : BaseProc
-        , IInput
     {
-        public bool ActionEnabled
+        #region コンストラクタ
+        public PlayerInputProxy(UnityEngine.InputSystem.PlayerInput basePlayerInput)
         {
-            get
+            _basePlayerInput = basePlayerInput;
+            if (_basePlayerInput != null)
             {
-                return InputImpl.ActionEnabled;
+                _basePlayerInput.onActionTriggered += OnSystemTrigger;
             }
-            set
+        }
+        #endregion
+
+        #region プロパティ
+        public Action OnAction { get; set; }
+        public Action<Vector2> OnMove { get; set; }
+        #endregion
+
+        #region メソッド
+        public void SetPlayerInput(UnityEngine.InputSystem.PlayerInput playerInput)
+        {
+            if (_playerInput != null)
             {
-                InputImpl.ActionEnabled = value;
+                _playerInput.onActionTriggered -= OnSystemTrigger;
+            }
+
+            _playerInput = playerInput;
+
+            if (_playerInput != null)
+            {
+                _playerInput.onActionTriggered += OnSystemTrigger;
             }
         }
 
-        public void ResetInput() => InputImpl.ResetInput();
+        public bool IsPressed(ButtonCode code)
+        {
+            if (_playerInput == null)
+            {
+                return IsPressedImpl(code, _basePlayerInput);
+            }
+            return IsPressedImpl(code, _playerInput);
+        }
 
-        public bool GetButtonDown(ButtonCode code, float precedeSec)=> InputImpl.GetButtonDown(code, precedeSec);
+        public float Axis(AxisCode code)
+        {
+            if (_playerInput == null)
+            {
+                return AxisImpl(code, _basePlayerInput);
+            }
+            return AxisImpl(code, _playerInput);
+        }
+        #endregion
 
-        public bool GetButton(ButtonCode code, float precedeSec) => InputImpl.GetButton(code, precedeSec);
+        #region privateフィールド
+        UnityEngine.InputSystem.PlayerInput _basePlayerInput;
+        UnityEngine.InputSystem.PlayerInput _playerInput;
+        #endregion
 
-        public bool GetButtonUp(ButtonCode code, float precedeSec) => InputImpl.GetButtonUp(code, precedeSec);
+        #region privateメソッド
+        bool IsPressedImpl(ButtonCode code, UnityEngine.InputSystem.PlayerInput playerInput)
+        {
+            return playerInput.actions["Action"].IsPressed();
+        }
 
-        public void ForceFlagOnHistory(ButtonCode code) => InputImpl.ForceFlagOnHistory(code);
+        float AxisImpl(AxisCode code, UnityEngine.InputSystem.PlayerInput playerInput)
+        {
+            if (code is AxisCode.Vertical)
+            {
+                return playerInput.actions["Move"].ReadValue<Vector2>().y;
+            }
+            return playerInput.actions["Move"].ReadValue<Vector2>().x;
+        }
 
-        public void ForceFlagOffHistory(ButtonCode code) => InputImpl.ForceFlagOffHistory(code);
+        void OnSystemTrigger(InputAction.CallbackContext context)
+        {
+            if (context.action.name == "Action")
+            {
+                if (!context.performed)
+                {
+                    return;
+                }
 
-        public float GetAxis(AxisCode code) => InputImpl.GetAxis(code);
+                OnAction?.Invoke();
+                return;
+            }
 
-        public IInput InputImpl => PlayerInputManager.Instance.GetInput(_number);
-
-        [SerializeField]
-        int _number = 0;
+            if (context.action.name == "Move")
+            {
+                var value = context.ReadValue<Vector2>();
+                OnMove?.Invoke(value);
+                return;
+            }
+        }
+        #endregion
     }
 }

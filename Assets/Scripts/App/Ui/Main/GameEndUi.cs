@@ -9,6 +9,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Unity.VisualScripting;
+using static App.GameSequenceManager;
 
 namespace App.Ui.Main
 {
@@ -29,9 +30,11 @@ namespace App.Ui.Main
             // スローにする
             Time.timeScale = 0.02f;
 
-            await UniTask.WaitForSeconds(2.0f * Time.timeScale);
+            await UniTask.WaitForSeconds(1.0f * Time.timeScale);
 
             Time.timeScale = 1.0f;
+
+            GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
             // バブルを全部壊す
             var bubbles = GameObject.FindObjectsByType<Actor.Gimmick.Bubble.Bubble>(FindObjectsSortMode.None);
@@ -53,7 +56,7 @@ namespace App.Ui.Main
 
         public async UniTask GameEnd(SimpleAnimation animation, int winnerPlayerIdx)
         {
-            GameSequenceManager.Instance.PhaseKind = GameSequenceManager.Phase.AfterBattle;
+            GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
             var winCharaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(winnerPlayerIdx);
 
