@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ChampionPan-Grey_0: 4394300101431779818
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

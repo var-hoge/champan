@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ChampionPan-Red_0: -5253761769931939856
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
