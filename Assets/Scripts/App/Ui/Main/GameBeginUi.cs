@@ -9,6 +9,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
+using UnityEngine.U2D;
 
 namespace App.Ui.Main
 {
@@ -36,40 +37,48 @@ namespace App.Ui.Main
 
             _main.gameObject.SetActive(false);
 
-            _background.gameObject.SetActive(true);
-
-            _description.gameObject.SetActive(true);
-
-            _background.rectTransform.localPosition = Vector3.down * 10.0f;
-
-            _ = _background.rectTransform.DOLocalMoveY(0.0f, 0.1f);
-
-            await UniTask.WaitForSeconds(1.0f);
+            await UniTask.WaitForSeconds(0.5f);
 
             _main.gameObject.SetActive(true);
+
+            // ルール説明
+            {
+                _main.SetSprite(_descriptionSprite);
+                _main.rectTransform.localScale = Vector3.one * 5.0f;
+                _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
+
+                _effect.SetActive(true);
+
+                await UniTask.WaitForSeconds(1.6f);
+
+                _effect.SetActive(false);
+            }
+
             SEManager.Instance.Play(SEPath.COUNTDOWN);
             foreach (var sprite in _countDownSprites)
             {
-                _main.sprite = sprite;
-                _main.rectTransform.localScale = Vector3.one * 1.5f;
+                _main.SetSprite(sprite);
+                _main.rectTransform.localScale = Vector3.one * 5.0f;
                 _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
 
-                await UniTask.WaitForSeconds(1.0f);
+                _effect.SetActive(true);
+
+                await UniTask.WaitForSeconds(1.4f);
+
+                _effect.SetActive(false);
             }
 
             // GO
-            _main.sprite = _goSprite;
-            _main.rectTransform.localScale = Vector3.one * 1.5f;
-            _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
+            {
+                BGMManager.Instance.Play(BGMPath.FIGHT);
+                _main.SetSprite(_descriptionSprite);
+                _main.rectTransform.localScale = Vector3.one * 5.0f;
+                _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
 
-            BGMManager.Instance.Play(BGMPath.FIGHT);
+                _effect.SetActive(true);
 
-            // 説明は消す
-            _description.gameObject.SetActive(false);
-
-            await UniTask.WaitForSeconds(0.8f);
-
-            // TODO: ガウシアンぶらーを切る
+                await UniTask.WaitForSeconds(0.8f);
+            }
 
             _ = _canvas.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
 
@@ -82,19 +91,19 @@ namespace App.Ui.Main
         Canvas _canvas;
 
         [SerializeField]
-        UnityEngine.UI.Image _background;
-
-        [SerializeField]
         UnityEngine.UI.Image _main;
 
         [SerializeField]
-        UnityEngine.UI.Image _description;
+        Sprite _descriptionSprite;
 
         [SerializeField]
         List<Sprite> _countDownSprites;
 
         [SerializeField]
         Sprite _goSprite;
+
+        [SerializeField]
+        GameObject _effect;
         #endregion
 
         #region privateメソッド
