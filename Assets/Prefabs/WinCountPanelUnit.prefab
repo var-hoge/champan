@@ -68,12 +68,13 @@ MonoBehaviour:
   _playerIdImage: {fileID: 651674651102481764}
   _panel: {fileID: 2971775832349321595}
   _winCountCrownProvider: {fileID: 0}
-  _fadeDurationSec: 0.3
-  _moveDurationSec: 0.4
+  _fadeDurationSec: 0.4
+  _moveDurationSec: 0.6
   _moveDistanceX: 200
   _crownAppearWaitDurationSec: 1
-  _panelLeftPadding: 130
-  _panelRightPadding: 100
+  _panelLeftPadding: 50
+  _panelRightPadding: 50
+  _debugWinSlotCount: 3
 --- !u!1 &4910865549859514594
 GameObject:
   m_ObjectHideFlags: 0

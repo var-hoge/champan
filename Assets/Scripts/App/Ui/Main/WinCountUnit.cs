@@ -37,6 +37,18 @@ namespace App.Ui.Main
         {
             Appear();
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            // 王冠の設定
+            var crownSlotGlobalPosList = CalcCrownSlotGlobalPosList(_debugWinSlotCount);
+            foreach (var pos in crownSlotGlobalPosList)
+            {
+                Gizmos.DrawSphere(pos, 12.0f);
+            }
+        }
+#endif
         #endregion
 
         #region privateフィールド
@@ -67,6 +79,9 @@ namespace App.Ui.Main
         [SerializeField]
         float _panelRightPadding = 20.0f;
 
+        [SerializeField]
+        int _debugWinSlotCount = 3;
+
         int _playerIdx = -1;
         bool _isWinPlayer = false;
         #endregion
@@ -77,8 +92,9 @@ namespace App.Ui.Main
             Debug.Assert(_playerIdx >= 0);
 
             // 初期設定
-            List<Vector3> _crownSlotGlobalPosList = new List<Vector3>();
             var curWinCount = GameMatchManager.Instance.GetWinCount(_playerIdx);
+            var winSlotCount = GameMatchManager.Instance.WinCountToMatchFinish;
+            var crownSlotGlobalPosList = CalcCrownSlotGlobalPosList(winSlotCount);
             {
                 var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
                 var charaSprite = CharacterManager.Instance.GetCharaMainVisualImage(charaIdx);
@@ -87,29 +103,8 @@ namespace App.Ui.Main
                 // @todo: panel の画像セット
 
                 // 王冠の設定
+
                 {
-                    var winSlotCount = GameMatchManager.Instance.WinCountToMatchFinish;
-
-                    var width = _panel.rectTransform.rect.width - _panelLeftPadding - _panelRightPadding;
-                    var center = (Vector3)_panel.rectTransform.rect.center + _panel.rectTransform.position;
-                    center.x += _panelLeftPadding * 0.5f;
-                    center.x -= _panelRightPadding * 0.5f;
-
-                    if (winSlotCount == 1)
-                    {
-                        _crownSlotGlobalPosList.Add(center);
-                    }
-                    else
-                    {
-                        for (int idx = 0; idx < winSlotCount; ++idx)
-                        {
-                            var x = center.x - (width * 0.5f) + (width / (winSlotCount - 1)) * idx;
-                            var pos = center;
-                            pos.x = x;
-                            _crownSlotGlobalPosList.Add(pos);
-                        }
-                    }
-
                     var crownCount = curWinCount;
                     if (_isWinPlayer)
                     {
@@ -120,14 +115,16 @@ namespace App.Ui.Main
                     for (int idx = 0; idx < winSlotCount; ++idx)
                     {
                         var isCrown = idx < crownCount;
-                        var pos = _crownSlotGlobalPosList[idx];
+                        var pos = crownSlotGlobalPosList[idx];
                         if (isCrown)
                         {
-                            _winCountCrownProvider.RentCrown(pos);
+                            var obj = _winCountCrownProvider.RentCrown(pos);
+                            obj.transform.SetParent(this.transform);
                         }
                         else
                         {
-                            _winCountCrownProvider.RentSlotMark(pos);
+                            var obj = _winCountCrownProvider.RentSlotMark(pos);
+                            obj.transform.SetParent(this.transform);
                         }
                     }
                 }
@@ -154,7 +151,36 @@ namespace App.Ui.Main
             await UniTask.WaitForSeconds(_crownAppearWaitDurationSec);
 
             // 王冠が降ってくる
-            _winCountCrownProvider.RentCrown(_crownSlotGlobalPosList[curWinCount - 1], playAnim: true);
+            _winCountCrownProvider.RentCrown(crownSlotGlobalPosList[curWinCount - 1], playAnim: true);
+        }
+
+        List<Vector3> CalcCrownSlotGlobalPosList(int winSlotCount)
+        {
+            var ret = new List<Vector3>();
+
+            var width = _panel.rectTransform.rect.width - _panelLeftPadding - _panelRightPadding;
+            var center = (Vector3)_panel.rectTransform.rect.center + _panel.rectTransform.position;
+            center.x += _panelLeftPadding * 0.5f;
+            center.x -= _panelRightPadding * 0.5f;
+
+            if (winSlotCount == 1)
+            {
+                ret.Add(center);
+            }
+            else
+            {
+                for (int idx = 0; idx < winSlotCount; ++idx)
+                {
+                    var left = center.x - width * 0.5f;
+                    var span = width / (winSlotCount - 1 + 2);
+                    var x = left + span * (idx + 1);
+                    var pos = center;
+                    pos.x = x;
+                    ret.Add(pos);
+                }
+            }
+
+            return ret;
         }
         #endregion
     }

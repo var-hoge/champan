@@ -38,7 +38,7 @@ namespace App.Ui.Main
 
             // バブルを全部壊す
             var bubbles = GameObject.FindObjectsByType<Actor.Gimmick.Bubble.Bubble>(FindObjectsSortMode.None);
-            foreach(var bubble in bubbles)
+            foreach (var bubble in bubbles)
             {
                 bubble.DoBurst();
             }
@@ -48,7 +48,31 @@ namespace App.Ui.Main
             // 勝ち点を表示
             _winCountPanel.gameObject.SetActive(true);
 
-            await UniTask.WaitForSeconds(6.0f);
+            await UniTask.WaitForSeconds(3.0f);
+
+            // クリックまで待つ
+            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+            while (true)
+            {
+                var isEnd = false;
+                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                {
+                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                    {
+                        isEnd = true;
+                        break;
+                    }
+                }
+
+                if (isEnd)
+                {
+                    break;
+                }
+
+                await UniTask.Yield();
+            }
+
+            await UniTask.WaitForSeconds(0.5f);
 
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.1f, 0.1f);
