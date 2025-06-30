@@ -21,7 +21,20 @@ namespace App
         /// ゲームに勝利するための勝ち点
         /// </summary>
         public int WinCountToMatchFinish { private set; get; } = 3;
+
+        /// <summary>
+        /// CPUが試合に出場するかどうか
+        /// </summary>
+        public bool IsExistCpu { private set; get; } = true;
         #endregion
+
+        /// <summary>
+        /// CPU の有無の設定
+        /// </summary>
+        public void SetIsExistCpu(bool isExist)
+        {
+            IsExistCpu = isExist;
+        }
 
         /// <summary>
         /// ゲームに勝利するための勝ち点の設定

@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using System.Linq;
 
 namespace App.Cpu
 {
@@ -23,23 +24,25 @@ namespace App.Cpu
 
         #region メソッド
         /// <summary>
-        /// CPU 人数の設定
+        /// 指定したインデックスの CPU 設定
         /// </summary>
         /// <param name="count"></param>
-        public void SetCpuCount(int count)
+        public void SetIsCpu(int idx, bool isCpu)
         {
-            Debug.Assert(count <= Actor.Player.Constant.PlayerCountMax);
+            Debug.Assert(idx < Actor.Player.Constant.PlayerCountMax);
             SetupIfNeeded();
 
-            for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
-            {
-                _isCpuList[idx] = false;
-            }
-            // 末尾から CPU を詰めていく
-            for (int idx = 0; idx < count; ++idx)
-            {
-                _isCpuList[Actor.Player.Constant.PlayerCountMax - 1 - idx] = true;
-            }
+            _isCpuList[idx] = isCpu;
+        }
+
+        /// <summary>
+        /// CPU の人数の取得
+        /// </summary>
+        /// <returns></returns>
+        public int CpuCount()
+        {
+            SetupIfNeeded();
+            return _isCpuList.Where(x => x).Count();
         }
 
         /// <summary>
