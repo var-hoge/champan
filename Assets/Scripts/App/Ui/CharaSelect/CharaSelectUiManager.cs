@@ -11,6 +11,7 @@ using DG.Tweening;
 using App.Actor;
 using System.Linq;
 using UnityEditor;
+using App.Ui.Common;
 
 namespace App.Ui.CharaSelect
 {
@@ -77,6 +78,9 @@ namespace App.Ui.CharaSelect
             // キャラクター決定
             _playerUseCharaIdList[playerIdx] = charaIdx;
 
+            // CPU 扱いにしない
+            Cpu.CpuManager.Instance.SetIsCpu(playerIdx, false);
+
             _charas[selectIdx].OnSelected(() =>
             {
                 // アニメーションが完了したら設定
@@ -125,6 +129,9 @@ namespace App.Ui.CharaSelect
             _charaPickedIcons[playerIdx].UnsetChara();
             _charas[selectIdx].OnCancelSelected();
 
+            // CPU 扱いに
+            Cpu.CpuManager.Instance.SetIsCpu(playerIdx, true);
+
             return true;
         }
 
@@ -135,6 +142,11 @@ namespace App.Ui.CharaSelect
             {
                 _isUsedList.Add(false);
                 _charaSelectCursors[idx].Setup(this, PlayerUseCharaIdList(idx));
+            }
+            for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
+            {
+                // デフォルトで CPU 扱いに
+                Cpu.CpuManager.Instance.SetIsCpu(idx, true);
             }
         }
         #endregion
@@ -167,7 +179,7 @@ namespace App.Ui.CharaSelect
 
             await UniTask.WaitForSeconds(2.0f);
 
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 1.0f, 1.0f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 1.0f, 1.0f);
         }
 
         // キャラクター ID に変換

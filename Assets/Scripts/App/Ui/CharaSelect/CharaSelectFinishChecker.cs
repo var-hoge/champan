@@ -37,7 +37,7 @@ namespace App.Ui.CharaSelect
             IEnumerator StartTransition()
             {
                 yield return new WaitForSeconds(1.5f);
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.5f, 0.5f);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 0.5f, 0.5f);
             }
         }
 

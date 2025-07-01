@@ -51,6 +51,12 @@ namespace App.Cpu
         #region privateメソッド
         void UpdateCpuViewData(int idx)
         {
+            var targetPlayer = PlayerManager.TryGetPlayer(idx);
+            if (targetPlayer == null)
+            {
+                return;
+            }
+
             var data = CpuViewData.Create();
 
             // バブル座標の更新
@@ -82,7 +88,6 @@ namespace App.Cpu
 
             data.playerIndex = idx;
 
-            var targetPlayer = PlayerManager.TryGetPlayer(idx);
             var dataHolder = targetPlayer.GetComponent<Actor.Player.DataHolder>();
             data.isGround = dataHolder.NoGroundDurationSec == 0.00f;
             data.maxVelocity = dataHolder.MaxVelocity;

@@ -65,42 +65,69 @@ namespace App.Ui.GameModeSelect
                 return;
             }
 
+            // 決定とキャンセルが同時に押されたら、決定を優先する
             var isDecied = IsDecided();
+            var isCanceled = IsCanceled();
 
-            if (isDecied == _isDecidedPrev)
+            var moveIdx = 0;
+
+            if (isDecied)
+            {
+                moveIdx = 1;
+            }
+            else if (isCanceled)
+            {
+                moveIdx = -1;
+            }
+
+            if (moveIdx == 0)
             {
                 return;
             }
 
-            _isDecidedPrev = isDecied;
-
-            if (isDecied)
+            int nextIndex;
+            if (moveIdx == 1)
             {
-                if (_selectedIndex == _items.Count)
-                {
-                    // シーン遷移
-                    TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.3f);
-                    _isEnd = true;
-                    return;
-                }
+                nextIndex = CalcAdvancedIndex(_selectedIndex);
+            }
+            else // moveIdx == -1
+            {
+                nextIndex = CalcRetreatedIndex(_selectedIndex);
+            }
 
-                _items[_selectedIndex].OnDecide();
-                _items[_selectedIndex].OnUnselected();
+            if (nextIndex == -1)
+            {
+                // 動けなかった
+                return;
+            }
 
-                ++_selectedIndex;
+            if (nextIndex == _items.Count)
+            {
+                // シーン遷移
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.3f);
+                _isEnd = true;
+                return;
+            }
 
-                if (_selectedIndex < _items.Count)
-                {
-                    _items[_selectedIndex].OnSelected();
+            _items[_selectedIndex].OnDecide();
+            _items[_selectedIndex].OnUnselected();
 
-                    _selectBack.rectTransform.DOKill();
-                    _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
-                }
-                else
-                {
-                    _startButtonOnDisabled.SetActive(false);
-                    _startButtonOnEnabled.SetActive(true);
-                }
+            _selectedIndex = nextIndex;
+            _items[_selectedIndex].OnSelected();
+
+            if (_selectedIndex == _items.Count - 1)
+            {
+                _startButtonOnDisabled.SetActive(false);
+                _startButtonOnEnabled.SetActive(true);
+                _selectBack.gameObject.SetActive(false);
+            }
+            else
+            {
+                _startButtonOnDisabled.SetActive(true);
+                _startButtonOnEnabled.SetActive(false);
+                _selectBack.gameObject.SetActive(true);
+                _selectBack.rectTransform.DOKill();
+                _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
             }
         }
         #endregion
@@ -119,7 +146,6 @@ namespace App.Ui.GameModeSelect
         GameObject _startButtonOnEnabled;
 
         int _selectedIndex = 0;
-        bool _isDecidedPrev = false;
         bool _isEnd = false;
         #endregion
 
@@ -129,13 +155,55 @@ namespace App.Ui.GameModeSelect
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
             for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
             {
-                if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                if (inputManager.InputProxy(idx).IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        bool IsCanceled()
+        {
+            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+            for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+            {
+                if (inputManager.InputProxy(idx).IsPressedTrigger(TadaLib.Input.ButtonCode.Cancel))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        int CalcAdvancedIndex(int curSelectedIndex)
+        {
+            ++curSelectedIndex;
+            if (curSelectedIndex == _items.Count)
+            {
+                return curSelectedIndex;
+            }
+            if (_items[curSelectedIndex].IsInvalid is false)
+            {
+                return curSelectedIndex;
+            }
+            return CalcAdvancedIndex(curSelectedIndex);
+        }
+
+        int CalcRetreatedIndex(int curSelectedIndex)
+        {
+            --curSelectedIndex;
+            if (curSelectedIndex == -1)
+            {
+                return curSelectedIndex;
+            }
+            if (_items[curSelectedIndex].IsInvalid is false)
+            {
+                return curSelectedIndex;
+            }
+            return CalcRetreatedIndex(curSelectedIndex);
         }
         #endregion
     }

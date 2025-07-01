@@ -118,6 +118,11 @@ namespace App.Actor.Gimmick.Bubble
 
         void Update()
         {
+            if (GameSequenceManager.Instance == null)
+            {
+                return;
+            }
+
             if (GameSequenceManager.Instance.PhaseKind != GameSequenceManager.Phase.Battle
                 || _isBursting)
             {

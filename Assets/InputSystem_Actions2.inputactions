@@ -22,6 +22,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "0d1ca1b1-1266-4119-bbe1-3d9ccb7e9acc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -313,8 +322,8 @@
                 },
                 {
                     "name": "",
-                    "id": "4d8f74e7-2e5c-43fc-89d9-2c93a09596c2",
-                    "path": "<Gamepad>/buttonSouth",
+                    "id": "df8fbe20-82f0-4f4b-8bcb-d43cc69976df",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": ";GamePad",
@@ -324,12 +333,67 @@
                 },
                 {
                     "name": "",
-                    "id": "df8fbe20-82f0-4f4b-8bcb-d43cc69976df",
-                    "path": "<Gamepad>/buttonWest",
+                    "id": "12e81edf-2460-45d1-bb53-2d4bfae97e29",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Arrows",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e06a8da6-ee90-4ddc-9623-6bd907d74f3c",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";WASD",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1ffba847-982d-4e1c-b821-bfbc3bdf8ad6",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";IJKL",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ee5222d-220b-4674-b4af-724ad098830b",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e2f6144b-4411-4655-8fca-bff01eaf25a0",
+                    "path": "<Keyboard>/numpad8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";8456",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8c029903-d1a7-4633-8040-603d597a890f",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": ";GamePad",
-                    "action": "Action",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

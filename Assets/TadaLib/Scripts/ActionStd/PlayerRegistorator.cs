@@ -32,6 +32,15 @@ namespace TadaLib.ActionStd
                 return;
             }
 #endif
+            if(
+                App.Cpu.CpuManager.Instance.IsCpu(GetComponent<DataHolder>().PlayerIdx) &&
+                App.GameMatchManager.Instance.IsExistCpu is false
+                )
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             PlayerManager.RegisterPlayer(gameObject, GetComponent<DataHolder>().PlayerIdx);
         }
         #endregion

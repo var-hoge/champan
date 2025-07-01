@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using UnityEngine.InputSystem;
 using System;
+using Mono.Cecil.Cil;
 
 namespace TadaLib.Input
 {
@@ -29,6 +30,7 @@ namespace TadaLib.Input
 
         #region プロパティ
         public Action OnAction { get; set; }
+        public Action OnCancel { get; set; }
         public Action<Vector2> OnMove { get; set; }
         #endregion
 
@@ -57,6 +59,15 @@ namespace TadaLib.Input
             return IsPressedImpl(code, _playerInput);
         }
 
+        public bool IsPressedTrigger(ButtonCode code)
+        {
+            if (_playerInput == null)
+            {
+                return IsPressedTriggerImpl(code, _basePlayerInput);
+            }
+            return IsPressedTriggerImpl(code, _playerInput);
+        }
+
         public float Axis(AxisCode code)
         {
             if (_playerInput == null)
@@ -75,7 +86,20 @@ namespace TadaLib.Input
         #region privateメソッド
         bool IsPressedImpl(ButtonCode code, UnityEngine.InputSystem.PlayerInput playerInput)
         {
+            if (code is ButtonCode.Cancel)
+            {
+                return playerInput.actions["Cancel"].IsPressed();
+            }
             return playerInput.actions["Action"].IsPressed();
+        }
+
+        bool IsPressedTriggerImpl(ButtonCode code, UnityEngine.InputSystem.PlayerInput playerInput)
+        {
+            if (code is ButtonCode.Cancel)
+            {
+                return playerInput.actions["Cancel"].WasPressedThisFrame();
+            }
+            return playerInput.actions["Action"].WasPressedThisFrame();
         }
 
         float AxisImpl(AxisCode code, UnityEngine.InputSystem.PlayerInput playerInput)
@@ -97,6 +121,17 @@ namespace TadaLib.Input
                 }
 
                 OnAction?.Invoke();
+                return;
+            }
+
+            if (context.action.name == "Cancel")
+            {
+                if (!context.performed)
+                {
+                    return;
+                }
+
+                OnCancel?.Invoke();
                 return;
             }
 

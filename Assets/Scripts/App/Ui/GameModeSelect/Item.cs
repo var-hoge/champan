@@ -30,6 +30,11 @@ namespace App.Ui.GameModeSelect
         #region メソッド
         public void OnSelected()
         {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
             _isSelected = true;
 
             foreach (var text in _colorChangableTexts)
@@ -43,6 +48,11 @@ namespace App.Ui.GameModeSelect
 
         public void OnUnselected()
         {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
             _isSelected = false;
 
             foreach (var text in _colorChangableTexts)
@@ -56,6 +66,11 @@ namespace App.Ui.GameModeSelect
 
         public void OnDecide()
         {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
             _onItemDecided[_curIndex].Invoke();
         }
         #endregion
@@ -63,12 +78,22 @@ namespace App.Ui.GameModeSelect
         #region MonoBehavior の実装
         void Start()
         {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
             _curIndex = _defaultIndex;
             OnIndexChanged();
         }
 
         void Update()
         {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
             if (_isSelected is false)
             {
                 return;
