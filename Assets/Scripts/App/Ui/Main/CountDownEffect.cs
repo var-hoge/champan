@@ -63,6 +63,12 @@ namespace Ui.Main
             var seq = DOTween.Sequence();
             seq.Append(rectTransform.DOMove(targetPos, _moveDurationSec).SetEase(Ease.OutBack));
 
+            if (_type == Type.GameFinish)
+            {
+                _isAutoRotateEnabled = true;
+                return;
+            }
+
             seq.AppendInterval(_intervalDurationSec * (_isFirst ? 3.0f : isLast ? 0.2f : 1.0f));
 
             var targetEulerAngles = initLocalEulerAngles;
@@ -74,16 +80,35 @@ namespace Ui.Main
 
             seq.OnComplete(() =>
             {
-
                 GetComponent<UnityEngine.UI.Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
             });
 
             _isFirst = false;
             ++_cnt;
         }
+
+        void Update()
+        {
+            if (_isAutoRotateEnabled)
+            {
+                var rectTransform = GetComponent<RectTransform>();
+                var angle = rectTransform.localEulerAngles;
+                angle.z += Time.deltaTime * -16.0f / rectTransform.localScale.x;
+                rectTransform.localEulerAngles = angle;
+            }
+        }
         #endregion
 
         #region privateフィールド
+        enum Type
+        {
+            CountDown,
+            GameFinish,
+        }
+
+        [SerializeField]
+        Type _type;
+
         [SerializeField]
         RectTransform _center;
 
@@ -104,6 +129,8 @@ namespace Ui.Main
 
         [SerializeField]
         bool _isUseForceStaging = false;
+
+        bool _isAutoRotateEnabled = false;
 
         bool _isFirst = true;
         Vector3 _initPos;
