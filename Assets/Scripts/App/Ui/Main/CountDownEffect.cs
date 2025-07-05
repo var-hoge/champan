@@ -29,7 +29,6 @@ namespace Ui.Main
 
             if (_isFirst)
             {
-                _isFirst = false;
                 _initPos = rectTransform.position;
                 _initLocalEulerAngles = rectTransform.localEulerAngles;
                 _initScale = rectTransform.localScale;
@@ -41,22 +40,35 @@ namespace Ui.Main
                 rectTransform.localScale = _initScale;
             }
 
+            if (_isUseForceStaging is false)
+            {
+                _cnt = 10;
+                _isFirst = false;
+            }
+
+            var isLast = _cnt == 4;
+
+            if (isLast)
+            {
+                rectTransform.localScale = _initScale * 1.5f;
+            }
+
             GetComponent<UnityEngine.UI.Image>().color = Color.white;
 
             var initPos = rectTransform.position;
             var initLocalEulerAngles = rectTransform.localEulerAngles;
             var initScale = rectTransform.localScale;
 
-            var targetPos = initPos + (initPos - _center.position).normalized * _moveDist;
+            var targetPos = initPos + (initPos - _center.position).normalized * (_moveDist * (isLast ? 2.0f : 1.0f));
             var seq = DOTween.Sequence();
-            seq.Append(rectTransform.DOMove(targetPos, _moveDurationSec));
+            seq.Append(rectTransform.DOMove(targetPos, _moveDurationSec).SetEase(Ease.OutBack));
 
-            seq.AppendInterval(_intervalDurationSec);
+            seq.AppendInterval(_intervalDurationSec * (_isFirst ? 3.0f : isLast ? 0.2f : 1.0f));
 
             var targetEulerAngles = initLocalEulerAngles;
             targetEulerAngles.z += _rotateDeg;
             seq.Append(rectTransform.DOLocalRotate(targetEulerAngles, _rotateDurationSec));
-            var targetScale = rectTransform.localScale * _scaleRate;
+            var targetScale = initScale * _scaleRate;
             seq.Join(rectTransform.DOScale(targetScale, _rotateDurationSec));
             seq.Join(GetComponent<UnityEngine.UI.Image>().DOFade(0.2f, _rotateDurationSec));
 
@@ -65,6 +77,9 @@ namespace Ui.Main
 
                 GetComponent<UnityEngine.UI.Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
             });
+
+            _isFirst = false;
+            ++_cnt;
         }
         #endregion
 
@@ -87,10 +102,14 @@ namespace Ui.Main
         [SerializeField]
         float _rotateDurationSec = 0.3f;
 
+        [SerializeField]
+        bool _isUseForceStaging = false;
+
         bool _isFirst = true;
         Vector3 _initPos;
         Vector3 _initLocalEulerAngles;
         Vector3 _initScale;
+        int _cnt = 0;
         #endregion
 
         #region privateメソッド

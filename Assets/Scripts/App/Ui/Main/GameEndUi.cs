@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Unity.VisualScripting;
 using static App.GameSequenceManager;
+using Ui.Main;
 
 namespace App.Ui.Main
 {
@@ -80,30 +81,58 @@ namespace App.Ui.Main
 
         public async UniTask GameEnd(SimpleAnimation animation, int winnerPlayerIdx)
         {
+            // スローにする
+            Time.timeScale = 0.02f;
+
+            await UniTask.WaitForSeconds(1.0f * Time.timeScale);
+
+            Time.timeScale = 1.0f;
+
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
-            var winCharaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(winnerPlayerIdx);
-
-            if (winCharaIdx == 3)
+            // バブルを全部壊す
+            var bubbles = GameObject.FindObjectsByType<Actor.Gimmick.Bubble.Bubble>(FindObjectsSortMode.None);
+            foreach (var bubble in bubbles)
             {
-                // キャラと王冠が被らないようにする
-                _chara.rectTransform.localPosition += new Vector3(30.0f, -50.0f, 0.0f);
+                bubble.DoBurst();
             }
 
-            var goalUi = _charaVarietySprites[winnerPlayerIdx];
-            var charaSprite = _charaSprites[winCharaIdx];
+            await UniTask.WaitForSeconds(2.0f);
 
-            _chara.sprite = charaSprite;
-            _chara.rectTransform.sizeDelta = charaSprite.textureRect.size;
-            _background.sprite = goalUi.BackSprite;
-            _description.sprite = goalUi.WinnerSprite;
+            // 勝ち点を表示
+            _winCountPanel.gameObject.SetActive(true);
 
-            animation.Play("GameEnd");
+            await UniTask.WaitForSeconds(3.0f);
 
-            await UniTask.WaitForSeconds(15.0f);
+            // クリックまで待つ
+            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+            while (true)
+            {
+                var isEnd = false;
+                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                {
+                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                    {
+                        isEnd = true;
+                        break;
+                    }
+                }
 
-            // シーン遷移
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.5f, 0.5f);
+                if (isEnd)
+                {
+                    break;
+                }
+
+                await UniTask.Yield();
+            }
+
+            await UniTask.WaitForSeconds(0.25f);
+
+            _ = _canvas.DOFade(0.0f, 0.2f);
+
+            await UniTask.WaitForSeconds(0.5f);
+
+            await _gameFinishUi.Staging(animation);
         }
         #endregion
 
@@ -134,10 +163,10 @@ namespace App.Ui.Main
         UnityEngine.UI.Image _crown;
 
         [SerializeField]
-        UnityEngine.UI.Image _description;
+        WinCountPanel _winCountPanel;
 
         [SerializeField]
-        WinCountPanel _winCountPanel;
+        GameFinishUi _gameFinishUi;
         #endregion
 
         #region privateメソッド
@@ -148,7 +177,6 @@ namespace App.Ui.Main
             _background.gameObject.SetActive(false);
             _chara.gameObject.SetActive(false);
             _crown.gameObject.SetActive(false);
-            _description.gameObject.SetActive(false);
         }
         #endregion
     }

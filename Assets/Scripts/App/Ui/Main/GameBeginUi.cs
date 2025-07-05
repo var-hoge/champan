@@ -63,7 +63,7 @@ namespace App.Ui.Main
 
                 _effect.SetActive(true);
 
-                await UniTask.WaitForSeconds(1.4f);
+                await UniTask.WaitForSeconds(0.95f);
 
                 _effect.SetActive(false);
             }
@@ -77,7 +77,7 @@ namespace App.Ui.Main
 
                 _effect.SetActive(true);
 
-                await UniTask.WaitForSeconds(0.8f);
+                await UniTask.WaitForSeconds(0.7f);
             }
 
             _ = _canvas.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
