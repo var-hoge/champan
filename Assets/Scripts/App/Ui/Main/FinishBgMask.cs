@@ -9,7 +9,7 @@ using UniRx;
 
 namespace Ui.Main
 {
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class FinishBgMask
         : MonoBehaviour
     {
