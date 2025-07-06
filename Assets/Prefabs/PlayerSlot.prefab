@@ -239,6 +239,7 @@ GameObject:
   - component: {fileID: 3357298345085451584}
   - component: {fileID: 7091202513593012886}
   - component: {fileID: 1710462752319069765}
+  - component: {fileID: 1142903054551447111}
   m_Layer: 5
   m_Name: Chara
   m_TagString: Untagged
@@ -303,6 +304,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1142903054551447111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5896762554579759700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be614a9e764791944af2cee90b006823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _outlineKind: 0
+  _considerCpu: 0
 --- !u!1 &6286844632798410559
 GameObject:
   m_ObjectHideFlags: 0

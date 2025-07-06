@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ImageMask
-  m_Shader: {fileID: -6465566751694194690, guid: 0715026be201a884aaaa040eadd44b07, type: 3}
+  m_Name: CharaOutline
+  m_Shader: {fileID: -6465566751694194690, guid: 18838d2e511ca8d4781caea087211e9e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -38,7 +38,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 42d1e1eef3e876c43b8c16f149989885, type: 3}
+        m_Texture: {fileID: 2800000, guid: 143618bf5803e204781cfa2e19ce05ee, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskTex:
@@ -87,7 +87,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _MaskRad: -0.5
-    - _MaskRad2: -0.08354568
+    - _MaskRad2: -0.11868581
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _OutlineThickness: 4.19
@@ -100,6 +100,8 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
+    - _Thr: 2.8
+    - _UvScroll: 0.013
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
@@ -111,7 +113,7 @@ Material:
     - _MaskPos: {r: 0, g: 0.06, b: 0, a: 0}
     - _MaskRot: {r: 0, g: 0, b: 0, a: 0}
     - _MaskScale: {r: 2, g: 0.5, b: 1, a: 0}
-    - _OutlineColor: {r: 5.657377, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.4292453, b: 0.4292453, a: 1}
     - _OutlineColor2: {r: 2.9960785, g: 0.32403442, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _Tint: {r: 0.2282164, g: 1, b: 0, a: 0.4666667}

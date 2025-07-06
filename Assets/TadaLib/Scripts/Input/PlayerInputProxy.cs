@@ -8,7 +8,6 @@ using TadaLib.ActionStd;
 using UniRx;
 using UnityEngine.InputSystem;
 using System;
-using Mono.Cecil.Cil;
 
 namespace TadaLib.Input
 {

@@ -1176,6 +1176,10 @@ PrefabInstance:
       propertyPath: _playerIdx
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4177480316797072672, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _outlineKind
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 1
@@ -3417,6 +3421,10 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1142903054551447111, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
+      propertyPath: _outlineKind
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5593103026622501098, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_Name
       value: PlayerSlot3
@@ -4198,6 +4206,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1051072475}
     m_Modifications:
+    - target: {fileID: 1142903054551447111, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
+      propertyPath: _outlineKind
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5593103026622501098, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_Name
       value: PlayerSlot4
@@ -4931,6 +4943,10 @@ PrefabInstance:
       propertyPath: _playerIdx
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4177480316797072672, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _outlineKind
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 2
@@ -5233,6 +5249,10 @@ PrefabInstance:
     - target: {fileID: 1070845796836945154, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142903054551447111, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
+      propertyPath: _outlineKind
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5593103026622501098, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_Name
@@ -5903,6 +5923,10 @@ PrefabInstance:
       propertyPath: _playerIdx
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4177480316797072672, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: _outlineKind
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5221090659934857165, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _number
       value: 3
@@ -6151,6 +6175,10 @@ PrefabInstance:
     - target: {fileID: 1070845796836945154, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142903054551447111, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
+      propertyPath: _outlineKind
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5593103026622501098, guid: 6fc999beff3d80e4c805ea020357ade1, type: 3}
       propertyPath: m_Name

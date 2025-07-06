@@ -106,44 +106,50 @@ namespace App.Ui.Main
                 bubble.DoBurst();
             }
 
-            await UniTask.WaitForSeconds(2.0f);
+            await UniTask.WaitForSeconds(1.2f);
 
-            // 勝ち点を表示
-            _winCountPanel.gameObject.SetActive(true);
-            _continueButton.gameObject.SetActive(false);
-
-            await UniTask.WaitForSeconds(2.5f);
-
-            _continueButton.gameObject.SetActive(true);
-            _continueButton.OnSelected();
-
-            await UniTask.WaitForSeconds(0.5f);
-
-            // クリックまで待つ
-            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-            while (true)
+            // 1 点先取で勝ちの場合はテンポ重視のため、パネルを出さない
+            if (GameMatchManager.Instance.WinCountToMatchFinish != 1)
             {
-                var isEnd = false;
-                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                await UniTask.WaitForSeconds(0.5f);
+
+                // 勝ち点を表示
+                _winCountPanel.gameObject.SetActive(true);
+                _continueButton.gameObject.SetActive(false);
+
+                await UniTask.WaitForSeconds(2.5f);
+
+                _continueButton.gameObject.SetActive(true);
+                _continueButton.OnSelected();
+
+                await UniTask.WaitForSeconds(0.5f);
+
+                // クリックまで待つ
+                var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+                while (true)
                 {
-                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                    var isEnd = false;
+                    for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
                     {
-                        isEnd = true;
+                        if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                        {
+                            isEnd = true;
+                            break;
+                        }
+                    }
+
+                    if (isEnd)
+                    {
                         break;
                     }
+
+                    await UniTask.Yield();
                 }
 
-                if (isEnd)
-                {
-                    break;
-                }
+                _continueButton.OnDecided();
 
-                await UniTask.Yield();
+                await UniTask.WaitForSeconds(0.25f);
             }
-
-            _continueButton.OnDecided();
-
-            await UniTask.WaitForSeconds(0.25f);
 
             _ = _canvas.DOFade(0.0f, 0.2f);
 
