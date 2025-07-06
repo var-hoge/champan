@@ -13,6 +13,7 @@ using KanKikuchi.AudioManager;
 using NUnit.Framework.Internal;
 using Unity.VisualScripting;
 using static UnityEngine.Rendering.DebugUI;
+using App.Cpu;
 
 namespace Ui.Main
 {
@@ -34,6 +35,15 @@ namespace Ui.Main
 
             _rematchButton.OnSelected();
             _meinMenuButton.OnUnselected();
+
+            // 振動
+            {
+                var winnerPlayerIdx = GameSequenceManager.WinnerPlayerIdx;
+                if (CpuManager.Instance.IsCpu(winnerPlayerIdx) is false)
+                {
+                    TadaLib.Input.PlayerInputManager.Instance.InputProxy(winnerPlayerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.VeryHappy);
+                }
+            }
 
             animation.Play("GameFinish");
 

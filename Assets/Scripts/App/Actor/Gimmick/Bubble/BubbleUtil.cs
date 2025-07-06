@@ -10,6 +10,15 @@ namespace App.Actor.Gimmick.Bubble
         /// <param name="obj">オブジェクト</param>
         public static void Blow(GameObject obj, Vector3 bubblePosition, float blowPower)
         {
+            // 振動
+            {
+                var playerIdx = obj.GetComponent<Player.DataHolder>().PlayerIdx;
+                if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
+                {
+                    TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
+                }
+            }
+
             var dirDiff = obj.transform.position - bubblePosition;
             dirDiff.z = 0.0f;
             var dirUnit = dirDiff.normalized;

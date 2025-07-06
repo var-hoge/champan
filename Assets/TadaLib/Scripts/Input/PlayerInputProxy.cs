@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using UnityEngine.InputSystem;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace TadaLib.Input
 {
@@ -16,6 +17,15 @@ namespace TadaLib.Input
     /// </summary>
     public class PlayerInputProxy
     {
+        #region 定義
+        public enum VibrateType
+        {
+            Dead,
+            Happy,
+            VeryHappy,
+        }
+        #endregion
+
         #region コンストラクタ
         public PlayerInputProxy(UnityEngine.InputSystem.PlayerInput basePlayerInput)
         {
@@ -106,6 +116,29 @@ namespace TadaLib.Input
 
             return cur > 0.0f ? 1.0f : -1.0f;
         }
+
+        public void Vibrate(VibrateType type)
+        {
+            (var low, var high, var sec) = type switch
+            {
+                VibrateType.Dead => (0.1f, 0.75f, 0.12f),
+                VibrateType.Happy => (0.15f, 0.35f, 0.12f),
+                VibrateType.VeryHappy => (0.4f, 1.0f, 0.8f),
+                _ => throw new NotImplementedException()
+            };
+
+            VibrateAdvanced(low, high, sec);
+        }
+
+        public void VibrateAdvanced(float lowFrequency, float highFrequency, float durationSec)
+        {
+            if (_playerInput == null)
+            {
+                VibrateImpl(lowFrequency, highFrequency, durationSec, _basePlayerInput);
+                return;
+            }
+            VibrateImpl(lowFrequency, highFrequency, durationSec, _playerInput);
+        }
         #endregion
 
         #region privateフィールド
@@ -173,6 +206,30 @@ namespace TadaLib.Input
                 OnMove?.Invoke(value);
                 return;
             }
+        }
+
+        void VibrateImpl(float lowFrequency, float highFrequency, float durationSec, UnityEngine.InputSystem.PlayerInput playerInput)
+        {
+            foreach (var device in playerInput.devices)
+            {
+                var gamepad = device as Gamepad;
+
+                if (gamepad == null)
+                {
+                    continue;
+                }
+
+                Vibrate(lowFrequency, highFrequency, durationSec, gamepad).Forget();
+            }
+        }
+
+        async UniTask Vibrate(float lowFrequency, float highFrequency, float durationSec, Gamepad gamepad)
+        {
+            gamepad.SetMotorSpeeds(lowFrequency, highFrequency);
+
+            await UniTask.WaitForSeconds(durationSec);
+
+            gamepad.SetMotorSpeeds(0.0f, 0.0f);
         }
         #endregion
     }

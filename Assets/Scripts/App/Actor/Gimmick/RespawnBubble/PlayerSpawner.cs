@@ -53,6 +53,12 @@ namespace App.Actor.Gimmick.RespawnBubble
                     // SEの再生
                     var path = SEPath[Random.Range(0, SEPath.Count)];
                     SEManager.Instance.Play(path, 20f);
+                    var playerIdx = player.GetComponent<Player.DataHolder>().PlayerIdx;
+                    if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
+                    {
+                        // コントローラを振動
+                        TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Dead);
+                    }
                     // リスポーンバブルの生成
                     var spawnPointX = Mathf.Clamp(player.transform.position.x, spawnRangeX.Min, spawnRangeX.Max);
                     var respawnBubble = Instantiate(_respawnBubble, new(spawnPointX, spawnRangeY.Max, 0), Quaternion.identity);

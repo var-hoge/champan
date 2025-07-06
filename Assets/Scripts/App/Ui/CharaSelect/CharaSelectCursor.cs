@@ -35,6 +35,9 @@ namespace App.Ui.CharaSelect
 
         public void Show()
         {
+            // 振動
+            TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.3f, 0.3f, 0.04f);
+
             var rectTransform = GetComponent<RectTransform>();
             var initScale = rectTransform.localScale;
             rectTransform.localScale = Vector3.zero;
@@ -211,6 +214,9 @@ namespace App.Ui.CharaSelect
             {
                 callback();
             }
+
+            // 振動
+            TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.2f, 0.8f, 0.04f);
         }
 
         void OnCancelSelect()
