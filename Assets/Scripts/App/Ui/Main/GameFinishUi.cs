@@ -12,6 +12,7 @@ using DG.Tweening;
 using KanKikuchi.AudioManager;
 using NUnit.Framework.Internal;
 using Unity.VisualScripting;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace Ui.Main
 {
@@ -31,9 +32,12 @@ namespace Ui.Main
             _canvas.GetComponent<CanvasGroup>().alpha = 0.0f;
             _ = _canvas.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
 
+            _rematchButton.OnSelected();
+            _meinMenuButton.OnUnselected();
+
             animation.Play("GameFinish");
 
-            await UniTask.WaitForSeconds(1.0f);
+            await UniTask.WaitForSeconds(3.0f);
 
             _rematchButton.gameObject.SetActive(true);
             _meinMenuButton.gameObject.SetActive(true);
@@ -42,7 +46,13 @@ namespace Ui.Main
 
             // クリックまで待つ
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-            var isRematch = true;
+            bool isRematch = true;
+            int selectedIdx = 0;
+            var axisPrev = new List<float>();
+            for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+            {
+                axisPrev.Add(0.0f);
+            }
             while (true)
             {
                 var isEnd = false;
@@ -50,14 +60,7 @@ namespace Ui.Main
                 {
                     if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
                     {
-                        isRematch = true;
-                        isEnd = true;
-                        break;
-                    }
-
-                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Cancel))
-                    {
-                        isRematch = false;
+                        isRematch = selectedIdx == 0;
                         isEnd = true;
                         break;
                     }
@@ -68,10 +71,55 @@ namespace Ui.Main
                     break;
                 }
 
+                // 上下移動
+                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                {
+                    var axis = inputManager.InputProxy(idx).Axis(TadaLib.Input.AxisCode.Vertical);
+
+                    // 入力開始時だけ受け付ける
+                    if ((axis > 0.5f && axisPrev[idx] > 0.5) ||
+                            (axis < -0.5f && axisPrev[idx] < -0.5f))
+                    {
+                        // 同じ
+                        continue;
+                    }
+
+                    axisPrev[idx] = axis;
+
+                    // 入力値が少ない場合はなし
+                    if (Mathf.Abs(axis) < 0.5f)
+                    {
+                        continue;
+                    }
+
+                    selectedIdx = 1 - selectedIdx;
+                    if (selectedIdx == 0)
+                    {
+                        _rematchButton.OnSelected(doReaction: true);
+                        _meinMenuButton.OnUnselected();
+                    }
+                    else
+                    {
+                        _rematchButton.OnUnselected();
+                        _meinMenuButton.OnSelected(doReaction: true);
+                    }
+
+                    break;
+                }
+
                 await UniTask.Yield();
             }
 
             GameMatchManager.Instance.ResetPlayersWinCount();
+
+            if (isRematch)
+            {
+                _rematchButton.OnDecided();
+            }
+            else
+            {
+                _meinMenuButton.OnDecided();
+            }
 
             if (isRematch)
             {
@@ -91,10 +139,10 @@ namespace Ui.Main
         Canvas _canvas;
 
         [SerializeField]
-        GameObject _rematchButton;
+        TadaLib.Ui.Button _rematchButton;
 
         [SerializeField]
-        GameObject _meinMenuButton;
+        TadaLib.Ui.Button _meinMenuButton;
         #endregion
 
         #region privateメソッド

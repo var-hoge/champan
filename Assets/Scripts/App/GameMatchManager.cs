@@ -20,7 +20,7 @@ namespace App
         /// <summary>
         /// ゲームに勝利するための勝ち点
         /// </summary>
-        public int WinCountToMatchFinish { private set; get; } = 3;
+        public int WinCountToMatchFinish { private set; get; } = 1;
 
         /// <summary>
         /// CPUが試合に出場するかどうか

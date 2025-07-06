@@ -118,7 +118,7 @@ namespace TadaLib.Input
                     sb.AppendLine($"    Devices: {input.devices[0].displayName}({input.devices[0].name})");
                 }
                 var moveVec2 = input.actions["Move"].ReadValue<Vector2>();
-                sb.AppendLine($"    Move/Action: ({moveVec2.x.ToString("F2")}, {moveVec2.y.ToString("F2")})/{input.actions["Action"].IsPressed()}:");
+                sb.AppendLine($"    Move/Action/Cancel: ({moveVec2.x.ToString("F2")}, {moveVec2.y.ToString("F2")})/{input.actions["Action"].IsPressed()}/{input.actions["Cancel"].IsPressed()}");
             }
 
             sb.AppendLine("  AllDevices:");
