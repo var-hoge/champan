@@ -15,6 +15,7 @@ namespace TadaLib.Input
     [RequireComponent(typeof(UnityEngine.InputSystem.PlayerInputManager))]
     public class PlayerInputManager
         : TadaLib.ProcSystem.BaseManagerProc<PlayerInputManager>
+        , TadaLib.ProcSystem.IProcManagerUpdate
     {
         #region プロパティ
         public int MaxPlayerCount { get; } = 4;
@@ -55,6 +56,14 @@ namespace TadaLib.Input
 #endif
             // @memo: なぜか 1P の Action だけ無効になってしまったので、ここで有効化
             _playerInputs[0].actions["Action"].Enable();
+        }
+
+        public void OnUpdate()
+        {
+            foreach (var input in _playerInputProxies)
+            {
+                input.Update();
+            }
         }
         #endregion
 

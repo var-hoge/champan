@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f435b4309117a634c9c02d8f02ef1832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crownStartShield: 1
+  crownStartShield: 10
   shieldConfigs:
   - shieldLevel: 8
     sprite: {fileID: -9130454481438517008, guid: e0405c6dce80e4340a461a541b3f2f14, type: 3}

@@ -66,7 +66,7 @@ namespace App.Ui.GameModeSelect
 
         public void OnDecide()
         {
-            if (_items.Count == 0)
+            if (_onItemDecided.Count == 0)
             {
                 return;
             }
@@ -87,36 +87,26 @@ namespace App.Ui.GameModeSelect
             OnIndexChanged();
         }
 
-        void Update()
+        public bool OnUpdate()
         {
             if (_items.Count == 0)
             {
-                return;
-            }
-
-            if (_isSelected is false)
-            {
-                return;
+                return false;
             }
 
             var inputValue = CalcInputValue();
 
-            if (inputValue == _inputValuePrev)
-            {
-                return;
-            }
-
-            _inputValuePrev = inputValue;
-
             if (inputValue == 0)
             {
-                return;
+                return false;
             }
 
             var itemCount = _items.Count;
             _curIndex = (_curIndex + inputValue + itemCount) % itemCount;
 
             OnIndexChanged();
+
+            return true;
         }
         #endregion
 
@@ -153,7 +143,6 @@ namespace App.Ui.GameModeSelect
 
         bool _isSelected = false;
         int _curIndex = 0;
-        int _inputValuePrev = 0;
         #endregion
 
         #region privateメソッド
@@ -167,7 +156,7 @@ namespace App.Ui.GameModeSelect
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
             for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
             {
-                var value = inputManager.InputProxy(idx).Axis(TadaLib.Input.AxisCode.Horizontal);
+                var value = inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Horizontal);
 
                 // 入力値が少ない場合はなし
                 if (Mathf.Abs(value) < 0.5f)

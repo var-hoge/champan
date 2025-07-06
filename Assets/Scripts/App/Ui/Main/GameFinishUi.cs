@@ -48,11 +48,6 @@ namespace Ui.Main
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
             bool isRematch = true;
             int selectedIdx = 0;
-            var axisPrev = new List<float>();
-            for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
-            {
-                axisPrev.Add(0.0f);
-            }
             while (true)
             {
                 var isEnd = false;
@@ -74,17 +69,7 @@ namespace Ui.Main
                 // 上下移動
                 for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
                 {
-                    var axis = inputManager.InputProxy(idx).Axis(TadaLib.Input.AxisCode.Vertical);
-
-                    // 入力開始時だけ受け付ける
-                    if ((axis > 0.5f && axisPrev[idx] > 0.5) ||
-                            (axis < -0.5f && axisPrev[idx] < -0.5f))
-                    {
-                        // 同じ
-                        continue;
-                    }
-
-                    axisPrev[idx] = axis;
+                    var axis = inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical);
 
                     // 入力値が少ない場合はなし
                     if (Mathf.Abs(axis) < 0.5f)

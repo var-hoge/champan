@@ -34,6 +34,8 @@ namespace App.Ui.GameModeSelect
         #region MonoBehavior の実装
         void Start()
         {
+            _selectBgDefaultAlpha = _selectBack.color.a;
+
             foreach (var item in _items)
             {
                 item.OnUnselected();
@@ -65,24 +67,58 @@ namespace App.Ui.GameModeSelect
                 return;
             }
 
-            // 決定とキャンセルが同時に押されたら、決定を優先する
-            var isDecied = IsDecided();
-            var isCanceled = IsCanceled();
-
-            var moveIdx = 0;
-
-            if (isDecied)
+            if (_items[_selectedIndex].OnUpdate())
             {
-                moveIdx = 1;
+                return;
             }
-            else if (isCanceled)
+
+            if (DecideOrCancel())
             {
-                moveIdx = -1;
+                return;
             }
+        }
+        #endregion
+
+        #region 定義
+        enum InputResult
+        {
+            Decide,
+            Cancel,
+            None,
+        }
+        #endregion
+
+        #region private フィールド
+        [SerializeField]
+        List<Item> _items;
+
+        [SerializeField]
+        UnityEngine.UI.Image _selectBack;
+
+        [SerializeField]
+        TadaLib.Ui.Button _startButton;
+
+        int _selectedIndex = 0;
+        bool _isEnd = false;
+
+        float _selectBgDefaultAlpha = 1.0f;
+        #endregion
+
+        #region private メソッド
+        bool DecideOrCancel()
+        {
+            var input = GetInput();
+
+            var moveIdx = input switch
+            {
+                InputResult.Decide => 1,
+                InputResult.Cancel => -1,
+                _ => 0
+            };
 
             if (moveIdx == 0)
             {
-                return;
+                return false;
             }
 
             int nextIndex;
@@ -98,18 +134,22 @@ namespace App.Ui.GameModeSelect
             if (nextIndex == -1)
             {
                 // 動けなかった
-                return;
+                return false;
             }
 
             if (nextIndex == _items.Count)
             {
                 // シーン遷移
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.3f);
+                _items[_selectedIndex].OnDecide();
                 _isEnd = true;
-                return;
+                return true;
             }
 
-            _items[_selectedIndex].OnDecide();
+            if (moveIdx > 0)
+            {
+                _items[_selectedIndex].OnDecide();
+            }
             _items[_selectedIndex].OnUnselected();
 
             _selectedIndex = nextIndex;
@@ -117,67 +157,57 @@ namespace App.Ui.GameModeSelect
 
             if (_selectedIndex == _items.Count - 1)
             {
-                _startButtonOnDisabled.SetActive(false);
-                _startButtonOnEnabled.SetActive(true);
-                _selectBack.gameObject.SetActive(false);
+                _startButton.OnSelected(doReaction: true);
+                _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
+                _selectBack.DOFade(0.0f, 0.1f);
             }
             else
             {
-                _startButtonOnDisabled.SetActive(true);
-                _startButtonOnEnabled.SetActive(false);
-                _selectBack.gameObject.SetActive(true);
+                _startButton.OnUnselected();
                 _selectBack.rectTransform.DOKill();
+                _selectBack.DOFade(_selectBgDefaultAlpha, 0.1f);
                 _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
             }
+
+            return true;
         }
-        #endregion
 
-        #region private フィールド
-        [SerializeField]
-        List<Item> _items;
-
-        [SerializeField]
-        UnityEngine.UI.Image _selectBack;
-
-        [SerializeField]
-        GameObject _startButtonOnDisabled;
-
-        [SerializeField]
-        GameObject _startButtonOnEnabled;
-
-        int _selectedIndex = 0;
-        bool _isEnd = false;
-        #endregion
-
-        #region private メソッド
-        bool IsDecided()
+        InputResult GetInput()
         {
+            // 決定とキャンセルが同時に押されたら、決定を優先する
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+
+            // 方向入力
+            //for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+            for (int idx = 0; idx < 1; ++idx)
+            {
+                var axis = inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical);
+
+                // 入力値が少ない場合はなし
+                if (Mathf.Abs(axis) < 0.5f)
+                {
+                    continue;
+                }
+
+                return axis > 0.0f ? InputResult.Cancel : InputResult.Decide;
+            }
+
+            // ボタン入力
             for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
             {
                 if (inputManager.InputProxy(idx).IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
                 {
-                    return true;
+                    return InputResult.Decide;
                 }
-            }
 
-            return false;
-        }
-
-        bool IsCanceled()
-        {
-            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-            for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
-            {
                 if (inputManager.InputProxy(idx).IsPressedTrigger(TadaLib.Input.ButtonCode.Cancel))
                 {
-                    return true;
+                    return InputResult.Cancel;
                 }
             }
 
-            return false;
+            return InputResult.None;
         }
-
         int CalcAdvancedIndex(int curSelectedIndex)
         {
             ++curSelectedIndex;

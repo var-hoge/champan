@@ -35,6 +35,12 @@ namespace TadaLib.Input
         #endregion
 
         #region メソッド
+        public void Update()
+        {
+            _axisPrev = _axis;
+            _axis = new Vector2(Axis(AxisCode.Horizontal), Axis(AxisCode.Vertical));
+        }
+
         public void SetPlayerInput(UnityEngine.InputSystem.PlayerInput playerInput)
         {
             if (_playerInput != null)
@@ -76,11 +82,38 @@ namespace TadaLib.Input
             }
             return AxisImpl(code, _playerInput);
         }
+
+        public float AxisTrigger(AxisCode code)
+        {
+            var deadZone = 0.5f;
+
+            var prev = code is AxisCode.Horizontal ? _axisPrev.x : _axisPrev.y;
+            var cur = code is AxisCode.Horizontal ? _axis.x : _axis.y;
+
+            if (Mathf.Abs(cur) < deadZone)
+            {
+                return 0.0f;
+            }
+
+            // 入力開始時ではない
+            if (cur > deadZone && prev > deadZone)
+            {
+                return 0.0f;
+            }
+            if (cur < -deadZone && prev < -deadZone)
+            {
+                return 0.0f;
+            }
+
+            return cur > 0.0f ? 1.0f : -1.0f;
+        }
         #endregion
 
         #region privateフィールド
         UnityEngine.InputSystem.PlayerInput _basePlayerInput;
         UnityEngine.InputSystem.PlayerInput _playerInput;
+        Vector2 _axis;
+        Vector2 _axisPrev;
         #endregion
 
         #region privateメソッド

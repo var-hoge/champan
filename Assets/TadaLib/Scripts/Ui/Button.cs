@@ -30,7 +30,7 @@ namespace TadaLib.Ui
             if (doReaction)
             {
                 _body.rectTransform.DOKill();
-                _body.rectTransform.DOScale(_body.rectTransform.localScale * 1.2f, 0.1f).SetLoops(1);
+                _body.rectTransform.DOScale(_body.rectTransform.localScale * 1.12f, 0.08f).SetLoops(2, LoopType.Yoyo);
             }
         }
 
