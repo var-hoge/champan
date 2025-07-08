@@ -57,6 +57,31 @@ namespace App.Graphics.Outline
             outMaterial = _outlineMaterials[playerIdx];
             return true;
         }
+
+        public bool TryGetOutlineMaterialForImage(OutlineKind kind, bool considerCpu, out Material outMaterial)
+        {
+            var playerIdx = kind switch
+            {
+                OutlineKind.Player0 => 0,
+                OutlineKind.Player1 => 1,
+                OutlineKind.Player2 => 2,
+                OutlineKind.Player3 => 3,
+                OutlineKind.WinnerPlayer => GameSequenceManager.WinnerPlayerIdx,
+                _ => 0
+            };
+
+            outMaterial = null;
+            if (considerCpu)
+            {
+                if (Cpu.CpuManager.Instance.IsCpu(playerIdx))
+                {
+                    return false;
+                }
+            }
+
+            outMaterial = _outlineMaterialsForImage[playerIdx];
+            return true;
+        }
         #endregion
 
         #region MonoBehavior の実装
@@ -68,6 +93,13 @@ namespace App.Graphics.Outline
                 material.SetColor("_OutlineColor", color);
                 _outlineMaterials.Add(material);
             }
+
+            foreach (var color in _playerColors)
+            {
+                var material = new Material(_outlineBaseMaterialForImage);
+                material.SetColor("_OutlineColor", color);
+                _outlineMaterialsForImage.Add(material);
+            }
         }
         #endregion
 
@@ -78,7 +110,11 @@ namespace App.Graphics.Outline
         [SerializeField]
         Material _outlineBaseMaterial;
 
+        [SerializeField]
+        Material _outlineBaseMaterialForImage;
+
         List<Material> _outlineMaterials = new List<Material>();
+        List<Material> _outlineMaterialsForImage = new List<Material>();
         #endregion
 
         #region private メソッド

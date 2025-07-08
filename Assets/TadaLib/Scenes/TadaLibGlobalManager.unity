@@ -834,6 +834,7 @@ MonoBehaviour:
   - {r: 0.14901961, g: 0.87843144, b: 0.40784317, a: 1}
   - {r: 1, g: 0.59607846, b: 0.34117648, a: 1}
   _outlineBaseMaterial: {fileID: 2100000, guid: 689b6fc04b09f49438d694b4a7e71f4b, type: 2}
+  _outlineBaseMaterialForImage: {fileID: 2100000, guid: e4e86dd52fd420d4bb37f34e483a29e8, type: 2}
 --- !u!4 &1882027930
 Transform:
   m_ObjectHideFlags: 0

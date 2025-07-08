@@ -24,25 +24,26 @@ namespace App.Graphics.Outline
         #region MonoBehavior の実装
         void Start()
         {
-            if (OutlineManager.Instance.TryGetOutlineMaterial(_outlineKind, _considerCpu, out var material) is false)
             {
-                return;
-            }
-
-            {
-                var spriteRenderer = GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
+                if (OutlineManager.Instance.TryGetOutlineMaterial(_outlineKind, _considerCpu, out var material))
                 {
-                    spriteRenderer.sharedMaterial = material;
-                    _spritePrev = spriteRenderer.sprite;
+                    var spriteRenderer = GetComponent<SpriteRenderer>();
+                    if (spriteRenderer != null)
+                    {
+                        spriteRenderer.sharedMaterial = material;
+                        _spritePrev = spriteRenderer.sprite;
+                    }
                 }
             }
 
             {
-                var image = GetComponent<UnityEngine.UI.Image>();
-                if (image != null)
+                if (OutlineManager.Instance.TryGetOutlineMaterialForImage(_outlineKind, _considerCpu, out var material))
                 {
-                    image.material = material;
+                    var image = GetComponent<UnityEngine.UI.Image>();
+                    if (image != null)
+                    {
+                        image.material = material;
+                    }
                 }
             }
         }
