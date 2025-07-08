@@ -173,8 +173,35 @@ namespace App.Ui.CharaSelect
         #endregion
 
         #region privateメソッド
-        async UniTask SceneChange()
+        public async UniTask SceneChange()
         {
+            // CPU に選ばれていないキャラを割り当てる
+            {
+                var unusedCharaList = new List<int>();
+                for (int idx = 0; idx < CharaMaxCount; idx++)
+                {
+                    unusedCharaList.Add(idx);
+                }
+
+                for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
+                {
+                    if (Cpu.CpuManager.Instance.IsCpu(idx))
+                    {
+                        continue;
+                    }
+                    unusedCharaList.Remove(_playerUseCharaIdList[idx]);
+                }
+
+                for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
+                {
+                    if (Cpu.CpuManager.Instance.IsCpu(idx))
+                    {
+                        _playerUseCharaIdList[idx] = unusedCharaList.First();
+                        unusedCharaList.RemoveAt(0);
+                    }
+                }
+            }
+
             _isSceneChanging = true;
 
             await UniTask.WaitForSeconds(2.0f);

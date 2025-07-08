@@ -5733,6 +5733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cd511519b7b9348b949601bb1d6a9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 1316101433}
   _playerParents: {fileID: 256883464}
   _starParticles: {fileID: 1198766706}
 --- !u!61 &2058510188

@@ -37,7 +37,7 @@ namespace App.Ui.CharaSelect
             IEnumerator StartTransition()
             {
                 yield return new WaitForSeconds(1.5f);
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 0.5f, 0.5f);
+                _ = _manager.SceneChange();
             }
         }
 
@@ -69,6 +69,9 @@ namespace App.Ui.CharaSelect
 
             return isFinished;
         }
+
+        [SerializeField]
+        CharaSelectUiManager _manager;
 
         [SerializeField]
         Transform _playerParents;
