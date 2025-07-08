@@ -25,6 +25,13 @@ namespace App.Ui.Common
         void Start()
         {
             GetComponent<UnityEngine.UI.Image>().enabled = false;
+
+            _isCpu = GameSequenceManager.Instance != null && Cpu.CpuManager.Instance.IsCpu(_playerNumber);
+
+            if (_isCpu)
+            {
+                GetComponent<RectTransform>().localScale = GetComponent<RectTransform>().localScale * 0.85f;
+            }
         }
 
         public void OnPostMove()
@@ -46,8 +53,13 @@ namespace App.Ui.Common
 
             var screenPos = Camera.main.WorldToScreenPoint(playerPos);
 
-            var offsetY = 170.0f;
+            var offsetY = 155.0f;
             var angle = 0.0f;
+
+            if (_isCpu)
+            {
+                offsetY *= 0.85f;
+            }
 
             if (!_isDummyPrev && isDummyValid)
             {
@@ -59,7 +71,11 @@ namespace App.Ui.Common
             // 画面内に収めるよう努力する
             if (isDummyValid)
             {
-                offsetY = 90.0f;
+                offsetY = 84.0f;
+                if (_isCpu)
+                {
+                    offsetY *= 0.85f;
+                }
                 if (screenPos.y + offsetY > Screen.height)
                 {
                     var diff = screenPos.y + offsetY - Screen.height;
@@ -86,6 +102,7 @@ namespace App.Ui.Common
         float _angleRate = 1.0f;
         bool _isDummyPrev = false;
         float _offsetY = 170.0f;
+        bool _isCpu = false;
         #endregion
 
         #region privateメソッド

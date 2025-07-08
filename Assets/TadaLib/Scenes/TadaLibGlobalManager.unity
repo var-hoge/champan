@@ -829,8 +829,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _section: 0
   _playerColors:
-  - {r: 0.37647063, g: 0.6666667, b: 1, a: 1}
-  - {r: 0.93725497, g: 0.28235295, b: 0.43921572, a: 1}
+  - {r: 0.9372549, g: 0.28235295, b: 0.4392157, a: 1}
+  - {r: 0.3764706, g: 0.6666667, b: 1, a: 1}
   - {r: 0.14901961, g: 0.87843144, b: 0.40784317, a: 1}
   - {r: 1, g: 0.59607846, b: 0.34117648, a: 1}
   _outlineBaseMaterial: {fileID: 2100000, guid: 689b6fc04b09f49438d694b4a7e71f4b, type: 2}
