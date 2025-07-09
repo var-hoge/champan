@@ -49,7 +49,8 @@ namespace App.Actor.Gimmick.RespawnBubble
             {
                 if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.Battle)
                 {
-                    player.GetComponent<Player.DataHolder>().IsDead = true;
+                    var dataHolder = player.GetComponent<Player.DataHolder>();
+                    dataHolder.IsDead = true;
                     // SEの再生
                     var path = SEPath[Random.Range(0, SEPath.Count)];
                     SEManager.Instance.Play(path, 20f);
@@ -59,6 +60,8 @@ namespace App.Actor.Gimmick.RespawnBubble
                         // コントローラを振動
                         TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Dead);
                     }
+                    // オノマトペを生成
+                    Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
                     // リスポーンバブルの生成
                     var spawnPointX = Mathf.Clamp(player.transform.position.x, spawnRangeX.Min, spawnRangeX.Max);
                     var respawnBubble = Instantiate(_respawnBubble, new(spawnPointX, spawnRangeY.Max, 0), Quaternion.identity);
@@ -70,6 +73,9 @@ namespace App.Actor.Gimmick.RespawnBubble
                 }
                 else
                 {
+                    var dataHolder = player.GetComponent<Player.DataHolder>();
+                    // オノマトペを生成
+                    Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
                     player.GetComponent<Player.DataHolder>().IsDead = true;
                     // プレイヤーを画面外に移動
                     player.transform.position = OutOfScreenPoint;

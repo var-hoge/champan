@@ -311,6 +311,39 @@
                 },
                 {
                     "name": "",
+                    "id": "ad1f9711-dcae-4a60-a0c6-5d3d473580b3",
+                    "path": "<HID::Nintendo Wireless Gamepad>/hat",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c8a29432-5906-4c8c-9f63-451e7fa8a1fa",
+                    "path": "<Joystick>/stick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8af5fea4-65c7-46b8-9a09-d6803005aaa2",
+                    "path": "<Joystick>/{Hatswitch}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4b62ba10-f88b-4a16-be53-b85642c906a8",
                     "path": "<Keyboard>/numpad8",
                     "interactions": "",
