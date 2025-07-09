@@ -4,6 +4,7 @@ using System.Linq;
 using TadaLib.Input;
 using UnityEngine;
 using TadaLib.ActionStd;
+using App.Graphics.Outline;
 
 namespace App.Actor.Gimmick.RespawnBubble
 {
@@ -85,6 +86,21 @@ namespace App.Actor.Gimmick.RespawnBubble
             var x = Random.Range(0f, 10f) * Mathf.Sign(_player.position.x) * -1;
             _rb.AddForce(new(x, -15));
             _body.sprite = CharacterManager.Instance.GetCharaImage(_player.GetComponent<Player.DataHolder>().CharaIdx);
+
+            {
+                var playerIndex = player.GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
+                var kind = playerIndex switch
+                {
+                    var idx when idx == 0 => OutlineManager.OutlineKind.Player0,
+                    var idx when idx == 1 => OutlineManager.OutlineKind.Player1,
+                    var idx when idx == 2 => OutlineManager.OutlineKind.Player2,
+                    _ => OutlineManager.OutlineKind.Player3,
+                };
+                if (OutlineManager.Instance.TryGetOutlineMaterial(kind, true, out var material))
+                {
+                    _body.sharedMaterial = material;
+                }
+            }
         }
 
         [SerializeField]
