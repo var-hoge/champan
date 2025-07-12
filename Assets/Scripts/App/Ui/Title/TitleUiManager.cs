@@ -25,7 +25,6 @@ namespace App.Ui.Title
         private void Start()
         {
             Staging().Forget();
-            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
         }
         #endregion
 
@@ -42,9 +41,38 @@ namespace App.Ui.Title
         public async UniTask Staging()
         {
             // 最低 2 秒は待つ
-            await UniTask.WaitForSeconds(1f);
+            GameObject.Find("Main").transform.DOScale(Vector3.one * 0.85f, 0.6f).SetEase(Ease.OutBack);
+
+            await UniTask.WaitForSeconds(0.1f);
+
             SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
-            await UniTask.WaitForSeconds(1f);
+
+            await UniTask.WaitForSeconds(0.2f);
+
+            var titleBgmask = FindAnyObjectByType<TitleBgMask>();
+            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.3f, 0.5f);
+
+            await UniTask.WaitForSeconds(0.4f);
+
+            var charInfos = new (string name, Vector2 pos)[]
+            {
+                ("Chara1", new(-526, 181)),
+                ("Chara2", new(518, 228)),
+                ("Chara3", new(514, -178)),
+                ("Chara4", new(-377, -189)),
+            };
+            foreach (var (name, pos) in charInfos)
+            {
+                GameObject.Find(name).GetComponent<RectTransform>().DOAnchorPos(pos, 0.8f).SetEase(Ease.OutBack);
+            }
+
+            await UniTask.WaitForSeconds(1.2f);
+
+            _start.DOScale(Vector3.one * 1.1f, 0.15f);
+            _exit.DOScale(Vector3.one, 0.15f);
+            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
+
+            await UniTask.WaitForSeconds(0.2f);
 
             var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(0);
             var isPushed = false;

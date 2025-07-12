@@ -14,9 +14,14 @@ namespace App.Ui.Title
         : MonoBehaviour
     {
         #region プロパティ
+        public Vector3 Scale => _scale;
         #endregion
 
         #region メソッド
+        public void SetScale(Vector3 value)
+        {
+            _scale = value;
+        }
         #endregion
 
         #region MonoBehavior の実装
