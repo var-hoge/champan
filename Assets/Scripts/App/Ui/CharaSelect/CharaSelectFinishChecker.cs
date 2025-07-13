@@ -36,7 +36,7 @@ namespace App.Ui.CharaSelect
 
             IEnumerator StartTransition()
             {
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(0.0f);
                 _ = _manager.SceneChange();
             }
         }

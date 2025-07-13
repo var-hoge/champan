@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ImageMask
-  m_Shader: {fileID: -6465566751694194690, guid: 0715026be201a884aaaa040eadd44b07, type: 3}
+  m_Name: DecideProgress
+  m_Shader: {fileID: -6465566751694194690, guid: e843776a06631384199f4e1791602478, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -87,8 +87,9 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _Mask: 0.28
     - _MaskRad: -0.5
-    - _MaskRad2: -0.06510629
+    - _MaskRad2: -0.059164718
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _OutlineThickness: 4.19

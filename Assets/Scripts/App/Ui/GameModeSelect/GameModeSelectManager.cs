@@ -58,6 +58,8 @@ namespace App.Ui.GameModeSelect
                 _items[_selectedIndex].OnSelected();
                 _selectBack.rectTransform.position = _items[_selectedIndex].CenterPos;
             }
+
+            _backUi.fillAmount = 0.0f;
         }
 
         void Update()
@@ -66,6 +68,8 @@ namespace App.Ui.GameModeSelect
             {
                 return;
             }
+
+            UpdateBack();
 
             if (_items[_selectedIndex].OnUpdate())
             {
@@ -98,10 +102,18 @@ namespace App.Ui.GameModeSelect
         [SerializeField]
         TadaLib.Ui.Button _startButton;
 
+        [SerializeField]
+        UnityEngine.UI.Image _backUi;
+
+        [SerializeField]
+        float _backTimeSecToDecide = 2.0f;
+
         int _selectedIndex = 0;
         bool _isEnd = false;
 
         float _selectBgDefaultAlpha = 1.0f;
+
+        float _backProgress = 0.0f;
         #endregion
 
         #region private メソッド
@@ -234,6 +246,44 @@ namespace App.Ui.GameModeSelect
                 return curSelectedIndex;
             }
             return CalcRetreatedIndex(curSelectedIndex);
+        }
+
+        void UpdateBack()
+        {
+
+            bool IsBacklPressed()
+            {
+                var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+                {
+                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Cancel))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if (IsBacklPressed())
+            {
+                _backProgress += Time.deltaTime;
+            }
+            else
+            {
+                _backProgress = 0.0f;
+            }
+
+            var rate = _backProgress / _backTimeSecToDecide;
+            _backUi.fillAmount = Mathf.Min(rate, 1.0f);
+
+            if (rate >= 1.0f)
+            {
+                // scene transition
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.4f, 0.3f);
+                _isEnd = true;
+
+                _backUi.rectTransform.parent.DOPunchScale(Vector3.one * 1.06f, 0.2f);
+            }
         }
         #endregion
     }
