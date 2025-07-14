@@ -81,6 +81,7 @@ namespace App.Ui.CharaSelect
         Phase _phase = Phase.WaitingForEntry;
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
 
+        bool _isReselect = false;
         #endregion
 
         #region privateメソッド
@@ -139,6 +140,13 @@ namespace App.Ui.CharaSelect
             _player.transform.position = worldPos;
 
             _chara.gameObject.SetActive(false);
+
+            if (_isReselect)
+            {
+                _player.GetComponent<Actor.Player.CharaCtrl>().UpdateCharaSprite();
+                // ジャンプスタート
+                _player.GetComponent<TadaLib.ActionStd.StateMachine>().ChangeState(typeof(Actor.Player.State.StateJump));
+            }
         }
 
         void OnCharaCanceled()
@@ -148,6 +156,7 @@ namespace App.Ui.CharaSelect
             _joinButton.gameObject.SetActive(true);
 
             _phase = Phase.WaitingForEntry;
+            _isReselect = true;
         }
         #endregion
     }

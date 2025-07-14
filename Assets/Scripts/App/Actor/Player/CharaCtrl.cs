@@ -19,6 +19,18 @@ namespace App.Actor.Player
         #endregion
 
         #region メソッド
+        public void UpdateCharaSprite()
+        {
+            var playerIdx = GetComponent<DataHolder>().PlayerIdx;
+            var charaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(playerIdx);
+
+            var sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
+            _body.sprite = sprite;
+            _shadow.sprite = sprite;
+
+            _body.transform.localPosition = _offsets[charaIdx];
+
+        }
         #endregion
 
         #region MonoBehavior の実装
