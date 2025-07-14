@@ -31,13 +31,7 @@ namespace App.Ui.CharaSelect
                 }
 
                 _isFinished = true;
-                StartCoroutine(StartTransition());
-            }
-
-            IEnumerator StartTransition()
-            {
-                yield return new WaitForSeconds(0.0f);
-                _ = _manager.SceneChange();
+                _manager.SceneChange();
             }
         }
 

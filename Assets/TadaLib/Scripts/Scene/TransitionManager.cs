@@ -40,7 +40,7 @@ namespace TadaLib.Scene
         /// <param name="fadeInDurationSec">遷移エフェクトの時間(遷移開始時)</param>
         /// <param name="fadeOutDurationSec">遷移エフェクトの時間(遷移終了時)</param>
         /// <param name="guranteedWaitDurationSec">遷移中の最低待ち時間(エフェクト時間は含めない)</param>
-        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.3f)
+        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.3f, bool isReverse = false)
         {
             if (_isLocked)
             {
@@ -51,7 +51,7 @@ namespace TadaLib.Scene
             OnTransitionBegin();
 
             // 遷移エフェクトを開始
-            await TransitionEffectManager.Instance.FadeIn(fadeInDurationSec);
+            await TransitionEffectManager.Instance.FadeIn(fadeInDurationSec, isReverse);
 
             // 最低待ち時間
             await UniTask.Delay(TimeSpan.FromSeconds(guranteedWaitDurationSec));
@@ -89,7 +89,7 @@ namespace TadaLib.Scene
             // nextScene を activeScene にする (メインはこれなので)
             UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.GetSceneByName(nextScene));
 
-            await TransitionEffectManager.Instance.FadeOut(fadeOutDurationSec);
+            await TransitionEffectManager.Instance.FadeOut(fadeOutDurationSec, isReverse);
 
             // すべて完了
             OnTransitionEnd();

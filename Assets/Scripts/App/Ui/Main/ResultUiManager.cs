@@ -67,7 +67,7 @@ namespace App.Ui.Main
 
             // 次のシーンへ
 
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.5f, 0.5f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.8f, 0.8f);
         }
         #endregion
     }

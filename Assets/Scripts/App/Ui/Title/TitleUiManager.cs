@@ -91,7 +91,7 @@ namespace App.Ui.Title
                         SEManager.Instance.Play(SEPath.MENU_VALIDATION);
                         inputProxy.OnAction -= OnActoinTrigged;
                         inputProxy.OnMove -= OnMove;
-                        TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
+                        TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.4f, 0.4f);
                         break;
                     }
                     else

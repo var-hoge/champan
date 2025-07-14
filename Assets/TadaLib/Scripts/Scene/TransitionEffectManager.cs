@@ -25,9 +25,9 @@ namespace TadaLib.Scene
         /// </summary>
         /// <param name="durationSec"></param>
         /// <returns></returns>
-        public async UniTask FadeIn(float durationSec)
+        public async UniTask FadeIn(float durationSec, bool isReverse)
         {
-            await FadeImpl(durationSec, true);
+            await FadeImpl(durationSec, true, isReverse);
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace TadaLib.Scene
         /// </summary>
         /// <param name="durationSec"></param>
         /// <returns></returns>
-        public async UniTask FadeOut(float durationSec)
+        public async UniTask FadeOut(float durationSec, bool isReverse)
         {
-            await FadeImpl(durationSec, false);
+            await FadeImpl(durationSec, false, isReverse);
         }
         #endregion
 
@@ -47,7 +47,7 @@ namespace TadaLib.Scene
         #endregion
 
         #region privateメソッド
-        async UniTask FadeImpl(float durationSec, bool isFadeIn)
+        async UniTask FadeImpl(float durationSec, bool isFadeIn, bool isReverse)
         {
             var startTime = Time.time;
             while (true)
@@ -60,7 +60,7 @@ namespace TadaLib.Scene
 
                 progress = Mathf.Clamp01(progress);
 
-                _transitoinEffect.SetProgress(progress);
+                _transitoinEffect.SetProgress(progress, isFadeIn, isReverse);
 
                 if (Time.time - startTime >= durationSec)
                 {

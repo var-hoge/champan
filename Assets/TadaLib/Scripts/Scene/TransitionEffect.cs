@@ -30,13 +30,20 @@ namespace TadaLib.Scene
         #endregion
 
         #region メソッド
-        public void SetProgress(float progress01)
+        public void SetProgress(float progress01, bool isFadeIn, bool isReverse)
         {
             switch (_effectType)
             {
                 case EffectType.Material:
                     {
-                        _image.material.SetFloat("_Progress", progress01);
+                        var progress = progress01;
+                        if (!isFadeIn)
+                        {
+                            progress = 1.0f - progress;
+                        }
+                        _image.material.SetFloat("_Progress", progress);
+                        _image.material.SetFloat("_IsFadeIn", isFadeIn ? 1.0f : 0.0f);
+                        _image.material.SetFloat("_IsReverse", isReverse ? 1.0f : 0.0f);
                     }
                     break;
                 case EffectType.RuleImage:
