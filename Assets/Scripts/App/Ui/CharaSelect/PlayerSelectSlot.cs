@@ -70,7 +70,10 @@ namespace App.Ui.CharaSelect
         CharaSelectCursor _cursor;
 
         [SerializeField]
-        UnityEngine.UI.Image _chara;
+        CanvasGroup _charaGroup;
+
+        [SerializeField]
+        List<UnityEngine.UI.Image> _charaImages;
 
         [SerializeField]
         GameObject _joinButton;
@@ -111,14 +114,17 @@ namespace App.Ui.CharaSelect
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
-            _chara.gameObject.SetActive(true);
-            _chara.SetSprite(charaImage);
+            _charaGroup.gameObject.SetActive(true);
 
-            _chara.rectTransform.localScale = Vector3.zero;
-            _chara.rectTransform.DOScale(1.2f, 0.4f).SetEase(Ease.OutBack);
-            _chara.color = _chara.color.SetAlpha(0.0f);
-            _chara.DOFade(1.0f, 0.2f);
+            _charaGroup.GetComponent<RectTransform>().localScale = Vector3.zero;
+            _charaGroup.GetComponent<RectTransform>().DOScale(1.2f, 0.4f).SetEase(Ease.OutBack);
+            _charaGroup.alpha = 0.0f; ;
+            _charaGroup.DOFade(1.0f, 0.2f);
 
+            foreach (var chara in _charaImages)
+            {
+                chara.SetSprite(charaImage);
+            }
             _joinButton.gameObject.SetActive(false);
         }
 
@@ -127,7 +133,10 @@ namespace App.Ui.CharaSelect
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
-            _chara.SetSprite(charaImage);
+            foreach (var chara in _charaImages)
+            {
+                chara.SetSprite(charaImage);
+            }
         }
 
         void OnCharaSelected()
@@ -139,7 +148,7 @@ namespace App.Ui.CharaSelect
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 10.0f));
             _player.transform.position = worldPos;
 
-            _chara.gameObject.SetActive(false);
+            _charaGroup.gameObject.SetActive(false);
 
             if (_isReselect)
             {
