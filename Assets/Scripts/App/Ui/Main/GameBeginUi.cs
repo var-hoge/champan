@@ -44,12 +44,12 @@ namespace App.Ui.Main
             // ルール説明
             {
                 _main.SetSprite(_descriptionSprite);
-                _main.rectTransform.localScale = Vector3.one * 5.0f;
+                _main.rectTransform.localScale = Vector3.one * 7.0f;
                 _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
 
                 _effect.SetActive(true);
 
-                await UniTask.WaitForSeconds(1.6f);
+                await UniTask.WaitForSeconds(1.8f);
 
                 _effect.SetActive(false);
             }
@@ -71,7 +71,7 @@ namespace App.Ui.Main
             // GO
             {
                 BGMManager.Instance.Play(BGMPath.FIGHT);
-                _main.SetSprite(_descriptionSprite);
+                _main.SetSprite(_goSprite);
                 _main.rectTransform.localScale = Vector3.one * 5.0f;
                 _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
 
