@@ -38,7 +38,7 @@ namespace App.Ui.Common
         {
             var player = TadaLib.ActionStd.PlayerManager.TryGetPlayer(_playerNumber);
 
-            if (player == null)
+            if (player == null || !player.activeSelf)
             {
                 GetComponent<UnityEngine.UI.Image>().enabled = false;
                 return;

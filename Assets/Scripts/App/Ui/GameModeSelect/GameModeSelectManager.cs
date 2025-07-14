@@ -60,6 +60,8 @@ namespace App.Ui.GameModeSelect
             }
 
             _backUi.fillAmount = 0.0f;
+            _backUi.material = new(_backUiMaterial);
+            _backUi.material.SetFloat("_Mask", 0.28f);
         }
 
         void Update()
@@ -101,6 +103,9 @@ namespace App.Ui.GameModeSelect
 
         [SerializeField]
         TadaLib.Ui.Button _startButton;
+
+        [SerializeField]
+        Material _backUiMaterial;
 
         [SerializeField]
         UnityEngine.UI.Image _backUi;

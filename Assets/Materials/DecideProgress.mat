@@ -87,7 +87,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Mask: 0.28
+    - _Mask: 0.33
     - _MaskRad: -0.5
     - _MaskRad2: -0.059164718
     - _Metallic: 0

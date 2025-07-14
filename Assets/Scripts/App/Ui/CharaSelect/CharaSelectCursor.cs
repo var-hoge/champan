@@ -35,6 +35,8 @@ namespace App.Ui.CharaSelect
 
         public void Show()
         {
+            _body.enabled = true;
+
             // 振動
             TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.3f, 0.3f, 0.04f);
 
@@ -54,14 +56,24 @@ namespace App.Ui.CharaSelect
             _moveCallbacks.Add(callback);
         }
 
-        public void AddSelectCallbac(System.Action callback)
+        public void AddSelectCallback(System.Action callback)
         {
             _selectCallbacks.Add(callback);
+        }
+
+        public void AddCancelCallback(System.Action callback)
+        {
+            _cancelCallbacks.Add(callback);
         }
 
         public void ForceMove(bool isRight)
         {
             MoveImpl(isRight);
+        }
+
+        public void ForceCancel()
+        {
+            OnCancelSelect();
         }
         #endregion
 
@@ -81,6 +93,7 @@ namespace App.Ui.CharaSelect
 
         List<System.Action> _moveCallbacks = new List<System.Action>();
         List<System.Action> _selectCallbacks = new List<System.Action>();
+        List<System.Action> _cancelCallbacks = new List<System.Action>();
         #endregion
 
         #region privateメソッド
@@ -221,11 +234,26 @@ namespace App.Ui.CharaSelect
 
         void OnCancelSelect()
         {
+            // なぜか何度も呼ばれる
+            if (!IsSelectDone)
+            {
+                return;
+            }
             Debug.Assert(IsSelectDone);
 
-            IsSelectDone = false;
+            _manager.NotifyCancelSelect(PlayerIdx);
 
-            _body.enabled = true;
+            IsSelectDone = false;
+            _body.enabled = false;
+
+            _isReady = false;
+
+            foreach (var callback in _cancelCallbacks)
+            {
+                callback();
+            }
+
+            TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.2f, 0.3f, 0.04f);
         }
         #endregion
     }

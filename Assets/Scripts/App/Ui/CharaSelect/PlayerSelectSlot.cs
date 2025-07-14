@@ -30,7 +30,8 @@ namespace App.Ui.CharaSelect
         {
             _inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
             _cursor.AddMoveCallback(() => OnCharaChanged());
-            _cursor.AddSelectCallbac(() => OnCharaSelected());
+            _cursor.AddSelectCallback(() => OnCharaSelected());
+            _cursor.AddCancelCallback(() => OnCharaCanceled());
         }
         #endregion
 
@@ -109,6 +110,7 @@ namespace App.Ui.CharaSelect
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
+            _chara.gameObject.SetActive(true);
             _chara.SetSprite(charaImage);
 
             _chara.rectTransform.localScale = Vector3.zero;
@@ -137,6 +139,15 @@ namespace App.Ui.CharaSelect
             _player.transform.position = worldPos;
 
             _chara.gameObject.SetActive(false);
+        }
+
+        void OnCharaCanceled()
+        {
+            // キャラ削除
+            _player.gameObject.SetActive(false);
+            _joinButton.gameObject.SetActive(true);
+
+            _phase = Phase.WaitingForEntry;
         }
         #endregion
     }

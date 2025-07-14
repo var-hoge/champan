@@ -300,7 +300,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 127865c47f4f6b94dafa24812686273e, type: 3}
   - {fileID: 21300000, guid: 3c45d02f8a687c54e811ecef4159d0b0, type: 3}
   - {fileID: 21300000, guid: 046ffed74e5b2ec449330ce96a8dd1a3, type: 3}
-  - {fileID: 21300000, guid: e8fcabd8803c926479f0ba499d610a7e, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 3
 --- !u!1 &35055205 stripped
 GameObject:
@@ -324,7 +324,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 990b06eafb076d84e8f65d18759545c1, type: 3}
   - {fileID: 21300000, guid: 509802e01791dca4fab2ca183f91c18b, type: 3}
   - {fileID: 21300000, guid: 5fad1ae6410f3b04a8f34c2cedc922ab, type: 3}
-  - {fileID: 21300000, guid: 2566e72be17f2c3478de8b6d0c54ba87, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 3
 --- !u!1 &79357744
 GameObject:
@@ -537,7 +537,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 127865c47f4f6b94dafa24812686273e, type: 3}
   - {fileID: 21300000, guid: 3c45d02f8a687c54e811ecef4159d0b0, type: 3}
   - {fileID: 21300000, guid: 046ffed74e5b2ec449330ce96a8dd1a3, type: 3}
-  - {fileID: 21300000, guid: e8fcabd8803c926479f0ba499d610a7e, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 1
 --- !u!1 &117224329 stripped
 GameObject:
@@ -2568,7 +2568,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _canvas: {fileID: 441823329}
   _main: {fileID: 1485552854}
-  _descriptionSprite: {fileID: -5730239369493217872, guid: 6563dc71282872343bc9c2a6ef505f87, type: 3}
+  _descriptionSprite: {fileID: 21300000, guid: 6ce696d68ad12f94ab5e1b5096b9a209, type: 3}
   _countDownSprites:
   - {fileID: -6470460504253458178, guid: f05ba2d2918b95043ba9e83af34bcfd9, type: 3}
   - {fileID: 6937817954938267909, guid: cc6fc969abc91ea438387c3985d21389, type: 3}
@@ -3111,7 +3111,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 127865c47f4f6b94dafa24812686273e, type: 3}
   - {fileID: 21300000, guid: 3c45d02f8a687c54e811ecef4159d0b0, type: 3}
   - {fileID: 21300000, guid: 046ffed74e5b2ec449330ce96a8dd1a3, type: 3}
-  - {fileID: 21300000, guid: e8fcabd8803c926479f0ba499d610a7e, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 4
 --- !u!1 &691802117
 GameObject:
@@ -5074,7 +5074,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 127865c47f4f6b94dafa24812686273e, type: 3}
   - {fileID: 21300000, guid: 3c45d02f8a687c54e811ecef4159d0b0, type: 3}
   - {fileID: 21300000, guid: 046ffed74e5b2ec449330ce96a8dd1a3, type: 3}
-  - {fileID: 21300000, guid: e8fcabd8803c926479f0ba499d610a7e, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 2
 --- !u!1 &1190587762
 GameObject:
@@ -6921,7 +6921,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 990b06eafb076d84e8f65d18759545c1, type: 3}
   - {fileID: 21300000, guid: 509802e01791dca4fab2ca183f91c18b, type: 3}
   - {fileID: 21300000, guid: 5fad1ae6410f3b04a8f34c2cedc922ab, type: 3}
-  - {fileID: 21300000, guid: 2566e72be17f2c3478de8b6d0c54ba87, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 2
 --- !u!1 &1543381188
 GameObject:
@@ -7167,7 +7167,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 990b06eafb076d84e8f65d18759545c1, type: 3}
   - {fileID: 21300000, guid: 509802e01791dca4fab2ca183f91c18b, type: 3}
   - {fileID: 21300000, guid: 5fad1ae6410f3b04a8f34c2cedc922ab, type: 3}
-  - {fileID: 21300000, guid: 2566e72be17f2c3478de8b6d0c54ba87, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 1
 --- !u!1 &1681386151
 GameObject:
@@ -7373,7 +7373,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 990b06eafb076d84e8f65d18759545c1, type: 3}
   - {fileID: 21300000, guid: 509802e01791dca4fab2ca183f91c18b, type: 3}
   - {fileID: 21300000, guid: 5fad1ae6410f3b04a8f34c2cedc922ab, type: 3}
-  - {fileID: 21300000, guid: 2566e72be17f2c3478de8b6d0c54ba87, type: 3}
+  - {fileID: 8309096688390797820, guid: e4b5df85448f7f643a2a98787d69d921, type: 3}
   _kind: 4
 --- !u!1 &1736469564
 GameObject:

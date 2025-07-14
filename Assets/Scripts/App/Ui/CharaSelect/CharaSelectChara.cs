@@ -60,6 +60,11 @@ namespace App.Ui.CharaSelect
         {
             return transform.GetChild(playerIdx + 1).GetComponent<RectTransform>();
         }
+
+        public void ChangeSprite(Sprite sprite)
+        {
+            _body.SetSprite(sprite);
+        }
         #endregion
 
         #region privateフィールド

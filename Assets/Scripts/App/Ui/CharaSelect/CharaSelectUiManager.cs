@@ -83,8 +83,8 @@ namespace App.Ui.CharaSelect
 
             _charas[selectIdx].OnSelected(() =>
             {
-                // アニメーションが完了したら設定
-                _charaPickedIcons[playerIdx].SetChara(charaIdx);
+                //// アニメーションが完了したら設定
+                //_charaPickedIcons[playerIdx].SetChara(charaIdx);
             });
 
             var isAllUsed = !_isUsedList.Any(a => !a);
@@ -115,18 +115,18 @@ namespace App.Ui.CharaSelect
             return true;
         }
 
-        public bool NotifyCancelSelect(int playerIdx, int selectIdx)
+        public bool NotifyCancelSelect(int playerIdx)
         {
             if (_isSceneChanging)
             {
                 return false;
             }
 
-            Debug.Assert(_isUsedList[selectIdx]);
+            var charaIdx = _playerUseCharaIdList[playerIdx];
+            var selectIdx = CharaIdxToSelectIdx(charaIdx);
 
             _isUsedList[selectIdx] = false;
 
-            _charaPickedIcons[playerIdx].UnsetChara();
             _charas[selectIdx].OnCancelSelected();
 
             // CPU 扱いに
@@ -170,6 +170,9 @@ namespace App.Ui.CharaSelect
         GameObject _startArea;
 
         bool _isSceneChanging = false;
+
+        [SerializeField]
+        List<Sprite> _unselectedCharaSprites;
         #endregion
 
         #region privateメソッド
@@ -200,6 +203,15 @@ namespace App.Ui.CharaSelect
                         unusedCharaList.RemoveAt(0);
                     }
                 }
+            }
+
+            for (int idx = 0; idx < CharaMaxCount; idx++)
+            {
+                if (!Cpu.CpuManager.Instance.IsCpu(idx))
+                {
+                    continue;
+                }
+                _charas[idx].ChangeSprite(_unselectedCharaSprites[SelectIdxToCharaIdx(idx)]);
             }
 
             _isSceneChanging = true;
