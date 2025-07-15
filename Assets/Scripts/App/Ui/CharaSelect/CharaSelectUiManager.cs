@@ -207,7 +207,7 @@ namespace App.Ui.CharaSelect
 
             for (int idx = 0; idx < CharaMaxCount; idx++)
             {
-                if (!Cpu.CpuManager.Instance.IsCpu(idx))
+                if (_isUsedList[idx])
                 {
                     continue;
                 }
@@ -216,7 +216,7 @@ namespace App.Ui.CharaSelect
 
             _isSceneChanging = true;
 
-            await UniTask.WaitForSeconds(0.5f);
+            await UniTask.WaitForSeconds(0.8f);
 
             TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 0.6f, 0.6f);
         }

@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using UnityEngine.UIElements;
+using DG.Tweening;
 
 namespace App.Ui.CharaSelect
 {
@@ -16,6 +17,14 @@ namespace App.Ui.CharaSelect
     public class CharaSelectFinishCheckerUnit
         : MonoBehaviour
     {
+        public void EnterTheDoor(Vector3 doorPos)
+        {
+            transform.DOMove(doorPos, 0.3f);
+            transform.GetChild(0).DOLocalMoveY(0.2f, 0.2f).SetLoops(-1, LoopType.Yoyo);
+            transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
+            transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
+        }
+
         public bool IsFinishReady { private set; get; }
 
         void Update()

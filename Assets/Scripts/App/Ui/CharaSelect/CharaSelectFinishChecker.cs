@@ -58,6 +58,11 @@ namespace App.Ui.CharaSelect
                     return false;
                 }
 
+                // 動けなくする
+                player.GetComponent<Actor.Player.MoveCtrl>().enabled = false;
+                player.GetComponent<TadaLib.ActionStd.StateMachine>().enabled = false;
+                checkerUnit.EnterTheDoor(_doorTrans.position);
+
                 isFinished = true;
             }
 
@@ -69,6 +74,9 @@ namespace App.Ui.CharaSelect
 
         [SerializeField]
         Transform _playerParents;
+
+        [SerializeField]
+        Transform _doorTrans;
 
         [SerializeField]
         private GameObject _starParticles;

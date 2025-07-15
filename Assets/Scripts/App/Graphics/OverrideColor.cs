@@ -30,6 +30,13 @@ namespace App.Graphics
                 image.material = new Material(image.material);
                 image.material.SetColor("_Color", _color);
             }
+
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            if(spriteRenderer != null)
+            {
+                spriteRenderer.sharedMaterial = new Material(spriteRenderer.material);
+                spriteRenderer.sharedMaterial.SetColor("_Color", _color);
+            }
         }
         #endregion
 
