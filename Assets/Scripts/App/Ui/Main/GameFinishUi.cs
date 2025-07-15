@@ -119,12 +119,12 @@ namespace Ui.Main
             if (isRematch)
             {
                 // シーン遷移
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.4f);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
             }
             else
             {
                 // シーン遷移
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.8f, 0.8f);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.6f, 0.4f);
             }
         }
         #endregion

@@ -85,7 +85,7 @@ namespace App.Ui.Main
             await UniTask.WaitForSeconds(0.5f);
 
             // シーン遷移
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.4f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
         }
 
         public async UniTask GameEnd(SimpleAnimation animation, int winnerPlayerIdx)

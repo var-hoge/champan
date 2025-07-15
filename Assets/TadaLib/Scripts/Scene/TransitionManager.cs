@@ -40,7 +40,7 @@ namespace TadaLib.Scene
         /// <param name="fadeInDurationSec">遷移エフェクトの時間(遷移開始時)</param>
         /// <param name="fadeOutDurationSec">遷移エフェクトの時間(遷移終了時)</param>
         /// <param name="guranteedWaitDurationSec">遷移中の最低待ち時間(エフェクト時間は含めない)</param>
-        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.3f, bool isReverse = false)
+        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.05f, bool isReverse = false)
         {
             if (_isLocked)
             {
