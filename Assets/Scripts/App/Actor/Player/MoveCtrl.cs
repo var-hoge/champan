@@ -222,6 +222,17 @@ namespace App.Actor.Player
             Velocity = newVel;
             var vel3 = new Vector3(Velocity.x * SpeedRateX, Velocity.y * SpeedRateY, 0.0f);
             transform.position += vel3 * deltaTime;
+
+            var pos = transform.position;
+            if (pos.x < _moveLimitPos.x)
+            {
+                pos.x = _moveLimitPos.x;
+            }
+            else if (pos.x > _moveLimitPos.y)
+            {
+                pos.x = _moveLimitPos.y;
+            }
+            transform.position = pos;
         }
         #endregion
 
@@ -243,6 +254,9 @@ namespace App.Actor.Player
         float _gravity = -98.0f;
         [SerializeField]
         float _decelGravity = 196.0f;
+
+        [SerializeField]
+        Vector2 _moveLimitPos = new Vector2(-50.0f, 50.0f);
 
         TadaLib.Util.Timer _uncontrollableTimer = new TadaLib.Util.Timer(2.0f);
         #endregion
