@@ -20,6 +20,7 @@ namespace App.Ui.CharaSelect
         #region プロパティ
         public int SelectIdx => _selectIdx;
         public int PlayerIdx => _playerIdx;
+        public CharaSelectUiManager Manager => _manager;
 
         public bool IsSelectDone { private set; get; } = false;
         #endregion

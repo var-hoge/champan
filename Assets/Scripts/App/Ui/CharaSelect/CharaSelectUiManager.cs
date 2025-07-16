@@ -39,6 +39,8 @@ namespace App.Ui.CharaSelect
             return _playerUseCharaIdList[playerIdx];
         }
         static List<int> _playerUseCharaIdList;
+
+        public bool IsSceneChanging => _isSceneChanging;
         #endregion
 
         #region メソッド

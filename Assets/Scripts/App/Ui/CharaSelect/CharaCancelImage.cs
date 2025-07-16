@@ -42,6 +42,10 @@ namespace App.Ui.CharaSelect
             {
                 isActive = true;
             }
+            if (_selectCursor.Manager.IsSceneChanging)
+            {
+                isActive = false;
+            }
 
             if (_playerId == 0)
             {
