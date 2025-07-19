@@ -28,9 +28,15 @@ namespace App.Ui.Main
             var toPos = rectTransform.position + Vector3.up * _moveY;
             var toRot = rectTransform.eulerAngles + Vector3.forward * _rotateDeg;
 
+            var sec = _stagingDurationSec;
+            if (GameSequenceManager.Instance != null && GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
+            {
+                sec *= 0.7f;
+            }
+
             var seq = DOTween.Sequence();
-            seq.Append(rectTransform.DOMove(toPos, _stagingDurationSec).SetEase(Ease.OutQuint));
-            seq.Join(rectTransform.DORotate(toRot, _stagingDurationSec).SetEase(Ease.OutBack));
+            seq.Append(rectTransform.DOMove(toPos, sec).SetEase(Ease.OutQuint));
+            seq.Join(rectTransform.DORotate(toRot, sec).SetEase(Ease.OutBack));
             seq.Append(GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f));
             seq.OnComplete(() =>
             {
