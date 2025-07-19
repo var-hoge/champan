@@ -220,7 +220,13 @@ namespace App.Actor.Player
             }
 
             Velocity = newVel;
-            var vel3 = new Vector3(Velocity.x * SpeedRateX, Velocity.y * SpeedRateY, 0.0f);
+
+            var rateY = 1.0f;
+            if(GameSequenceManager.Instance != null && GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
+            {
+                rateY = 2.0f; 
+            }
+            var vel3 = new Vector3(Velocity.x * SpeedRateX, Velocity.y * SpeedRateY * rateY, 0.0f);
             transform.position += vel3 * deltaTime;
 
             var pos = transform.position;

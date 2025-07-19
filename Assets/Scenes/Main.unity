@@ -6340,6 +6340,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _crownTemplate: {fileID: 315207477}
   _slotMarkTemplate: {fileID: 996308853}
+  _crownAnimPosOffsetX: 100
+  _crownAnimEndPosOffset: 20
+  _crownAnimStartPosY: 1500
+  _crownAnimStartDegZ: 40
+  _crownAnimEase: 7
+  _crownAnimBackEase: 5
+  _crownAnimDurationSecRate: 0.8
+  _crownAnimBackDurationSec: 0.3
 --- !u!1 &1458077579
 GameObject:
   m_ObjectHideFlags: 0

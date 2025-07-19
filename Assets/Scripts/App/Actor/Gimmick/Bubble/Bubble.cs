@@ -57,6 +57,9 @@ namespace App.Actor.Gimmick.Bubble
 
         [SerializeField] private Sprite InactiveShieldSprite;
 
+        [SerializeField]
+        SimpleAnimation _finishCrown;
+
         private float _burstTimer;
         private float _burstGracePeriod = 0.05f;
         private bool _hasRidden = false;
@@ -354,6 +357,9 @@ namespace App.Actor.Gimmick.Bubble
                         transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
                         {
                             CrownShieldValue--;
+                            var finishCrown = GameObject.Instantiate(_finishCrown);
+                            finishCrown.transform.position = transform.position;
+                            finishCrown.GetComponent<SimpleAnimation>().Play("Appear");
                             Destroy(gameObject);
                         });
                         return;
