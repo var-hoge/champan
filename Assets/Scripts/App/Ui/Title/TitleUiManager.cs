@@ -50,16 +50,16 @@ namespace App.Ui.Title
             await UniTask.WaitForSeconds(0.2f);
 
             var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.3f, 0.5f);
+            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
 
             await UniTask.WaitForSeconds(0.4f);
 
             var charInfos = new (string name, Vector2 pos)[]
             {
-                ("Chara1", new(-485, -181)),
-                ("Chara2", new(657, -178)),
-                ("Chara3", new(648, 183)),
-                ("Chara4", new(-673, 176)),
+                ("Chara1", new(-701, -294)),
+                ("Chara2", new(704, -341)),
+                ("Chara3", new(543, -38)),
+                ("Chara4", new(-428, -66)),
             };
             foreach (var (name, pos) in charInfos)
             {
