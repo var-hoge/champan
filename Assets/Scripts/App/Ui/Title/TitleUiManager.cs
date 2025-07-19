@@ -41,7 +41,7 @@ namespace App.Ui.Title
         public async UniTask Staging()
         {
             // 最低 2 秒は待つ
-            GameObject.Find("Main").transform.DOScale(Vector3.one * 0.85f, 0.6f).SetEase(Ease.OutBack);
+            GameObject.Find("Main").transform.DOScale(Vector3.one, 0.6f).SetEase(Ease.OutBack);
 
             await UniTask.WaitForSeconds(0.1f);
 
@@ -50,16 +50,16 @@ namespace App.Ui.Title
             await UniTask.WaitForSeconds(0.2f);
 
             var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.3f, 0.5f);
+            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
 
             await UniTask.WaitForSeconds(0.4f);
 
             var charInfos = new (string name, Vector2 pos)[]
             {
-                ("Chara1", new(-526, 181)),
-                ("Chara2", new(518, 228)),
-                ("Chara3", new(514, -178)),
-                ("Chara4", new(-377, -189)),
+                ("Chara1", new(-701, -294)),
+                ("Chara2", new(704, -341)),
+                ("Chara3", new(543, -38)),
+                ("Chara4", new(-428, -66)),
             };
             foreach (var (name, pos) in charInfos)
             {
