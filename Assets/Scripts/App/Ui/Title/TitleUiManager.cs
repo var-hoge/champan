@@ -72,10 +72,10 @@ namespace App.Ui.Title
             // パンのアニメーション
             var charInfos = new (string name, Vector2 pos, float moveAmount)[]
             {
-                ("Chara1", new(-701, -294), 15f),
-                ("Chara2", new(704, -341), 15f),
-                ("Chara3", new(543, -38), 10f),
-                ("Chara4", new(-428, -66), 10f),
+                ("Chara1", new(-701, -294), 30f),
+                ("Chara2", new(704, -341), 30f),
+                ("Chara3", new(543, -38), 20f),
+                ("Chara4", new(-428, -66), 20f),
             };
             foreach (var (name, pos, moveAmount) in charInfos)
             {
