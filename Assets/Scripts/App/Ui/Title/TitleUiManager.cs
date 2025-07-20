@@ -41,35 +41,65 @@ namespace App.Ui.Title
         public async UniTask Staging()
         {
             // 最低 2 秒は待つ
-            GameObject.Find("Main").transform.DOScale(Vector3.one, 0.6f).SetEase(Ease.OutBack);
+
+            // ロゴのアニメーション
+            var main = GameObject.Find("Main").transform;
+            main.DOScale(Vector3.one, 0.6f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() => MainYoyo());
+
+            void MainYoyo()
+            {
+                main.GetComponent<RectTransform>()
+                    .DOAnchorPos(new(-67, 89), 2f)
+                    .SetEase(Ease.Linear)
+                    .SetLoops(-1, LoopType.Yoyo);
+            }
 
             await UniTask.WaitForSeconds(0.1f);
 
+            // 「チャン・ピョン・パン！」の再生
             SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
 
             await UniTask.WaitForSeconds(0.2f);
 
+            // 背景のアニメーション
             var titleBgmask = FindAnyObjectByType<TitleBgMask>();
             DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
 
             await UniTask.WaitForSeconds(0.4f);
 
-            var charInfos = new (string name, Vector2 pos)[]
+            // パンのアニメーション
+            var charInfos = new (string name, Vector2 pos, float moveAmount)[]
             {
-                ("Chara1", new(-701, -294)),
-                ("Chara2", new(704, -341)),
-                ("Chara3", new(543, -38)),
-                ("Chara4", new(-428, -66)),
+                ("Chara1", new(-701, -294), 15f),
+                ("Chara2", new(704, -341), 15f),
+                ("Chara3", new(543, -38), 10f),
+                ("Chara4", new(-428, -66), 10f),
             };
-            foreach (var (name, pos) in charInfos)
+            foreach (var (name, pos, moveAmount) in charInfos)
             {
-                GameObject.Find(name).GetComponent<RectTransform>().DOAnchorPos(pos, 0.8f).SetEase(Ease.OutBack);
+                var rt = GameObject.Find(name).GetComponent<RectTransform>();
+                var startPos = rt.anchoredPosition;
+                rt.DOAnchorPos(pos, 0.8f)
+                  .SetEase(Ease.OutBack)
+                  .OnComplete(() => CharYoyo());
+
+                void CharYoyo()
+                {
+                    var moveVec = (startPos - pos).normalized * moveAmount;
+                    rt.DOAnchorPos(moveVec + pos, 2f)
+                      .SetEase(Ease.Linear)
+                      .SetLoops(-1, LoopType.Yoyo);
+                }
             }
 
             await UniTask.WaitForSeconds(1.2f);
 
+            // START・EXITのアニメーション
             _start.DOScale(Vector3.one * 1.1f, 0.15f);
             _exit.DOScale(Vector3.one, 0.15f);
+            // BGMの再生
             BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
 
             await UniTask.WaitForSeconds(0.2f);
