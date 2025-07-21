@@ -55,7 +55,7 @@ namespace App.Ui.CharaSelect
 
                 if (!checkerUnit.IsFinishReady)
                 {
-                    return false;
+                    continue;
                 }
 
                 // 動けなくする
