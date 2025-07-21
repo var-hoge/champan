@@ -46,6 +46,7 @@ namespace App.Actor.Player.Hit
             }
             else if (result.IsTopHit)
             {
+                // 踏まれた
                 GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);
 
                 if(_seq != null && _seq.IsActive() && !_seq.IsComplete())
@@ -56,7 +57,7 @@ namespace App.Actor.Player.Hit
                 _seq.Append(DOTween.To(
                     () => ViewScaleRate,
                     rate => ViewScaleRate = rate,
-                    new Vector3(1.0f, 0.5f, 1.0f),
+                    new Vector3(1.0f, 0.4f, 1.0f),
                     0.3f
                     ).SetEase(Ease.OutElastic)
                     );

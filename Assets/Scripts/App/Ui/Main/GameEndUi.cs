@@ -44,7 +44,7 @@ namespace App.Ui.Main
                 bubble.DoBurst();
             }
 
-            await UniTask.WaitForSeconds(1.5f);
+            await UniTask.WaitForSeconds(1.8f);
 
             // 勝ち点を表示
             _winCountPanel.gameObject.SetActive(true);
