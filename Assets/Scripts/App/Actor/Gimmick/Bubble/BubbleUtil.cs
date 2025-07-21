@@ -8,9 +8,10 @@ namespace App.Actor.Gimmick.Bubble
         /// オブジェクトを飛ばす
         /// </summary>
         /// <param name="obj">オブジェクト</param>
-        public static void Blow(GameObject obj, Vector3 bubblePosition, float blowPower)
+        public static void Blow(GameObject obj, Vector3 bubblePosition, float blowPower, bool doVibrate = true)
         {
             // 振動
+            if (doVibrate)
             {
                 var playerIdx = obj.GetComponent<Player.DataHolder>().PlayerIdx;
                 if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)

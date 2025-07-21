@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 3316383800480739770}
   - component: {fileID: 8330107099159563309}
   - component: {fileID: 364523019584042171}
-  - component: {fileID: 1886653595746825039}
+  - component: {fileID: 7404558613714429827}
   m_Layer: 0
-  m_Name: FinishCrown
+  m_Name: RunAwayCrown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,11 @@ MonoBehaviour:
     name: Appear
     speed: 1.6
     defaultState: 0
---- !u!114 &1886653595746825039
+  - clip: {fileID: 7400000, guid: 13d243ad69f7ca3419359649a35f0580, type: 2}
+    name: RunAway
+    speed: 1
+    defaultState: 0
+--- !u!114 &7404558613714429827
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +96,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2154420800481429707}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad8e69cf3d4972846a6b048b72a63157, type: 3}
+  m_Script: {fileID: 11500000, guid: 94a69cd4723a80a448949156b46fc7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7357281394240820344

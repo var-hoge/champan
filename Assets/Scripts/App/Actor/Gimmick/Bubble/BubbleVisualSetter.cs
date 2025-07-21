@@ -3,16 +3,21 @@ using UnityEngine;
 
 namespace App.Actor.Gimmick.Bubble
 {
-	public class BubbleVisualSetter : MonoBehaviour
-	{
-		[SerializeField] private List<Sprite> sprites;
+    public class BubbleVisualSetter : MonoBehaviour
+    {
+        [SerializeField] private List<Sprite> sprites;
 
-		private SpriteRenderer spriteRenderer;
+        [SerializeField]
+        private List<SpriteRenderer> spriteRenderers;
 
-		void Start()
-		{
-			spriteRenderer = GetComponent<SpriteRenderer>();
-			spriteRenderer.sprite = sprites[Random.Range(0, sprites.Count - 1)];
-		}
-	}
+        void Start()
+        {
+            var sprite = sprites[Random.Range(0, sprites.Count - 1)];
+
+            foreach (var spriteRenderer in spriteRenderers)
+            {
+                spriteRenderer.sprite = sprite; ;
+            }
+        }
+    }
 }

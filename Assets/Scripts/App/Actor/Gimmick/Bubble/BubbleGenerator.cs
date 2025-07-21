@@ -1,8 +1,10 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 namespace App.Actor.Gimmick.Bubble
 {
@@ -20,41 +22,21 @@ namespace App.Actor.Gimmick.Bubble
             }
 
             Bubble.SetupCrown(bubbles[Random.Range(0, bubbles.Count - 1)]);
-            Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
+            Crown.Manager.Instance.CrownBubble.OnDestroyEvent += TeleportCrown;
         }
 
         private void TeleportCrown()
         {
-            if (Bubble.CrownShieldValue <= 0)
+            if (Crown.Manager.Instance.ShieldValue == 0)
             {
-                Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
+                Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
                 return;
             }
 
-            Debug.Log($"TeleportCrown\nCrownShieldValue : {Bubble.CrownShieldValue}");
-            SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
+            Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
-            Transform crown = Bubble.CrownBubble.CrownSpriteRenderer;
-            crown.SetParent(null);
-
-            Bubble.CrownBubble.OnDestroyEvent -= TeleportCrown;
-
-            var bubbles = FindObjectsByType<Bubble>(FindObjectsSortMode.None)
-                            .Where(bubble => bubble.TeleportCrown)
-                            .ToList();
-
-            if (bubbles.Contains(Bubble.CrownBubble))
-            {
-                bubbles.Remove(Bubble.CrownBubble);
-            }
-
-            var target = (bubbles.Count == 0)
-                            ? Generate()
-                            : bubbles[Random.Range(0, bubbles.Count - 1)];
-            Bubble.SetupCrown(target);
-            crown.DOMove(Bubble.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
-
-            Bubble.CrownBubble.OnDestroyEvent += TeleportCrown;
+            // 生成は遅延処理
+            TeleportImpl().Forget();
         }
 
         private Bubble Generate()
@@ -63,6 +45,34 @@ namespace App.Actor.Gimmick.Bubble
             var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
             bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
             return bubble.GetComponent<Bubble>();
+        }
+
+        async UniTask TeleportImpl()
+        {
+            Transform crown = Crown.Manager.Instance.CrownBubble.CrownSpriteRenderer;
+            crown.SetParent(null);
+
+            // クラウンが逃げる演出が出るまで待つ
+            await UniTask.WaitForSeconds(0.05f);
+
+            var bubbles = FindObjectsByType<Bubble>(FindObjectsSortMode.None)
+                            .Where(bubble => bubble.IsTeleportableCrown)
+                            .ToList();
+
+            if (bubbles.Contains(Crown.Manager.Instance.CrownBubble))
+            {
+                bubbles.Remove(Crown.Manager.Instance.CrownBubble);
+            }
+
+            var target = (bubbles.Count == 0)
+                            ? Generate()
+                            : bubbles[Random.Range(0, bubbles.Count - 1)];
+            Bubble.SetupCrown(target);
+            crown.DOMove(Crown.Manager.Instance.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
+
+            Crown.Manager.Instance.CrownBubble.OnDestroyEvent += TeleportCrown;
+
+            SEManager.Instance.Play(SEPath.CROWN_BUBBLE_REPOSITION);
         }
     }
 }

@@ -152,11 +152,11 @@ public partial class SimpleAnimation: MonoBehaviour
         }
     }
 
-    public bool Play(string stateName)
+    public bool Play(string stateName, float? speedRate = null)
     {
         m_Animator.enabled = true;
         Kick();
-        return m_Playable.Play(stateName);
+        return m_Playable.Play(stateName, speedRate);
     }
 
     public void PlayQueued(string stateName, QueueMode queueMode)

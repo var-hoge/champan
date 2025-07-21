@@ -38,7 +38,7 @@ namespace App
         #region メソッド
         public void GameOver()
         {
-            WinnerPlayerIdx = Actor.Gimmick.Bubble.Bubble.LastCrownRidePlayerIdx;
+            WinnerPlayerIdx = Actor.Gimmick.Crown.Manager.Instance.LastCrownRidePlayerIdx;
 
             var gameMatchManager = GameMatchManager.Instance;
             gameMatchManager.AddWinScore(WinnerPlayerIdx);

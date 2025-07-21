@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using KanKikuchi.AudioManager;
 using DG.Tweening;
+using App.Actor.Gimmick.Crown;
+using static UnityEngine.Rendering.STP;
 
 namespace App.Actor.Gimmick.Bubble
 {
@@ -18,9 +20,6 @@ namespace App.Actor.Gimmick.Bubble
             public int shieldLevel;
             public Sprite sprite;
         }
-
-        public static Bubble CrownBubble { get; set; }
-        public static int CrownShieldValue { get; private set; }
 
         public Action OnDestroyEvent;
 
@@ -35,7 +34,8 @@ namespace App.Actor.Gimmick.Bubble
 
         [Header("References")]
         [SerializeField] private SpriteRenderer shieldSpriteRenderer;
-        [SerializeField] private SpriteRenderer crownSpriteRenderer;
+        [SerializeField] private GameObject crownSpriteParent;
+        [SerializeField] private SpriteRenderer crownFrontBubbleRenderer;
 
         [Header("Amplitude")]
         [SerializeField] private float amplitude = 0.01f;
@@ -57,6 +57,9 @@ namespace App.Actor.Gimmick.Bubble
 
         [SerializeField] private Sprite InactiveShieldSprite;
 
+        [SerializeField] private CrownEffectCtrl _crownEffect;
+        [SerializeField] private CrownAnimCtrl _crownAnim;
+
         [SerializeField]
         SimpleAnimation _finishCrown;
 
@@ -71,25 +74,23 @@ namespace App.Actor.Gimmick.Bubble
         private IEnumerator _vibrateCoroutine = null;
         private int currentRiders;
 
-        public static int LastCrownRidePlayerIdx = 0;
         private static Vector3 TopRight = Vector3.positiveInfinity;
 
-        public Transform CrownSpriteRenderer => crownSpriteRenderer.transform;
-        public bool HasCrown => CrownBubble == this;
+        public Transform CrownSpriteRenderer => crownSpriteParent.transform;
+        public bool HasCrown => Crown.Manager.Instance.CrownBubble == this;
 
         private List<string> _SEPath = null;
         private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Bubble Jump/Bubble_Jump_", 11).ToList();
         private bool IsRidden => _moveInfoCtrl.IsRidden;
         private bool _isRidenPrev = false;
-        public bool TeleportCrown => !IsSpawning && IsOnScreen() && !IsRidden;
-        private bool IsCrownBubble => shieldSpriteRenderer.gameObject.activeSelf;
+        public bool IsTeleportableCrown => !IsSpawning && IsOnScreen() && !IsRidden;
 
         // Bust bubble
         public void DoBurst(int playerIdx = -1)
         {
             if (playerIdx >= 0)
             {
-                LastCrownRidePlayerIdx = playerIdx;
+                Crown.Manager.Instance.LastCrownRidePlayerIdx = playerIdx;
             }
             BurstImpl();
         }
@@ -145,7 +146,7 @@ namespace App.Actor.Gimmick.Bubble
 
                 if (HasCrown)
                 {
-                    LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx;
+                    Crown.Manager.Instance.LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx;
                 }
 
                 if (_burstTimer == burstTime)
@@ -176,7 +177,7 @@ namespace App.Actor.Gimmick.Bubble
                 {
                     foreach (var player in players)
                     {
-                        BubbleUtil.Blow(player, transform.position, blowPower);
+                        BubbleUtil.Blow(player, transform.position, blowPower, doVibrate: !HasCrown);
                     }
                 }
             }
@@ -212,7 +213,7 @@ namespace App.Actor.Gimmick.Bubble
             }
 
             // クラウンバブルの場合、シールドを回転
-            if (IsCrownBubble)
+            if (HasCrown)
             {
                 _shieldCountRoot.Rotate(Vector3.forward, Time.deltaTime * 15f);
             }
@@ -246,33 +247,24 @@ namespace App.Actor.Gimmick.Bubble
 
         public static void SetupCrown(Bubble bubble)
         {
-            if (CrownBubble != null)
-            {
-                CrownBubble.RemoveCrown();
-            }
-            else
-            {
-                CrownShieldValue = bubble.crownStartShield;
-            }
+            Crown.Manager.Instance.CrownBubble = bubble;
+            bubble.SetupCrown(Crown.Manager.Instance.ShieldValue, withGameStart: Crown.Manager.Instance.IsFirstCrownSetup);
 
-            CrownBubble = bubble;
-
-            bubble.SetupCrown(CrownShieldValue);
+            Crown.Manager.Instance.IsFirstCrownSetup = false;
         }
 
         private void RemoveCrown()
         {
-            // TODO: If supporting bubble shield, reset original shield here
-
-            crownSpriteRenderer.gameObject.SetActive(false);
+            crownSpriteParent.gameObject.SetActive(false);
+            _crownEffect.gameObject.SetActive(false);
             shieldSpriteRenderer.gameObject.SetActive(false);
         }
 
-        private void SetupCrown(int shieldValue)
+        private void SetupCrown(int shieldValue, bool withGameStart)
         {
             gameObject.name = "BubbleCrown";
 
-            BubbleShieldConfig config = default;
+            BubbleShieldConfig? config = null;
             foreach (var shieldConfig in shieldConfigs)
             {
                 if (shieldConfig.shieldLevel > shieldValue) continue;
@@ -281,46 +273,46 @@ namespace App.Actor.Gimmick.Bubble
                 break;
             }
 
-            crownSpriteRenderer.transform.DOScale(Vector3.one, 0.15f);
+            if (config.HasValue)
+            {
+                shieldSpriteRenderer.gameObject.SetActive(true);
+                shieldSpriteRenderer.sprite = config.Value.sprite;
+            }
 
-            shieldSpriteRenderer.gameObject.SetActive(true);
-            shieldSpriteRenderer.sprite = config.sprite;
+            if (withGameStart)
+            {
+                crownSpriteParent.transform.localScale = Vector3.one;
+                crownSpriteParent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 15.0f);
+            }
+            else
+            {
+                crownSpriteParent.transform.DOScale(Vector3.one, 0.15f);
+                crownSpriteParent.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 15.0f + 180.0f);
+                crownSpriteParent.transform.DOLocalRotate(new Vector3(0.0f, 0.0f, 375.0f), 0.2f, RotateMode.FastBeyond360);
+            }
 
+            {
+                var alpha = shieldValue switch
+                {
+                    var cnt when cnt >= 10 => 0.23f,
+                    var cnt when cnt >= 9 => 0.20f,
+                    var cnt when cnt >= 8 => 0.17f,
+                    var cnt when cnt >= 7 => 0.14f,
+                    var cnt when cnt >= 6 => 0.11f,
+                    var cnt when cnt >= 5 => 0.08f,
+                    var cnt when cnt >= 4 => 0.05f,
+                    var cnt when cnt >= 3 => 0.02f,
+                    var cnt when cnt >= 2 => 0.0f,
+                    var cnt when cnt >= 1 => 0.0f,
+                    _ => 0,
+                };
+                crownFrontBubbleRenderer.color = new Color(1.0f, 1.0f, 1.0f, alpha);
+            }
+
+            _crownEffect.SetRemainHitCount(shieldValue);
+            _crownAnim.SetRemainHitCount(shieldValue, transform.lossyScale.x);
             // エフェクトの再生
             crownGlitter.Play(false);
-            if (shieldValue <= 1)
-            {
-                foreach (var particle in crownParticles)
-                {
-                    particle.Play(false);
-                }
-            }
-
-            // シールドの残数を表示
-            if (shieldValue > 1)
-            {
-                DisplayShieldCount(shieldValue);
-            }
-        }
-
-        /// <summary>
-        /// シールドの残数を表示
-        /// </summary>
-        /// <param name="shieldValue">シールドの残数</param>
-        private void DisplayShieldCount(int shieldValue)
-        {
-            var angle = -360 / 5f;
-            for (var n = 1; n <= 5; ++n)
-            {
-                var shieldCount = Instantiate(_shieldCountPrefab, _shieldCountRoot).transform;
-                shieldCount.localPosition = Vector3.up * 0.7f;
-                shieldCount.RotateAround(_shieldCountRoot.position, Vector3.forward, angle * n);
-
-                if (n > shieldValue)
-                {
-                    shieldCount.GetComponent<SpriteRenderer>().sprite = InactiveShieldSprite;
-                }
-            }
         }
 
         public void Init(float x)
@@ -340,36 +332,73 @@ namespace App.Actor.Gimmick.Bubble
 
         private void BurstImpl()
         {
+            if (_isBursting)
+            {
+                return;
+            }
+
             _isBursting = true;
             PlaySE();
             if (HasCrown)
             {
-                if (CrownShieldValue == 1)
+                Crown.Manager.Instance.ShieldValue--;
+
+                var shieldValue = Crown.Manager.Instance.ShieldValue;
+
+                // 最後の演出
+                if (shieldValue == 0)
                 {
-                    // 最後の演出
-                    if (Bubble.CrownShieldValue == 1)
+                    // 振動
                     {
-                        Bubble.CrownShieldValue--;
-
-                        GameSequenceManager.WinnerPlayerIdx = Bubble.LastCrownRidePlayerIdx;
-                        GameSequenceManager.Instance.GameOver();
-
-                        transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+                        var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
+                        if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                         {
-                            CrownShieldValue--;
-                            var finishCrown = GameObject.Instantiate(_finishCrown);
-                            finishCrown.transform.position = transform.position;
-                            finishCrown.GetComponent<SimpleAnimation>().Play("Appear");
-                            Destroy(gameObject);
-                        });
-                        return;
+                            TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
+                        }
                     }
+
+                    GameSequenceManager.WinnerPlayerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
+                    GameSequenceManager.Instance.GameOver();
+
+                    var scale = transform.lossyScale.x;
+                    transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+                    {
+                        FinishCrown.Create(transform.position, scale);
+                        Destroy(gameObject);
+                    });
+                    return;
                 }
                 else
                 {
+                    // 振動
+                    {
+                        var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
+                        if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
+                        {
+                            var durationSec = shieldValue switch
+                            {
+                                var value when value == 9 => 0.12f,
+                                var value when value == 8 => 0.14f,
+                                var value when value == 7 => 0.16f,
+                                var value when value == 6 => 0.18f,
+                                var value when value == 5 => 0.20f,
+                                var value when value == 4 => 0.22f,
+                                var value when value == 3 => 0.24f,
+                                var value when value == 2 => 0.26f,
+                                var value when value == 1 => 0.28f,
+                                _ => 0.12f,
+                            };
+                            Debug.Log(durationSec);
+                            TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).VibrateAdvanced(0.2f, 0.5f, durationSec);
+                        }
+                    }
+
+                    var scale = transform.lossyScale.x;
+                    //// テンポ重視のため早めに出す
+                    //RunAwayCrown.Create(transform.position, scale);
+                    //crownSpriteParent.gameObject.SetActive(false);
                     transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
                     {
-                        CrownShieldValue--;
                         Destroy(gameObject);
                     });
                 }
