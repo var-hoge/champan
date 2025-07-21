@@ -47,6 +47,16 @@ namespace App.Ui.Main
                 }
 
                 var playerIdx = playerCount - remainPlayerCount;
+
+                if (GameMatchManager.Instance.IsExistCpu is false)
+                {
+                    if (Cpu.CpuManager.Instance.IsCpu(playerIdx))
+                    {
+                        // 存在しないキャラ
+                        continue;
+                    }
+                }
+
                 var isWinPlayer = GameSequenceManager.WinnerPlayerIdx == playerIdx;
                 winCountUnit.Setup(playerIdx, isWinPlayer);
                 winCountUnit.gameObject.SetActive(true);
