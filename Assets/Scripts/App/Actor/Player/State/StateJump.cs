@@ -149,6 +149,12 @@ namespace App.Actor.Player.State
                 return;
             }
 
+            if (speedY < 1.0f && obj.GetComponent<TadaLib.ActionStd.TadaRigidbody2D>().IsGround)
+            {
+                StateIdle.ChangeState(obj);
+                return;
+            }
+
             _isJumpButtonReleasedOnce = _isJumpButtonReleasedOnce || !InputUtil.IsButton(obj, ButtonCode.Action);
             obj.GetComponent<MoveCtrl>().GravityRateState = CalcGravityRate();
         }
