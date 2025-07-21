@@ -36,7 +36,7 @@ namespace App.Ui.Main
 
                 var seq = DOTween.Sequence();
                 seq.Append(rectTrasnform.DOMove(pos + dir.normalized * _crownAnimEndPosOffset, durationSec).SetEase(_crownAnimEase));
-                seq.Join(rectTrasnform.DOLocalRotate(Vector3.zero, durationSec));
+                seq.Join(rectTrasnform.DOLocalRotate(new Vector3(0.0f, 0.0f, -360.0f), durationSec, RotateMode.FastBeyond360));
                 seq.Append(rectTrasnform.DOMove(pos, _crownAnimBackDurationSec).SetEase(_crownAnimBackEase));
             }
 

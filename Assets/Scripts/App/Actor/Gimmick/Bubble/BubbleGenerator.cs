@@ -49,8 +49,8 @@ namespace App.Actor.Gimmick.Bubble
 
         async UniTask TeleportImpl()
         {
-            Transform crown = Crown.Manager.Instance.CrownBubble.CrownSpriteRenderer;
-            crown.SetParent(null);
+            //Transform crown = Crown.Manager.Instance.CrownBubble.CrownSpriteRenderer;
+            //crown.SetParent(null);
 
             // クラウンが逃げる演出が出るまで待つ
             await UniTask.WaitForSeconds(0.05f);
@@ -68,7 +68,7 @@ namespace App.Actor.Gimmick.Bubble
                             ? Generate()
                             : bubbles[Random.Range(0, bubbles.Count - 1)];
             Bubble.SetupCrown(target);
-            crown.DOMove(Crown.Manager.Instance.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
+            //crown.DOMove(Crown.Manager.Instance.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
 
             Crown.Manager.Instance.CrownBubble.OnDestroyEvent += TeleportCrown;
 
