@@ -221,6 +221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _outlineKind: 1
+  _considerCpu: 1
 --- !u!1 &9139938000420098449
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,6 +244,7 @@ GameObject:
   - component: {fileID: 5259226107377835526}
   - component: {fileID: 5221090659934857165}
   - component: {fileID: 5393084470439959549}
+  - component: {fileID: 2409276670051547345}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -384,6 +386,7 @@ MonoBehaviour:
     - 18
     - 15
     - 24
+    - 20
     _gravityIgnoreMaxSec: 0.15
     _jumpEffectPrefab: {fileID: 0}
     _jumpSe: {fileID: 0}
@@ -421,6 +424,7 @@ MonoBehaviour:
   _decelAirX: 60
   _gravity: -51
   _decelGravity: 55
+  _moveLimitPos: {x: -50, y: 50}
 --- !u!114 &4084096041492405670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,3 +498,18 @@ MonoBehaviour:
   - {x: 0, y: 0.61, z: 0}
   - {x: 0, y: 0.57, z: 0}
   - {x: 0, y: 0.6, z: 0}
+--- !u!114 &2409276670051547345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139938000420098449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cfd062f160a9e74b87a736a2dddbe4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _root: {fileID: 8468343991582604293}
+  _offset: {x: 0, y: 0.65, z: 0}
+  _radius: 0.65

@@ -74,7 +74,7 @@ namespace App.Actor.Gimmick.Crown
                     var deg = degPrev + Random.Range(30.0f, 330.0f);
 
                     var dir = new Vector2(Mathf.Cos(deg * Mathf.Deg2Rad), Mathf.Sin(deg * Mathf.Deg2Rad));
-                    float radius = 0.04f * scale * Random.Range(0.5f, 1.0f) * Mathf.Sqrt(animRate);
+                    float radius = 0.02f * scale * Random.Range(0.5f, 1.0f) * Mathf.Sqrt(animRate);
                     var targetPos = dir * radius;
 
                     var easeCandidate = new List<Ease>() {

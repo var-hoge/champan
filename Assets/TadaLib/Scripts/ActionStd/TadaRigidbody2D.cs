@@ -136,7 +136,7 @@ namespace TadaLib.ActionStd
                 IsThroughMode = isThroghMode,
             };
 
-            // このゲームでは不要なので壁判定をなくす
+            // このゲームでは左右チェックは行わない
 
             //// (X+&X-)/Y+/Y-/(X+&X-)の順にチェックする
             //// 壁押し出しの差分
@@ -174,7 +174,7 @@ namespace TadaLib.ActionStd
             // このゲームでは不要なので天井判定をなくす
             IsTopCollide = !IsGround && false;// CheckTopCollide(ref diff, collideInfo);
 
-            // このゲームでは不要なので壁判定をなくす
+            // このゲームでは左右チェックは行わない
 
             //{
             //    var diffByRtCk = diff;

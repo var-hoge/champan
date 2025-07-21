@@ -47,11 +47,6 @@ namespace App.Ui.CharaSelect
                 isActive = false;
             }
 
-            if (_playerId == 0)
-            {
-                Debug.Log(isActive);
-            }
-
             if (isActive != _isActivePrev)
             {
                 _isActivePrev = isActive;

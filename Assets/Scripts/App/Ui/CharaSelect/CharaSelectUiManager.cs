@@ -93,7 +93,7 @@ namespace App.Ui.CharaSelect
 
             if (isAllUsed)
             {
-                SceneChange().Forget();
+                //SceneChange().Forget();
             }
             else
             {
