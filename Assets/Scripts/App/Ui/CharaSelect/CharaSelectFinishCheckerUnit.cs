@@ -22,7 +22,6 @@ namespace App.Ui.CharaSelect
             transform.DOMove(doorPos, 0.3f);
             transform.GetChild(0).DOLocalMoveY(0.2f, 0.2f).SetLoops(-1, LoopType.Yoyo);
             transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
-            transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
         }
 
         public bool IsFinishReady { private set; get; }

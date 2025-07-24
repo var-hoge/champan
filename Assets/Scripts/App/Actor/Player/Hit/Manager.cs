@@ -57,11 +57,19 @@ namespace App.Actor.Player.Hit
 
                 foreach (var rhs in _colliders)
                 {
+                    if (lhs == null)
+                    {
+                        continue;
+                    }
                     if (lhs.IsEnabled is false)
                     {
                         continue;
                     }
 
+                    if (rhs == null)
+                    {
+                        continue;
+                    }
                     if (rhs.IsEnabled is false)
                     {
                         continue;
