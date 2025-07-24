@@ -759,7 +759,7 @@ GameObject:
   - component: {fileID: 702880725}
   - component: {fileID: 702880726}
   m_Layer: 5
-  m_Name: NpcSelect
+  m_Name: CpuSelect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -803,10 +803,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selectedColor: {r: 0.9372549, g: 0.2784314, b: 0.43529412, a: 1}
   _unselectedColor: {r: 0.34509805, g: 0.33333334, b: 0.3019608, a: 1}
+  _invalidColor: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 0.74509805}
   _center: {fileID: 381598486}
   _mainText: {fileID: 1754856688}
   _colorChangableTexts:
   - {fileID: 1754856688}
+  _colorChangableTextsForInvalid:
+  - {fileID: 1754856688}
+  - {fileID: 1607043879}
   _selectCursorLeft: {fileID: 431718228}
   _selectCursorRight: {fileID: 1452546521}
   _items:
@@ -841,7 +845,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _invalidReason: 1
   _defaultIndex: 0
+  _invalidIndex: 1
 --- !u!1 &838905044
 GameObject:
   m_ObjectHideFlags: 0
@@ -897,11 +903,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selectedColor: {r: 0.9372549, g: 0.2784314, b: 0.43529412, a: 1}
   _unselectedColor: {r: 0.34509805, g: 0.33333334, b: 0.3019608, a: 1}
+  _invalidColor: {r: 0, g: 0, b: 0, a: 0}
   _center: {fileID: 286273672}
   _mainText: {fileID: 1326226618}
   _colorChangableTexts:
   - {fileID: 1164998359}
   - {fileID: 1326226618}
+  _colorChangableTextsForInvalid: []
   _selectCursorLeft: {fileID: 285863719}
   _selectCursorRight: {fileID: 2029487600}
   _items:
@@ -951,7 +959,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _invalidReason: 0
   _defaultIndex: 1
+  _invalidIndex: 0
 --- !u!1 &843872277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2103,9 +2113,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selectedColor: {r: 0, g: 0, b: 0, a: 0}
   _unselectedColor: {r: 0, g: 0, b: 0, a: 0}
+  _invalidColor: {r: 0, g: 0, b: 0, a: 0}
   _center: {fileID: 1608321135}
   _mainText: {fileID: 0}
   _colorChangableTexts: []
+  _colorChangableTextsForInvalid: []
   _selectCursorLeft: {fileID: 0}
   _selectCursorRight: {fileID: 0}
   _items: []
@@ -2124,7 +2136,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _invalidReason: 0
   _defaultIndex: 0
+  _invalidIndex: 0
 --- !u!114 &1608321137
 MonoBehaviour:
   m_ObjectHideFlags: 0

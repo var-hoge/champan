@@ -20,8 +20,11 @@ namespace App.Ui.GameModeSelect
         {
             get
             {
+                if (_invalidReason is InvalidReason.CannotAddCpu)
+                {
+                    return Cpu.CpuManager.Instance.CpuCount() == 0;
+                }
                 return false;
-                //return Cpu.CpuManager.Instance.CpuCount() == 0;
             }
         }
         public Vector3 CenterPos => _center.position;
@@ -59,6 +62,13 @@ namespace App.Ui.GameModeSelect
             {
                 text.color = _unselectedColor;
             }
+            if (IsInvalid)
+            {
+                foreach (var text in _colorChangableTextsForInvalid)
+                {
+                    text.color = text.color.SetAlpha(_invalidColor.a);
+                }
+            }
 
             _selectCursorLeft.SetActive(false);
             _selectCursorRight.SetActive(false);
@@ -80,6 +90,17 @@ namespace App.Ui.GameModeSelect
         {
             if (_items.Count == 0)
             {
+                return;
+            }
+
+            if (IsInvalid)
+            {
+                _curIndex = _invalidIndex;
+                OnIndexChanged();
+                foreach (var text in _colorChangableTextsForInvalid)
+                {
+                    text.color = _unselectedColor.SetAlpha(_invalidColor.a);
+                }
                 return;
             }
 
@@ -118,6 +139,9 @@ namespace App.Ui.GameModeSelect
         Color _unselectedColor;
 
         [SerializeField]
+        Color _invalidColor;
+
+        [SerializeField]
         RectTransform _center;
 
         [SerializeField]
@@ -125,6 +149,9 @@ namespace App.Ui.GameModeSelect
 
         [SerializeField]
         List<TMPro.TextMeshProUGUI> _colorChangableTexts;
+
+        [SerializeField]
+        List<TMPro.TextMeshProUGUI> _colorChangableTextsForInvalid;
 
         [SerializeField]
         GameObject _selectCursorLeft;
@@ -138,8 +165,19 @@ namespace App.Ui.GameModeSelect
         [SerializeField]
         List<UnityEngine.Events.UnityEvent> _onItemDecided;
 
+        enum InvalidReason
+        {
+            None,
+            CannotAddCpu,
+        }
+        [SerializeField]
+        InvalidReason _invalidReason;
+
         [SerializeField]
         int _defaultIndex = 0;
+
+        [SerializeField]
+        int _invalidIndex = 0;
 
         bool _isSelected = false;
         int _curIndex = 0;
