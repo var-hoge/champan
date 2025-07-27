@@ -12,13 +12,11 @@ namespace TadaLib.Ui
     /// <summary>
     /// IdleAnimation
     /// </summary>
-    public class IdleAnimation
-        : BaseProc
-        , IProcUpdate
-        , IProcMove
-        , IProcPostMove
+    public class IdleAnimator
+        : MonoBehaviour
     {
         #region プロパティ
+        public bool IsEnabled { get; set; } = true;
         #endregion
 
         #region メソッド
@@ -27,28 +25,26 @@ namespace TadaLib.Ui
         #region MonoBehavior の実装
         void Start()
         {
+            IsEnabled = _defaultEnabled;
         }
-        #endregion
 
-        #region IProcUpdate の実装
-        public void OnUpdate()
+        void Update()
         {
-        }
-        #endregion
-
-        #region IProcMove の実装
-        public void OnMove()
-        {
-        }
-        #endregion
-
-        #region IProcPostMove の実装
-        public void OnPostMove()
-        {
+            if (IsEnabled is false)
+            {
+                return;
+            }
         }
         #endregion
 
         #region privateフィールド
+        [SerializeField]
+        bool _defaultEnabled = true;
+
+        [SerializeField]
+        float _animRate = 1.0f;
+
+        float _durationSec = 0.0f;
         #endregion
 
         #region privateメソッド

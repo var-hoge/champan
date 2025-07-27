@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using App.Actor.Player;
+using App.Ui.Main;
+using UnityEngine;
 
 namespace App.Actor.Gimmick.Bubble
 {
@@ -24,12 +26,11 @@ namespace App.Actor.Gimmick.Bubble
             dirDiff.z = 0.0f;
             var dirUnit = dirDiff.normalized;
             // x 軸方向の成分を強める
-            dirUnit.x += Mathf.Sign(dirUnit.x) * 0.5f;
             dirUnit = dirUnit.normalized;
             if (dirUnit.sqrMagnitude < 0.0001f)
             {
                 // 座標が一致していたなら適当な方向に飛ばす
-                dirUnit = Vector3.right;
+                dirUnit = Vector3.up;
             }
 
             var moveCtrl = obj.GetComponent<Actor.Player.MoveCtrl>();

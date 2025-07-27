@@ -273,7 +273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bubPopEff: {fileID: 3220368770406111458, guid: 2edb08e734c9ccd44850bec0d66aba3b, type: 3}
-  blowPower: 20
+  blowPower: 15
   _body: {fileID: 8434616484534968764}
 --- !u!50 &6108269917134769804
 Rigidbody2D:

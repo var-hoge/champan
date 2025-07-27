@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using DG.Tweening;
+using App.Ui.Main;
 
 namespace App.Actor.Player.Hit
 {
@@ -49,7 +50,9 @@ namespace App.Actor.Player.Hit
                 // 踏まれた
                 GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);
 
-                if(_seq != null && _seq.IsActive() && !_seq.IsComplete())
+                EmotionManager.Instance.Spawn(GetComponent<DataHolder>().EmotionRoot, EmotionManager.EmotionKind.Angry, 0.0f);
+
+                if (_seq != null && _seq.IsActive() && !_seq.IsComplete())
                 {
                     _seq.Kill();
                 }

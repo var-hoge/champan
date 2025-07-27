@@ -545,7 +545,7 @@ MonoBehaviour:
   crownFrontBubbleRenderer: {fileID: 1870660039789092212}
   amplitude: 0.01
   burstTime: 5
-  blowPower: 30
+  blowPower: 25
   _moveInfoCtrl: {fileID: 2411988068338451430}
   _bubPopEff: {fileID: 3220368770406111458, guid: 2edb08e734c9ccd44850bec0d66aba3b, type: 3}
   _shieldCountRoot: {fileID: 5611870513187391303}

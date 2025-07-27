@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using TadaLib.ProcSystem;
 using TadaLib.ActionStd;
 using TadaLib.Input;
+using UnityEngine.XR;
 
 namespace App.Actor.Player
 {
@@ -43,7 +44,7 @@ namespace App.Actor.Player
         void UpdateRotate()
         {
             var dataHolder = GetComponent<DataHolder>();
-            var rotVec3 = transform.localEulerAngles;
+            var rotVec3 = _mesh.transform.localEulerAngles;
 
             var velocityX = GetComponent<MoveCtrl>().Velocity.x;
             // 試合開始前に方向を変更できるようにする
@@ -60,12 +61,14 @@ namespace App.Actor.Player
                 rotVec3.y = velocityX < 0.0f ? 180.0f : 0.0f;
             }
 
-            transform.localEulerAngles = rotVec3;
+            _mesh.transform.localEulerAngles = rotVec3;
             dataHolder.FaceVec = transform.right;
         }
         #endregion
 
         #region privateフィールド
+        [SerializeField]
+        Transform _mesh;
         #endregion
     }
 }

@@ -30,6 +30,8 @@ namespace App.Actor.Player
         public float Gravity { get; set; } = -10.0f;
 
         //public Bubble LastLandingBubble { get; set; } = null;
+
+        public Transform EmotionRoot => _emotionRoot;
         #endregion
 
         #region メソッド
@@ -94,6 +96,9 @@ namespace App.Actor.Player
         #region privateフィールド
         [SerializeField]
         int _playerIdx = 0;
+
+        [SerializeField]
+        Transform _emotionRoot;
         #endregion
     }
 }

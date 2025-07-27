@@ -43,7 +43,13 @@ namespace App.Ui.Main
                 sprites = _spritesCP;
             }
 
-            var sprite = sprites[UnityEngine.Random.Range(0, sprites.Count)];
+            var max = _history == null ? sprites.Count : sprites.Count - 1;
+            var sprite = sprites[UnityEngine.Random.Range(0, max)];
+            if (sprite == _history)
+            {
+                sprite = sprites[sprites.Count - 1];
+            }
+            _history = sprite;
 
             var screenPos = Camera.main.WorldToScreenPoint(pos);
             var obj = Instantiate(_template, screenPos, Quaternion.identity);
@@ -73,6 +79,7 @@ namespace App.Ui.Main
         [SerializeField]
         List<Sprite> _spritesCP;
 
+        Sprite _history = null;
         //List<OtomatopoeiaObj> _objs = new List<OtomatopoeiaObj>();
         #endregion
 

@@ -9,6 +9,7 @@ using KanKikuchi.AudioManager;
 using DG.Tweening;
 using App.Actor.Gimmick.Crown;
 using static UnityEngine.Rendering.STP;
+using App.Ui.Main;
 
 namespace App.Actor.Gimmick.Bubble
 {
@@ -178,6 +179,10 @@ namespace App.Actor.Gimmick.Bubble
                     foreach (var player in players)
                     {
                         BubbleUtil.Blow(player, transform.position, blowPower, doVibrate: !HasCrown);
+                        if (HasCrown)
+                        {
+                            EmotionManager.Instance.Spawn(player.GetComponent<Player.DataHolder>().EmotionRoot, EmotionManager.EmotionKind.Happy);
+                        }
                     }
                 }
             }
