@@ -26,6 +26,8 @@ namespace App.Actor.Player.Hit
         public float Radius => _radius;
 
         public Vector2 Velocity => GetComponent<DataHolder>().Velocity;
+
+        public int PlayerIdx => GetComponent<DataHolder>().PlayerIdx;
         #endregion
 
         #region メソッド
@@ -50,7 +52,7 @@ namespace App.Actor.Player.Hit
                 // 踏まれた
                 GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);
 
-                EmotionManager.Instance.Spawn(GetComponent<DataHolder>().EmotionRoot, EmotionManager.EmotionKind.Angry, 0.0f);
+                GetComponent<EmotionCtrl>().NotifyStepedOn();
 
                 if (_seq != null && _seq.IsActive() && !_seq.IsComplete())
                 {

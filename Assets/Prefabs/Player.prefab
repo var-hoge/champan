@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 5221090659934857165}
   - component: {fileID: 5393084470439959549}
   - component: {fileID: 2409276670051547345}
+  - component: {fileID: 3459226316223657637}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -471,3 +472,18 @@ MonoBehaviour:
   _root: {fileID: 8468343991582604293}
   _offset: {x: 0, y: 0.65, z: 0}
   _radius: 0.65
+--- !u!114 &3459226316223657637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139938000420098449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 561a80f32f069744ea82ba8ebd86e825, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _emotionRoot: {fileID: 8883013224884429482}
+  _angryTriggerIntervalSec: 2
+  _happyTriggerIntervalSec: 1.5

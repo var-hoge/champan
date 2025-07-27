@@ -45,10 +45,28 @@ namespace App.Actor.Player.Hit
         #region MonoBehavior の実装
         void Start()
         {
+            _history = new List<List<float>>();
+            for (int idx = 0; idx < ColliderCountMax; ++idx)
+            {
+                _history.Add(new List<float>());
+                for (int j = 0; j < ColliderCountMax; ++j)
+                {
+                    _history[idx].Add(-10.0f);
+                }
+            }
         }
 
         void Update()
         {
+            if (GameSequenceManager.Instance != null)
+            {
+                if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
+                {
+                    // ゲーム終了後は何もしない
+                    return;
+                }
+            }
+
             List<HitResult> results = new();
 
             foreach (var lhs in _colliders)
@@ -80,10 +98,18 @@ namespace App.Actor.Player.Hit
                         continue;
                     }
 
+                    if (Time.time - _history[lhs.PlayerIdx][rhs.PlayerIdx] < _interval)
+                    {
+                        // 連続で当たりすぎ
+                        continue;
+                    }
+
                     var isCollide = Vector2.Distance(lhs.CenterPos, rhs.CenterPos) <= (lhs.Radius + rhs.Radius);
 
                     if (isCollide)
                     {
+                        _history[lhs.PlayerIdx][rhs.PlayerIdx] = Time.time;
+
                         var dir = rhs.CenterPos - lhs.CenterPos;
                         if (dir.sqrMagnitude < 0.001f)
                         {
@@ -135,7 +161,12 @@ namespace App.Actor.Player.Hit
         #endregion
 
         #region private フィールド
+        int ColliderCountMax => Player.Constant.PlayerCountMax;
+
         List<HitCollider> _colliders = new();
+
+        List<List<float>> _history = new List<List<float>>();
+        float _interval = 0.1f;
         #endregion
 
         #region private メソッド
