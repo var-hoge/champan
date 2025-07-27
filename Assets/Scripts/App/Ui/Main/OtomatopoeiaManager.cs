@@ -30,12 +30,6 @@ namespace App.Ui.Main
         #region メソッド
         public void Spawn(int playerIdx, Vector3 pos, Vector3 playerVelocity)
         {
-            // CPU なら何もしない
-            if (Cpu.CpuManager.Instance.IsCpu(playerIdx))
-            {
-                return;
-            }
-
             var sprites = playerIdx switch
             {
                 var idx when idx == 0 => _spritesP1,
@@ -43,6 +37,11 @@ namespace App.Ui.Main
                 var idx when idx == 2 => _spritesP3,
                 _ => _spritesP4,
             };
+
+            if (Cpu.CpuManager.Instance.IsCpu(playerIdx))
+            {
+                sprites = _spritesCP;
+            }
 
             var sprite = sprites[UnityEngine.Random.Range(0, sprites.Count)];
 
@@ -71,6 +70,8 @@ namespace App.Ui.Main
         List<Sprite> _spritesP3;
         [SerializeField]
         List<Sprite> _spritesP4;
+        [SerializeField]
+        List<Sprite> _spritesCP;
 
         //List<OtomatopoeiaObj> _objs = new List<OtomatopoeiaObj>();
         #endregion

@@ -34,7 +34,7 @@ namespace App.Ui.GameModeSelect
         #region MonoBehavior の実装
         void Start()
         {
-            _selectBgDefaultAlpha = _selectBack.color.a;
+            _selectBgDefaultAlpha = _selectBack.alpha;
 
             foreach (var item in _items)
             {
@@ -56,7 +56,7 @@ namespace App.Ui.GameModeSelect
             if (_selectedIndex < _items.Count)
             {
                 _items[_selectedIndex].OnSelected();
-                _selectBack.rectTransform.position = _items[_selectedIndex].CenterPos;
+                _selectBack.GetComponent<RectTransform>().position = _items[_selectedIndex].CenterPos;
             }
 
             _backUi.fillAmount = 0.0f;
@@ -99,7 +99,7 @@ namespace App.Ui.GameModeSelect
         List<Item> _items;
 
         [SerializeField]
-        UnityEngine.UI.Image _selectBack;
+        CanvasGroup _selectBack;
 
         [SerializeField]
         TadaLib.Ui.Button _startButton;
@@ -175,15 +175,15 @@ namespace App.Ui.GameModeSelect
             if (_selectedIndex == _items.Count - 1)
             {
                 _startButton.OnSelected(doReaction: true);
-                _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
+                _selectBack.GetComponent<RectTransform>().DOMove(_items[_selectedIndex].CenterPos, 0.2f);
                 _selectBack.DOFade(0.0f, 0.1f);
             }
             else
             {
                 _startButton.OnUnselected();
-                _selectBack.rectTransform.DOKill();
+                _selectBack.GetComponent<RectTransform>().DOKill();
                 _selectBack.DOFade(_selectBgDefaultAlpha, 0.1f);
-                _selectBack.rectTransform.DOMove(_items[_selectedIndex].CenterPos, 0.2f);
+                _selectBack.GetComponent<RectTransform>().DOMove(_items[_selectedIndex].CenterPos, 0.2f);
             }
 
             return true;

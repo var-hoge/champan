@@ -145,7 +145,7 @@ namespace App.Ui.GameModeSelect
         RectTransform _center;
 
         [SerializeField]
-        TMPro.TextMeshProUGUI _mainText;
+        List<TMPro.TextMeshProUGUI> _mainTexts;
 
         [SerializeField]
         List<TMPro.TextMeshProUGUI> _colorChangableTexts;
@@ -210,7 +210,10 @@ namespace App.Ui.GameModeSelect
 
         void OnIndexChanged()
         {
-            _mainText.text = _items[_curIndex];
+            foreach (var text in _mainTexts)
+            {
+                text.text = _items[_curIndex];
+            }
         }
         #endregion
     }

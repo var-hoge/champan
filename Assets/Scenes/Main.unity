@@ -926,6 +926,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a881df40af24f6b4384efc3c651c6eaa, type: 3}
   - {fileID: 21300000, guid: 62bebf8a55eda734ab59fcc580653412, type: 3}
   - {fileID: 21300000, guid: 69080155e9ca1e849a899afc7c254e8d, type: 3}
+  _spritesCP:
+  - {fileID: 4957277490622361588, guid: 88e739de269195443adeb355396ca36c, type: 3}
+  - {fileID: -577314262199391556, guid: dd5e8487ff4801e44a03a99139d8aeb1, type: 3}
+  - {fileID: 3122721688328688309, guid: ad113d18aa59f3e46ab5edb0df7a72de, type: 3}
 --- !u!1 &172422998
 GameObject:
   m_ObjectHideFlags: 0
