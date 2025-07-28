@@ -128,7 +128,9 @@ namespace App.Ui.Title
 
             // 背景のアニメーション
             var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
+            //DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
+            //DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(1.32f, 1.14f, 1.5f), 0.5f);
+            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(1.21f, 1.25f, 1.5f), 0.5f);
 
             await UniTask.WaitForSeconds(0.4f);
 
