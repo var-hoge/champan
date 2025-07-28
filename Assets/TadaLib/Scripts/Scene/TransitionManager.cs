@@ -32,6 +32,10 @@ namespace TadaLib.Scene
         }
         #endregion
 
+        #region プロパティ
+        public bool IsTransitioning => _isLocked;
+        #endregion
+
         #region メソッド
         /// <summary>
         /// 遷移を開始する
