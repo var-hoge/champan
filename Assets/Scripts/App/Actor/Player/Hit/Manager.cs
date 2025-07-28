@@ -105,10 +105,26 @@ namespace App.Actor.Player.Hit
                     if (isCollide)
                     {
                         var dir = rhs.CenterPos - lhs.CenterPos;
-                        if (dir.sqrMagnitude < 0.001f)
+                        if (dir.sqrMagnitude < 0.003f)
                         {
-                            // 埋まっている
-                            result.IsButtomHit = true;
+                            // 番号によって挙動を変える
+                            // @memo: 重なり続けるのを回避するため
+                            if (lhs.PlayerIdx == 0)
+                            {
+                                result.IsButtomHit = true;
+                            }
+                            else if (lhs.PlayerIdx == 1)
+                            {
+                                result.IsTopHit = true;
+                            }
+                            else if (lhs.PlayerIdx == 2)
+                            {
+                                result.IsLeftHit = true;
+                            }
+                            else if (rhs.PlayerIdx == 3)
+                            {
+                                result.IsRightHit = true;
+                            }
                         }
                         else
                         {
@@ -120,6 +136,7 @@ namespace App.Actor.Player.Hit
                             //        deg = 180 のときに x, y = (-1, 0)
                             //        deg = 90 のときに x, y = (0, 1)
                             var deg = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
                             if (deg < 45.0f && deg > -45.0f)
                             {
                                 result.IsRightHit = true;
