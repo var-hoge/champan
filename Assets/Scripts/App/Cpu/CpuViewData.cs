@@ -15,11 +15,12 @@ namespace App.Cpu
             return data;
         }
         #endregion
-        
+
         #region フィールド
         public List<Vector2> bubblePositions;
         public List<Vector2> playerPositions;
         public Vector2 crownPosition;
+        public float crownChangedTime;
         public int playerIndex;
         public bool isGround;
         public Vector2 maxVelocity;

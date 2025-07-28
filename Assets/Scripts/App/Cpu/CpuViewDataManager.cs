@@ -37,19 +37,38 @@ namespace App.Cpu
         #region IProcManagerUpdate の実装
         public void OnUpdate()
         {
+            var bubbles = GameObject.FindObjectsByType<App.Actor.Gimmick.Bubble.Bubble>(FindObjectsSortMode.None);
+            // クラウン座標の更新
+            foreach (var bubble in bubbles)
+            {
+                if (!bubble.HasCrown)
+                {
+                    continue;
+                }
+
+                if (Vector2.Distance(bubble.transform.position, _crownPosPrev) > 2.0f)
+                {
+                    // 変わった
+                    _crownChangedTime = Time.time;
+                    _crownPosPrev = bubble.transform.position;
+                }
+            }
+
             for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
             {
-                UpdateCpuViewData(idx);
+                UpdateCpuViewData(idx, bubbles);
             }
         }
         #endregion
 
         #region privateフィールド
         List<CpuViewData> _cpuViewData = new List<CpuViewData>();
+        Vector2 _crownPosPrev = Vector2.zero;
+        float _crownChangedTime = 0.0f;
         #endregion
 
         #region privateメソッド
-        void UpdateCpuViewData(int idx)
+        void UpdateCpuViewData(int idx, Actor.Gimmick.Bubble.Bubble[] bubbles)
         {
             var targetPlayer = PlayerManager.TryGetPlayer(idx);
             if (targetPlayer == null)
@@ -60,7 +79,6 @@ namespace App.Cpu
             var data = CpuViewData.Create();
 
             // バブル座標の更新
-            var bubbles = GameObject.FindObjectsByType<App.Actor.Gimmick.Bubble.Bubble>(FindObjectsSortMode.None);
             data.bubblePositions.Clear();
             foreach (var bubble in bubbles)
             {
@@ -70,6 +88,7 @@ namespace App.Cpu
                     data.crownPosition = bubble.transform.position;
                 }
             }
+            data.crownChangedTime = _crownChangedTime;
 
             // プレイヤー座標の更新
             data.playerPositions.Clear();

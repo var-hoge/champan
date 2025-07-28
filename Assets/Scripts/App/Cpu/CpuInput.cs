@@ -139,6 +139,7 @@ namespace App.Cpu
         Vector2 _jumpWaitDurationSec = new Vector2(0.1f, 0.6f);
 
         Vector2 _targetBubblePosition;
+        Vector2 _targetBubblePositionRaw;
         bool _hasTargetBubble = false;
 
         TadaLib.Util.Timer _jumpWaitTimer;
@@ -146,6 +147,13 @@ namespace App.Cpu
 
         InputData _nextInput;
         InputData _nextInputPrev;
+
+        [Header("CPU強さ設定")]
+        [SerializeField]
+        float _reactionSec = 0.3f;
+
+        [SerializeField]
+        float _targetBubbleTargetPosShift = 1.0f;
         #endregion
 
         #region privateメソッド
@@ -160,7 +168,7 @@ namespace App.Cpu
                 var isExistTargetBubble = false;
                 foreach (var bubblePos in cpuViewData.bubblePositions)
                 {
-                    if (Vector2.Distance(bubblePos, _targetBubblePosition) < 1.0f)
+                    if (Vector2.Distance(bubblePos, _targetBubblePositionRaw) < 1.0f)
                     {
                         isExistTargetBubble = true;
                         break;
@@ -176,7 +184,9 @@ namespace App.Cpu
             // どのバブルを狙うか決める
             if (!_hasTargetBubble)
             {
-                _targetBubblePosition = SelectTargetBubble(cpuViewData);
+                _targetBubblePositionRaw = SelectTargetBubble(cpuViewData);
+                var sign = Random.Range(0, 2) % 2 == 0 ? 1 : -1;
+                _targetBubblePosition = _targetBubblePositionRaw + Vector2.right * _targetBubbleTargetPosShift * sign;
                 _hasTargetBubble = true;
             }
 
@@ -246,7 +256,7 @@ namespace App.Cpu
                 // 最高速を考慮するのが難しいため、考慮しない
                 var moveY = velocityY * t - gravity * t * t;
 
-                return moveY;
+                return moveY * 0.75f;
             }
 
             // 良いバブルを狙う
@@ -287,6 +297,12 @@ namespace App.Cpu
                 var diff = bubblePos - (Vector2)transform.position;
                 var crownDiff = cpuViewData.crownPosition - bubblePos;
                 var isCrown = crownDiff.sqrMagnitude < 0.1f;
+                if (Time.time - cpuViewData.crownChangedTime < _reactionSec)
+                {
+                    // 反応できない
+                    isCrown = false;
+                    crownDiff *= 100.0f;
+                }
 
                 var reachY = CalcReachHeightDiff(diff.x, velocityY, cpuViewData.maxVelocity, cpuViewData.gravity) - diff.y;
                 var score = CalcScore(reachY, crownDiff.magnitude, isCrown);
