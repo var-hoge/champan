@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bb48b94082b461646a7787087b71f4f0
+guid: 667432a7fa5dfbd45a98c4bc6ba0c372
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 350.8772
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -103,10 +103,10 @@ TextureImporter:
       name: CP_chr_3_1_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 0
-        width: 110
-        height: 83
+        x: 4
+        y: 2
+        width: 392
+        height: 291
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

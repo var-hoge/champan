@@ -485,5 +485,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _emotionRoot: {fileID: 8883013224884429482}
+  _meshRoot: {fileID: 1196567346848327988}
   _angryTriggerIntervalSec: 2
   _happyTriggerIntervalSec: 1.5
+  _sadSpriteDurationSec: 0.8

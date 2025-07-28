@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using App.Actor.Player;
+using App.Actor;
 
 namespace App.Ui.Main
 {
@@ -44,6 +45,11 @@ namespace App.Ui.Main
                 _latesetStepedOnTime = 0.0f; // 連続で出ないようにする
                 return;
             }
+
+            var playerIdx = GetComponent<DataHolder>().PlayerIdx;
+            var charaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(playerIdx);
+            _meshRoot.sprite = CharacterManager.Instance.GetSadCharaImage(charaIdx);
+            _sadSpriteTimer = _sadSpriteDurationSec;
             _latesetStepedOnTime = Time.time;
         }
         #endregion
@@ -52,6 +58,20 @@ namespace App.Ui.Main
         void Start()
         {
         }
+
+        void Update()
+        {
+            if (_sadSpriteTimer > 0.0f)
+            {
+                _sadSpriteTimer -= Time.deltaTime;
+                if (_sadSpriteTimer <= 0.0f)
+                {
+                    var playerIdx = GetComponent<DataHolder>().PlayerIdx;
+                    var charaIdx = Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(playerIdx);
+                    _meshRoot.sprite = CharacterManager.Instance.GetCharaImage(charaIdx);
+                }
+            }
+        }
         #endregion
 
         #region privateフィールド
@@ -59,11 +79,18 @@ namespace App.Ui.Main
         Transform _emotionRoot;
 
         [SerializeField]
+        SpriteRenderer _meshRoot;
+
+        [SerializeField]
         float _angryTriggerIntervalSec = 5.0f;
 
         [SerializeField]
         float _happyTriggerIntervalSec = 3.0f;
 
+        [SerializeField]
+        float _sadSpriteDurationSec = 3.0f;
+
+        float _sadSpriteTimer = 0.0f;
         float _latesetStepedOnTime = -10.0f;
         float _latesetHitCrownTime = -10.0f;
         #endregion

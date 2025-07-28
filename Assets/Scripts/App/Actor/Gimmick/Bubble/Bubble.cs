@@ -181,7 +181,7 @@ namespace App.Actor.Gimmick.Bubble
                         BubbleUtil.Blow(player, transform.position, blowPower, doVibrate: !HasCrown);
                         if (HasCrown)
                         {
-                            EmotionManager.Instance.Spawn(player.GetComponent<Player.DataHolder>().EmotionRoot, EmotionManager.EmotionKind.Happy);
+                            player.GetComponent<EmotionCtrl>().NotifyHitCrown();
                         }
                     }
                 }

@@ -12,12 +12,17 @@ using DG.Tweening;
 
 namespace App.Actor
 {
-    public class CharacterManager: TadaLib.Util.SingletonMonoBehaviour<CharacterManager>
+    public class CharacterManager : TadaLib.Util.SingletonMonoBehaviour<CharacterManager>
     {
         public Sprite GetCharaImage(int charaIdx)
         {
-            var hoge =  Images[charaIdx];
+            var hoge = Images[charaIdx];
             return hoge[Random.Range(0, hoge.Count)];
+        }
+
+        public Sprite GetSadCharaImage(int charaIdx)
+        {
+            return _sadCharaImages[charaIdx];
         }
 
         public Sprite GetCharaMainVisualImage(int charaIdx)
@@ -36,6 +41,9 @@ namespace App.Actor
 
         [SerializeField]
         List<Sprite> _charaMainVisualImages;
+
+        [SerializeField]
+        List<Sprite> _sadCharaImages;
 
         private List<Sprite>[] _images = null;
         private List<Sprite>[] Images
