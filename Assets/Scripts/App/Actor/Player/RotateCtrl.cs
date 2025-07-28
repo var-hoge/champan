@@ -60,6 +60,11 @@ namespace App.Actor.Player
             {
                 rotVec3.y = velocityX < 0.0f ? 180.0f : 0.0f;
             }
+            else if (dataHolder.PushedDir != 0)
+            {
+                rotVec3.y = dataHolder.PushedDir > 0 ? 0.0f : 180.0f;
+                dataHolder.PushedDir = 0;
+            }
 
             _mesh.transform.localEulerAngles = rotVec3;
             dataHolder.FaceVec = transform.right;

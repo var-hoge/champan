@@ -89,7 +89,7 @@ Material:
     - _GlossyReflections: 0
     - _IsBegin: 1
     - _IsFadeIn: 0
-    - _IsReverse: 0
+    - _IsReverse: 1
     - _MaskRad: 0
     - _MaskRad2: 0
     - _Metallic: 0

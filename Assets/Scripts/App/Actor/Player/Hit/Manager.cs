@@ -29,6 +29,8 @@ namespace App.Actor.Player.Hit
 
             public bool IsTopHit;
             public float TopHitSpeed;
+
+            public Vector2 RhsCenterPosition;
         }
         #endregion
 
@@ -98,18 +100,10 @@ namespace App.Actor.Player.Hit
                         continue;
                     }
 
-                    if (Time.time - _history[lhs.PlayerIdx][rhs.PlayerIdx] < _interval)
-                    {
-                        // 連続で当たりすぎ
-                        continue;
-                    }
-
                     var isCollide = Vector2.Distance(lhs.CenterPos, rhs.CenterPos) <= (lhs.Radius + rhs.Radius);
 
                     if (isCollide)
                     {
-                        _history[lhs.PlayerIdx][rhs.PlayerIdx] = Time.time;
-
                         var dir = rhs.CenterPos - lhs.CenterPos;
                         if (dir.sqrMagnitude < 0.001f)
                         {
@@ -138,15 +132,30 @@ namespace App.Actor.Player.Hit
                             }
                             else if (deg >= 45.0f && deg <= 135.0f)
                             {
+                                if (Time.time - _history[lhs.PlayerIdx][rhs.PlayerIdx] < _interval)
+                                {
+                                    // 連続で当たりすぎ
+                                    continue;
+                                }
+
                                 result.IsTopHit = true;
                                 result.TopHitSpeed = Mathf.Max(result.TopHitSpeed, Mathf.Max(0.0f, -velocity.y));
                             }
                             else
                             {
+                                if (Time.time - _history[lhs.PlayerIdx][rhs.PlayerIdx] < _interval)
+                                {
+                                    // 連続で当たりすぎ
+                                    continue;
+                                }
+
                                 result.IsButtomHit = true;
                                 result.ButtomHitSpeed = Mathf.Max(result.ButtomHitSpeed, Mathf.Max(0.0f, velocity.y));
                             }
                         }
+
+                        _history[lhs.PlayerIdx][rhs.PlayerIdx] = Time.time;
+                        result.RhsCenterPosition = rhs.CenterPos;
                     }
                 }
 

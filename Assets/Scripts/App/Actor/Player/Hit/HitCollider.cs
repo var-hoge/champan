@@ -38,16 +38,25 @@ namespace App.Actor.Player.Hit
                 // ジャンプ
                 State.StateJump.ChangeState(transform.gameObject, State.StateJump.JumpPowerKind.Spring);
             }
-            else if (result.IsLeftHit || result.IsRightHit)
+            
+            if (result.IsLeftHit || result.IsRightHit)
             {
                 // 左右吹き飛び
-                var speed = result.IsLeftHit ? result.LeftHitSpeed : result.RightHitSpeed;
-                speed = TadaLib.Util.InterpUtil.Remap(speed, 0.0f, 20.0f, 12.0f, 24.0f);
+                // あまり派手にしないようにする
 
-                var velX = result.IsRightHit ? -speed : speed;
-                GetComponent<MoveCtrl>().SetVelocityForceX(velX);
+                var strength01 = TadaLib.Util.InterpUtil.Remap(Mathf.Abs(CenterPos.x - result.RhsCenterPosition.x), 0.0f, Radius * 2.0f, 1.0f, 0.0f);
+
+                var dir = Mathf.Sign(CenterPos.x - result.RhsCenterPosition.x);
+
+                var addSpeedX = TadaLib.Util.InterpUtil.Linier(0.0f, 20.0f, strength01);
+
+                var addVelX = addSpeedX * dir;
+
+                transform.position += Vector3.right * (addVelX * Time.deltaTime);
+                GetComponent<DataHolder>().PushedDir = dir > 0.0f ? 1 : -1;
             }
-            else if (result.IsTopHit)
+            
+            if (result.IsTopHit)
             {
                 // 踏まれた
                 GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);

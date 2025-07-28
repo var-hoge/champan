@@ -33,11 +33,16 @@ namespace App.Actor.Player
         #endregion
 
         #region メソッド
-        public void SetVelocityForceX(float speed)
+        public void SetVelocityForceX(float speed, bool forceChangeAxisXInput = false)
         {
             var vel = Velocity;
             vel.x = speed;
             Velocity = vel;
+
+            if (forceChangeAxisXInput)
+            {
+                _forceChangeAxisXInputOnce = true;
+            }
         }
         public void SetVelocityForceY(float speed)
         {
@@ -145,6 +150,11 @@ namespace App.Actor.Player
                 {
                     axisX = 0.0f;
                 }
+                if (_forceChangeAxisXInputOnce)
+                {
+                    _forceChangeAxisXInputOnce = false;
+                    axisX = Velocity.x > 0.0f ? 1.0f : -1.0f;
+                }
                 var addVelX = axisX * accelX * deltaTime;
 
                 newVel.x += addVelX;
@@ -222,9 +232,9 @@ namespace App.Actor.Player
             Velocity = newVel;
 
             var rateY = 1.0f;
-            if(GameSequenceManager.Instance != null && GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
+            if (GameSequenceManager.Instance != null && GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.AfterBattle)
             {
-                rateY = 2.0f; 
+                rateY = 2.0f;
             }
             var vel3 = new Vector3(Velocity.x * SpeedRateX, Velocity.y * SpeedRateY * rateY, 0.0f);
             transform.position += vel3 * deltaTime;
@@ -265,6 +275,7 @@ namespace App.Actor.Player
         Vector2 _moveLimitPos = new Vector2(-50.0f, 50.0f);
 
         TadaLib.Util.Timer _uncontrollableTimer = new TadaLib.Util.Timer(2.0f);
+        bool _forceChangeAxisXInputOnce = false;
         #endregion
     }
 }

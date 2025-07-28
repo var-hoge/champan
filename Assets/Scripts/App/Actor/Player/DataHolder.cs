@@ -28,6 +28,7 @@ namespace App.Actor.Player
         public Vector2 MaxVelocity { get; set; } = Vector2.zero;
         public float JumpPower { get; set; } = 10.0f;
         public float Gravity { get; set; } = -10.0f;
+        public int PushedDir { get; set; } = 0; // 左が-1、右が1
 
         //public Bubble LastLandingBubble { get; set; } = null;
 

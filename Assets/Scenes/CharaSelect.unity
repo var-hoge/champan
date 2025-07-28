@@ -1659,6 +1659,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1326331723319440163, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8817762753609954406, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: _moveLimitPos.x
       value: -11.7
@@ -1903,6 +1907,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 315043585835928836, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1326331723319440163, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
@@ -6116,7 +6124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5ce47ddb3e48d4a911c8cab24d31cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _section: 0
+  _section: 2
 --- !u!4 &1595361891
 Transform:
   m_ObjectHideFlags: 0
@@ -7181,6 +7189,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 315043585835928836, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1326331723319440163, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
@@ -8502,6 +8514,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 315043585835928836, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1326331723319440163, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4084096041492405670, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
