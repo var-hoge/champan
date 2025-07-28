@@ -203,6 +203,7 @@ GameObject:
   - component: {fileID: 2409276670051547345}
   - component: {fileID: 3459226316223657637}
   - component: {fileID: 1326331723319440163}
+  - component: {fileID: 2007366303116001842}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -505,3 +506,16 @@ MonoBehaviour:
   _jumpWaitDurationSec: {x: 0.3, y: 0.8}
   _reactionSec: 0.7
   _targetBubbleTargetPosShift: 1
+--- !u!114 &2007366303116001842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139938000420098449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 194603a5c2070f04696eb9fe370d8920, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _body: {fileID: 1196567346848327988}
