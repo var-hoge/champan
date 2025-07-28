@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RunAwayCrownPrefab: {fileID: 7404558613714429827, guid: 2ce63459128e6e84ca727f4162e893a1, type: 3}
   FinishCrownPrefab: {fileID: 1886653595746825039, guid: 4bb1966bed3b1ed4daaf8b6e8311cd11, type: 3}
+  InitShieldValue: 10

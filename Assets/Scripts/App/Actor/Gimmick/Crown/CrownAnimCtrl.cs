@@ -35,7 +35,7 @@ namespace App.Actor.Gimmick.Crown
                 var cnt when cnt >= 4 => 1.5f,
                 var cnt when cnt >= 3 => 2.0f,
                 var cnt when cnt >= 2 => 2.3f,
-                var cnt when cnt >= 1 => 2.5f,
+                var cnt when cnt >= 0 => 2.5f,
                 _ => 0.0f,
             };
 

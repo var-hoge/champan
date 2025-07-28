@@ -21,6 +21,13 @@ namespace App.Actor.Gimmick.Crown
         #region メソッド
         public void SetRemainHitCount(int count)
         {
+            // @todo: 整理
+            // エフェクトの出るタイミングを調整
+            if (Manager.Instance.InitShieldValue == count && Manager.Instance.InitShieldValue == 9)
+            {
+                count++;
+            }
+
             // 残りヒット数を考慮せず、呼ばれるたびにエフェクトを追加する
             _curAppearedEffectCount = count switch
             {
@@ -33,7 +40,7 @@ namespace App.Actor.Gimmick.Crown
                 var cnt when cnt >= 4 => 4,
                 var cnt when cnt >= 3 => 4,
                 var cnt when cnt >= 2 => 5,
-                var cnt when cnt >= 1 => 5,
+                var cnt when cnt >= 0 => 5,
                 _ => 1,
             };
 
@@ -48,7 +55,7 @@ namespace App.Actor.Gimmick.Crown
                 var cnt when cnt >= 4 => 1.6f,
                 var cnt when cnt >= 3 => 1.8f,
                 var cnt when cnt >= 2 => 2.0f,
-                var cnt when cnt >= 1 => 2.0f,
+                var cnt when cnt >= 0 => 2.0f,
                 _ => 1.0f,
             };
 
@@ -105,7 +112,7 @@ namespace App.Actor.Gimmick.Crown
                     var cnt when cnt >= 4 => 20.0f,
                     var cnt when cnt >= 3 => 24.0f,
                     var cnt when cnt >= 2 => 28.0f,
-                    var cnt when cnt >= 1 => 32.0f,
+                    var cnt when cnt >= 0 => 32.0f,
                     _ => 0,
                 };
 

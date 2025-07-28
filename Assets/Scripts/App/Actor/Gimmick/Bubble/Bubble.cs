@@ -27,7 +27,6 @@ namespace App.Actor.Gimmick.Bubble
         public bool IsSpawning { get; private set; }
 
         [Header("Configurations")]
-        [SerializeField] private int crownStartShield;
         [SerializeField] private BubbleShieldConfig[] shieldConfigs;
 
         [SerializeField] private float minSize = 2.2f;
@@ -69,7 +68,6 @@ namespace App.Actor.Gimmick.Bubble
         private bool _hasRidden = false;
         private bool _isBursting = false;
         private BubbleShieldConfig currentShieldConfig;
-        private int currentShieldValue;
         private Transform visualRoot;
         private bool _vibrating = false;
         private IEnumerator _vibrateCoroutine = null;
@@ -241,14 +239,14 @@ namespace App.Actor.Gimmick.Bubble
             }
         }
 
-        private void UpdateShield()
-        {
-            if (currentShieldValue <= 0)
-            {
-                shieldSpriteRenderer.gameObject.SetActive(false);
-                return;
-            }
-        }
+        //private void UpdateShield()
+        //{
+        //    if (currentShieldValue <= 0)
+        //    {
+        //        shieldSpriteRenderer.gameObject.SetActive(false);
+        //        return;
+        //    }
+        //}
 
         public static void SetupCrown(Bubble bubble)
         {
@@ -308,7 +306,7 @@ namespace App.Actor.Gimmick.Bubble
                     var cnt when cnt >= 4 => 0.05f,
                     var cnt when cnt >= 3 => 0.02f,
                     var cnt when cnt >= 2 => 0.0f,
-                    var cnt when cnt >= 1 => 0.0f,
+                    var cnt when cnt >= 0 => 0.0f,
                     _ => 0,
                 };
                 crownFrontBubbleRenderer.color = new Color(1.0f, 1.0f, 1.0f, alpha);
@@ -346,12 +344,17 @@ namespace App.Actor.Gimmick.Bubble
             PlaySE();
             if (HasCrown)
             {
-                Crown.Manager.Instance.ShieldValue--;
-
-                var shieldValue = Crown.Manager.Instance.ShieldValue;
+                if (Crown.Manager.Instance.ShieldValue == 0)
+                {
+                    Crown.Manager.Instance.ExShieldValue--;
+                }
+                else
+                {
+                    Crown.Manager.Instance.ShieldValue--;
+                }
 
                 // ÅŒã‚Ì‰‰o
-                if (shieldValue == 0)
+                if (Manager.Instance.IsShieldDestroyed)
                 {
                     // U“®
                     {
@@ -380,7 +383,7 @@ namespace App.Actor.Gimmick.Bubble
                         var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
                         if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                         {
-                            var durationSec = shieldValue switch
+                            var durationSec = Manager.Instance.ShieldValue switch
                             {
                                 var value when value == 9 => 0.12f,
                                 var value when value == 8 => 0.14f,

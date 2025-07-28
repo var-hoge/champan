@@ -27,7 +27,7 @@ namespace App.Actor.Gimmick.Bubble
 
         private void TeleportCrown()
         {
-            if (Crown.Manager.Instance.ShieldValue == 0)
+            if (Crown.Manager.Instance.IsShieldDestroyed)
             {
                 Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
                 return;
