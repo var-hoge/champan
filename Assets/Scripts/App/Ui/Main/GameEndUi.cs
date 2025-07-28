@@ -44,20 +44,18 @@ namespace App.Ui.Main
                 bubble.DoBurst();
             }
 
-            await UniTask.WaitForSeconds(1.8f);
+            await UniTask.WaitForSeconds(1.5f);
 
             // 勝ち点を表示
             _winCountPanel.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
 
-            await UniTask.WaitForSeconds(2.5f);
-
-            await UniTask.WaitForSeconds(0.4f);
+            await UniTask.WaitForSeconds(2.3f);
 
             _continueButton.gameObject.SetActive(true);
             _continueButton.OnSelected();
 
-            await UniTask.WaitForSeconds(0.1f);
+            await UniTask.WaitForSeconds(0.03f);
 
             // クリックまで待つ
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;

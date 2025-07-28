@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using DG.Tweening;
+using UnityEditor.Build;
 
 namespace Ui.Main
 {
@@ -16,6 +17,11 @@ namespace Ui.Main
     public class CountDownEffect
         : MonoBehaviour
     {
+        #region static プロパティ
+        public static bool IsFirst { get; set; } = false;
+        public static bool IsLast { get; set; } = false;
+        #endregion
+
         #region プロパティ
         #endregion
 
@@ -27,8 +33,9 @@ namespace Ui.Main
         {
             var rectTransform = GetComponent<RectTransform>();
 
-            if (_isFirst)
+            if (_isFirstInnter)
             {
+                _isFirstInnter = false;
                 _initPos = rectTransform.position;
                 _initLocalEulerAngles = rectTransform.localEulerAngles;
                 _initScale = rectTransform.localScale;
@@ -43,12 +50,10 @@ namespace Ui.Main
             if (_isUseForceStaging is false)
             {
                 _cnt = 10;
-                _isFirst = false;
+                _isFirstInnter = false;
             }
 
-            var isLast = _cnt == 4;
-
-            if (isLast)
+            if (IsLast)
             {
                 rectTransform.localScale = _initScale * 1.5f;
             }
@@ -59,7 +64,7 @@ namespace Ui.Main
             var initLocalEulerAngles = rectTransform.localEulerAngles;
             var initScale = rectTransform.localScale;
 
-            var targetPos = initPos + (initPos - _center.position).normalized * (_moveDist * (isLast ? 2.0f : 1.0f));
+            var targetPos = initPos + (initPos - _center.position).normalized * (_moveDist * (IsLast ? 2.0f : 1.0f));
             var seq = DOTween.Sequence();
             seq.Append(rectTransform.DOMove(targetPos, _moveDurationSec).SetEase(Ease.OutBack));
 
@@ -69,7 +74,7 @@ namespace Ui.Main
                 return;
             }
 
-            seq.AppendInterval(_intervalDurationSec * (_isFirst ? 3.0f : isLast ? 0.2f : 1.0f));
+            seq.AppendInterval(_intervalDurationSec * (IsFirst ? 3.0f : IsLast ? 0.2f : 1.0f));
 
             var targetEulerAngles = initLocalEulerAngles;
             targetEulerAngles.z += _rotateDeg;
@@ -83,7 +88,7 @@ namespace Ui.Main
                 GetComponent<UnityEngine.UI.Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
             });
 
-            _isFirst = false;
+            _isFirstInnter = false;
             ++_cnt;
         }
 
@@ -132,7 +137,7 @@ namespace Ui.Main
 
         bool _isAutoRotateEnabled = false;
 
-        bool _isFirst = true;
+        bool _isFirstInnter = true;
         Vector3 _initPos;
         Vector3 _initLocalEulerAngles;
         Vector3 _initScale;

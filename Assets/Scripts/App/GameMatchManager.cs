@@ -26,6 +26,44 @@ namespace App
         /// CPUが試合に出場するかどうか
         /// </summary>
         public bool IsExistCpu { private set; get; } = true;
+
+        /// <summary>
+        /// 勝ち点がリーチのプレイヤーがいるかどうか
+        /// </summary>
+        public bool IsExistReachPlayer
+        {
+            get
+            {
+                for (int idx = 0; idx < _winCounts.Count; ++idx)
+                {
+                    if (_winCounts[idx] + 1 == WinCountToMatchFinish)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// スコアを獲得したプレイヤーがいるかどうか
+        /// </summary>
+        public bool IsExistScoreGottenPlayer
+        {
+            get
+            {
+                for (int idx = 0; idx < _winCounts.Count; ++idx)
+                {
+                    if (_winCounts[idx] >= 1)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
         #endregion
 
         /// <summary>
