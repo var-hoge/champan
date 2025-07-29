@@ -16,7 +16,7 @@ namespace App.Ui.Main
     public class WinCountCrownProvider
         : MonoBehaviour
     {
-        public GameObject RentCrown(Vector3 pos, bool playAnim = false)
+        public GameObject RentCrown(Vector3 pos, bool playAnim = false, float animRate = 1.0f)
         {
             var obj = Instantiate(_crownTemplate.gameObject, transform);
             obj.gameObject.SetActive(true);
@@ -31,13 +31,13 @@ namespace App.Ui.Main
                 angles.z = _crownAnimStartDegZ;
                 rectTrasnform.localEulerAngles = angles;
                 var moveY = pos.y - _crownAnimStartPosY;
-                var durationSec = (Mathf.Abs(moveY) / 4000.0f + 0.4f) * _crownAnimDurationSecRate;
+                var durationSec = (Mathf.Abs(moveY) / 4000.0f + 0.4f) * _crownAnimDurationSecRate * animRate;
                 var dir = pos - rectTrasnform.position;
 
                 var seq = DOTween.Sequence();
                 seq.Append(rectTrasnform.DOMove(pos + dir.normalized * _crownAnimEndPosOffset, durationSec).SetEase(_crownAnimEase));
                 seq.Join(rectTrasnform.DOLocalRotate(new Vector3(0.0f, 0.0f, -360.0f), durationSec, RotateMode.FastBeyond360));
-                seq.Append(rectTrasnform.DOMove(pos, _crownAnimBackDurationSec).SetEase(_crownAnimBackEase));
+                seq.Append(rectTrasnform.DOMove(pos, _crownAnimBackDurationSec * animRate).SetEase(_crownAnimBackEase));
             }
 
             return obj.gameObject;

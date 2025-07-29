@@ -70,6 +70,20 @@ namespace App
                 return false;
             }
         }
+
+        public int TotalWinCount
+        {
+            get
+            {
+                var sum = 0;
+                for (int idx = 0; idx < _winCounts.Count; ++idx)
+                {
+                    sum += _winCounts[idx];
+                }
+
+                return sum;
+            }
+        }
         #endregion
 
         /// <summary>

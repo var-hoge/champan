@@ -41,6 +41,12 @@ namespace App.Ui.Main
 
             await UniTask.WaitForSeconds(1.5f);
 
+            if (GameMatchManager.Instance.TotalWinCount >= 2)
+            {
+                // スピーディモード
+                Time.timeScale = 1.2f;
+            }
+
             // 勝ち点を表示
             _winCountPanel.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
@@ -76,6 +82,12 @@ namespace App.Ui.Main
 
             await UniTask.WaitForSeconds(0.1f);
 
+            if (GameMatchManager.Instance.TotalWinCount >= 2)
+            {
+                // スピーディモード解除
+                Time.timeScale = 1.0f;
+            }
+
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
         }
@@ -101,7 +113,7 @@ namespace App.Ui.Main
             await UniTask.WaitForSeconds(1.2f);
 
             // 1 点先取で勝ちの場合はテンポ重視のため、パネルを出さない
-            if (GameMatchManager.Instance.WinCountToMatchFinish != 1)
+            if (GameMatchManager.Instance.TotalWinCount >= 2)
             {
                 await UniTask.WaitForSeconds(0.5f);
 

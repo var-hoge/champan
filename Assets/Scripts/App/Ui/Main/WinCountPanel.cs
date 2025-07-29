@@ -72,8 +72,8 @@ namespace App.Ui.Main
             // 演出が終わるまで待つ
             await UniTask.WaitForSeconds(_continueAppearWaitDurationSec);
 
-            // continue の表示
-            _continueButton.gameObject.SetActive(true);
+            //// continue の表示
+            //_continueButton.gameObject.SetActive(true);
         }
     }
 }
