@@ -23,12 +23,12 @@ namespace TadaLib.Scene
         #endregion
 
         #region メソッド
-        public void SetTemporaryTimeScale(float timeScale, float durationSecUnscaled, float delaySec = 0.0f)
+        public void SetTemporaryTimeScale(float timeScale, float durationSec, float delaySec = 0.0f)
         {
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
-            _ = ApplyTimeScaleAsync(timeScale, durationSecUnscaled, delaySec, _cts.Token);
+            _ = ApplyTimeScaleAsync(timeScale, durationSec, delaySec, _cts.Token);
         }
         #endregion
 
@@ -38,7 +38,7 @@ namespace TadaLib.Scene
         #endregion
 
         #region private メソッド
-        async UniTaskVoid ApplyTimeScaleAsync(float timeScale, float durationSecUnscaled, float delaySec, CancellationToken token)
+        async UniTaskVoid ApplyTimeScaleAsync(float timeScale, float durationSec, float delaySec, CancellationToken token)
         {
             try
             {
@@ -50,9 +50,9 @@ namespace TadaLib.Scene
                 Time.timeScale = timeScale;
                 BGMManager.Instance.ChangeBaseVolume(timeScale);
 
-                if (durationSecUnscaled > 0.0f)
+                if (durationSec > 0.0f)
                 {
-                    await UniTask.WaitForSeconds(durationSecUnscaled, ignoreTimeScale: true, cancellationToken: token);
+                    await UniTask.WaitForSeconds(durationSec, cancellationToken: token);
                 }
 
                 Time.timeScale = _originalTimeScale;

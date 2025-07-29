@@ -44,7 +44,7 @@ namespace TadaLib.Ui
 
         public void OnDecided()
         {
-            GetComponent<RectTransform>().DOLocalMoveY(GetComponent<RectTransform>().localPosition.y - 10.0f, 0.15f);
+            GetComponent<RectTransform>().DOLocalMoveY(GetComponent<RectTransform>().localPosition.y - 14.0f, 0.07f);
         }
         #endregion
 

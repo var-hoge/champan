@@ -28,7 +28,7 @@ namespace App.Ui.Main
         {
             // この関数が呼ばれる時点で勝ち点は加算されている
 
-            await UniTask.WaitForSeconds(0.6f);
+            await UniTask.WaitForSeconds(0.25f);
 
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
@@ -45,12 +45,10 @@ namespace App.Ui.Main
             _winCountPanel.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
 
-            await UniTask.WaitForSeconds(2.3f);
+            await UniTask.WaitForSeconds(2.2f);
 
             _continueButton.gameObject.SetActive(true);
             _continueButton.OnSelected();
-
-            await UniTask.WaitForSeconds(0.03f);
 
             // クリックまで待つ
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
@@ -76,7 +74,7 @@ namespace App.Ui.Main
 
             _continueButton.OnDecided();
 
-            await UniTask.WaitForSeconds(0.5f);
+            await UniTask.WaitForSeconds(0.1f);
 
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
@@ -111,12 +109,12 @@ namespace App.Ui.Main
                 _winCountPanel.gameObject.SetActive(true);
                 _continueButton.gameObject.SetActive(false);
 
-                await UniTask.WaitForSeconds(2.5f);
+                await UniTask.WaitForSeconds(2.2f);
 
                 _continueButton.gameObject.SetActive(true);
                 _continueButton.OnSelected();
 
-                await UniTask.WaitForSeconds(0.5f);
+                await UniTask.WaitForSeconds(0.05f);
 
                 // クリックまで待つ
                 var inputManager = TadaLib.Input.PlayerInputManager.Instance;
@@ -142,7 +140,7 @@ namespace App.Ui.Main
 
                 _continueButton.OnDecided();
 
-                await UniTask.WaitForSeconds(0.25f);
+                await UniTask.WaitForSeconds(0.1f);
             }
 
             _ = _canvas.DOFade(0.0f, 0.2f);

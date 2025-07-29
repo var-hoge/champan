@@ -5215,7 +5215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8388189f3453748ad7f07306038127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _durationSec: 0.3
+  _durationSec: 0.15
   _movePixel: {x: 0, y: 30}
 --- !u!114 &932615569
 MonoBehaviour:

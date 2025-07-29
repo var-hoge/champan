@@ -368,7 +368,7 @@ namespace App.Actor.Gimmick.Bubble
                     GameSequenceManager.WinnerPlayerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
                     GameSequenceManager.Instance.GameOver();
 
-                    TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.015f, 1.0f, 0.0f);
+                    TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.01f, 0.015f, 0.0f);
 
                     transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
                     {
@@ -409,7 +409,7 @@ namespace App.Actor.Gimmick.Bubble
                         RunAwayCrown.Create(transform.position, scale);
                         crownSpriteParent.gameObject.SetActive(false);
 
-                        TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.02f, 1.0f, 0.0f);
+                        TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.01f, 0.008f, 0.0f);
                     }
 
                     transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>

@@ -70,10 +70,9 @@ namespace App.Actor.Gimmick.Crown
 
         private void Start()
         {
-            if (GameMatchManager.Instance.IsExistReachPlayer)
+            if (GameMatchManager.Instance.WinCountToMatchFinish != 1 && GameMatchManager.Instance.IsExistReachPlayer)
             {
                 _doFaleFinishStaging = Random.Range(0, 8) <= 0;
-                Debug.Log(_doFaleFinishStaging);
             }
 
         }
