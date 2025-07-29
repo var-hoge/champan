@@ -368,9 +368,11 @@ namespace App.Actor.Gimmick.Bubble
                     GameSequenceManager.WinnerPlayerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
                     GameSequenceManager.Instance.GameOver();
 
-                    var scale = transform.lossyScale.x;
+                    TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.015f, 1.0f, 0.0f);
+
                     transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
                     {
+                        var scale = transform.lossyScale.x;
                         FinishCrown.Create(transform.position, scale);
                         Destroy(gameObject);
                     });
@@ -396,17 +398,28 @@ namespace App.Actor.Gimmick.Bubble
                                 var value when value == 1 => 0.28f,
                                 _ => 0.12f,
                             };
-                            Debug.Log(durationSec);
                             TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).VibrateAdvanced(0.2f, 0.5f, durationSec);
                         }
                     }
 
-                    var scale = transform.lossyScale.x;
-                    //// テンポ重視のため早めに出す
-                    //RunAwayCrown.Create(transform.position, scale);
-                    //crownSpriteParent.gameObject.SetActive(false);
+                    // フェイク演出
+                    if (Manager.Instance.DoFakeFinishStaging)
+                    {
+                        var scale = transform.lossyScale.x;
+                        RunAwayCrown.Create(transform.position, scale);
+                        crownSpriteParent.gameObject.SetActive(false);
+
+                        TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.02f, 1.0f, 0.0f);
+                    }
+
                     transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
                     {
+                        if (Manager.Instance.DoFakeFinishStaging)
+                        {
+                            var scale = transform.lossyScale.x;
+                            RunAwayCrown.Create(transform.position, scale);
+                            crownSpriteParent.gameObject.SetActive(false);
+                        }
                         Destroy(gameObject);
                     });
                 }

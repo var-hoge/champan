@@ -1,3 +1,4 @@
+using App.Actor.Gimmick.Crown;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
@@ -52,7 +53,12 @@ namespace App.Actor.Gimmick.Bubble
             //Transform crown = Crown.Manager.Instance.CrownBubble.CrownSpriteRenderer;
             //crown.SetParent(null);
 
-            // クラウンが逃げる演出が出るまで待つ
+            if (Manager.Instance.DoFakeFinishStaging)
+            {
+                // クラウンが逃げる演出が出るまで待つ
+                await UniTask.WaitForSeconds(0.8f);
+            }
+
             await UniTask.WaitForSeconds(0.05f);
 
             var bubbles = FindObjectsByType<Bubble>(FindObjectsSortMode.None)

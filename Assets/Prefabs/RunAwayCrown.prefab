@@ -85,7 +85,7 @@ MonoBehaviour:
     defaultState: 0
   - clip: {fileID: 7400000, guid: 13d243ad69f7ca3419359649a35f0580, type: 2}
     name: RunAway
-    speed: 1
+    speed: 0.9
     defaultState: 0
 --- !u!114 &7404558613714429827
 MonoBehaviour:
@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a69cd4723a80a448949156b46fc7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lifeTime: 1
 --- !u!1 &7357281394240820344
 GameObject:
   m_ObjectHideFlags: 0

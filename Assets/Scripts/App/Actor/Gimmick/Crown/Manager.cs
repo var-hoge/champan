@@ -21,11 +21,26 @@ namespace App.Actor.Gimmick.Crown
         public int ExShieldValue { get; set; }
         public bool IsShieldDestroyed => ShieldValue == 0 && ExShieldValue == 0;
         public int InitShieldValue { private set; get; }
+        public bool DoFakeFinishStaging
+        {
+            get
+            {
+                if (_doFaleFinishStaging is false)
+                {
+                    return false;
+                }
+
+                return ShieldValue + ExShieldValue == 1;
+            }
+        }
+        bool _doFaleFinishStaging = false;
+
         public Bubble.Bubble CrownBubble { get; set; }
 
         public int LastCrownRidePlayerIdx { get; set; } = 0;
 
         public bool IsFirstCrownSetup { get; set; } = true;
+
         #endregion
 
         #region メソッド
@@ -47,7 +62,20 @@ namespace App.Actor.Gimmick.Crown
             }
 
             InitShieldValue = ShieldValue;
+
+            _doFaleFinishStaging = false;
+
             Debug.Log($"ShieldValue/Ex: {ShieldValue}/{ExShieldValue}");
+        }
+
+        private void Start()
+        {
+            if (GameMatchManager.Instance.IsExistReachPlayer)
+            {
+                _doFaleFinishStaging = Random.Range(0, 8) <= 0;
+                Debug.Log(_doFaleFinishStaging);
+            }
+
         }
         #endregion
 

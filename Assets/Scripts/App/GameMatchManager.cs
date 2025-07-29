@@ -34,6 +34,12 @@ namespace App
         {
             get
             {
+                if (_winCounts.Count == 0)
+                {
+                    // セットアップ前
+                    return false;
+                }
+
                 for (int idx = 0; idx < _winCounts.Count; ++idx)
                 {
                     if (_winCounts[idx] + 1 == WinCountToMatchFinish)

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79274b109a447e94ba8e8def48e40939, type: 3}
   m_Name: CpuSettingDefault
   m_EditorClassIdentifier: 
-  IsCpuPlayer0: 0
+  IsCpuPlayer0: 1
   IsCpuPlayer1: 1
   IsCpuPlayer2: 1
   IsCpuPlayer3: 1

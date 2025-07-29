@@ -28,12 +28,7 @@ namespace App.Ui.Main
         {
             // この関数が呼ばれる時点で勝ち点は加算されている
 
-            // スローにする
-            Time.timeScale = 0.02f;
-
-            await UniTask.WaitForSeconds(1.0f * Time.timeScale);
-
-            Time.timeScale = 1.0f;
+            await UniTask.WaitForSeconds(0.6f);
 
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
