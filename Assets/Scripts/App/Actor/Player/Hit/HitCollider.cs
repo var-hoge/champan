@@ -15,7 +15,8 @@ namespace App.Actor.Player.Hit
     /// HitCollider
     /// </summary>
     public class HitCollider
-        : MonoBehaviour
+        : BaseProc
+        , IProcPostMove
         , IScaleChanger
     {
         #region プロパティ
@@ -33,29 +34,45 @@ namespace App.Actor.Player.Hit
         #region メソッド
         public void ReflectHitResult(in Manager.HitResult result)
         {
+            if (_posCache is null)
+            {
+                _posCache = transform.position;
+            }
+
             if (result.IsButtomHit)
             {
                 // ジャンプ
                 State.StateJump.ChangeState(transform.gameObject, State.StateJump.JumpPowerKind.Spring);
             }
-            
-            if (result.IsLeftHit || result.IsRightHit)
+
+            static void ReflectLeftOrRightHitResult(HitCollider obj, in Manager.HitResult result, bool isLeft)
             {
                 // 左右吹き飛び
                 // あまり派手にしないようにする
 
-                var strength01 = TadaLib.Util.InterpUtil.Remap(Mathf.Abs(CenterPos.x - result.RhsCenterPosition.x), 0.0f, Radius * 2.0f, 1.0f, 0.0f);
+                var rhsCenterPos = isLeft ? result.RhsCenterPositionLeftHit : result.RhsCenterPositionRightHit;
+                var strength01 = TadaLib.Util.InterpUtil.Remap(Mathf.Abs(obj._posCache.Value.x - rhsCenterPos.x), 0.0f, obj.Radius * 2.0f, 1.0f, 0.0f);
 
-                var dir = Mathf.Sign(CenterPos.x - result.RhsCenterPosition.x);
+                var dir = Mathf.Sign(obj._posCache.Value.x - rhsCenterPos.x);
 
                 var addSpeedX = TadaLib.Util.InterpUtil.Linier(0.0f, 20.0f, strength01);
 
                 var addVelX = addSpeedX * dir;
 
-                transform.position += Vector3.right * (addVelX * Time.deltaTime);
-                GetComponent<DataHolder>().PushedDir = dir > 0.0f ? 1 : -1;
+                obj.transform.position += Vector3.right * (addVelX * Time.deltaTime);
+                obj._moveDiffX += addVelX * Time.deltaTime;
             }
-            
+
+            if (result.IsLeftHit)
+            {
+                ReflectLeftOrRightHitResult(this, result, isLeft: true);
+            }
+
+            if (result.IsRightHit)
+            {
+                ReflectLeftOrRightHitResult(this, result, isLeft: false);
+            }
+
             if (result.IsTopHit)
             {
                 // 踏まれた
@@ -93,6 +110,18 @@ namespace App.Actor.Player.Hit
         }
         #endregion
 
+        #region IPostMove の実装
+        public void OnPostMove()
+        {
+            if (Mathf.Abs(_moveDiffX) > 0.01f)
+            {
+                GetComponent<DataHolder>().PushedDir = _moveDiffX > 0.0f ? 1 : -1;
+            }
+            _moveDiffX = 0.0f;
+            _posCache = null;
+        }
+        #endregion
+
         #region IScaleChangerの実装
         public Vector3 ScaleRate { private set; get; } = Vector3.one;
 
@@ -110,6 +139,8 @@ namespace App.Actor.Player.Hit
         float _radius = 0.5f;
 
         Sequence? _seq = null;
+        Vector2? _posCache;
+        float _moveDiffX = 0.0f;
         #endregion
 
         #region privateメソッド

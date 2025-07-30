@@ -20,9 +20,11 @@ namespace App.Actor.Player.Hit
         {
             public bool IsLeftHit;
             public float LeftHitSpeed;
+            public Vector2 RhsCenterPositionLeftHit;
 
             public bool IsRightHit;
             public float RightHitSpeed;
+            public Vector2 RhsCenterPositionRightHit;
 
             public bool IsButtomHit;
             public float ButtomHitSpeed;
@@ -30,7 +32,6 @@ namespace App.Actor.Player.Hit
             public bool IsTopHit;
             public float TopHitSpeed;
 
-            public Vector2 RhsCenterPosition;
         }
         #endregion
 
@@ -141,11 +142,13 @@ namespace App.Actor.Player.Hit
                             {
                                 result.IsRightHit = true;
                                 result.RightHitSpeed = Mathf.Max(result.RightHitSpeed, Mathf.Max(0.0f, -velocity.x));
+                                result.RhsCenterPositionRightHit = rhs.CenterPos;
                             }
                             else if (deg > 135.0f || deg < -135.0f)
                             {
                                 result.IsLeftHit = true;
                                 result.LeftHitSpeed = Mathf.Max(result.LeftHitSpeed, Mathf.Max(0.0f, velocity.x));
+                                result.RhsCenterPositionLeftHit = rhs.CenterPos;
                             }
                             else if (deg >= 45.0f && deg <= 135.0f)
                             {
@@ -172,7 +175,6 @@ namespace App.Actor.Player.Hit
                         }
 
                         _history[lhs.PlayerIdx][rhs.PlayerIdx] = Time.time;
-                        result.RhsCenterPosition = rhs.CenterPos;
                     }
                 }
 
@@ -182,6 +184,7 @@ namespace App.Actor.Player.Hit
             for (int idx = 0; idx < results.Count; ++idx)
             {
                 _colliders[idx].ReflectHitResult(results[idx]);
+                //Debug.Log($"{idx}: {results[idx].RhsCenterPositionLeftHit}/{results[idx].RhsCenterPositionRightHit}");
             }
         }
         #endregion
