@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
 using UnityEngine.Video;
+using TadaLib.Ui;
 
 namespace App.Ui.Title
 {
@@ -37,21 +38,32 @@ namespace App.Ui.Title
         [SerializeField]
         Canvas _mainCanvas;
 
-        bool _isVideoFinished = false;
+        [SerializeField]
+        List<Button> _items;
 
-        [SerializeField] private Transform _start;
-        [SerializeField] private GameObject _startOnImage;
-        [SerializeField] private GameObject _startOffImage;
-        [SerializeField] private Transform _exit;
-        [SerializeField] private GameObject _exitOnImage;
-        [SerializeField] private GameObject _exitOffImage;
+        int _selectedIdx = 0;
         #endregion
 
         #region privateメソッド
         public async UniTask Staging()
         {
+            await PlayIntro();
+
+            await AppearLogo();
+
+            // BGMの再生
+            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
+
+            // 選択
+            await SelectItem();
+        }
+
+        async UniTask PlayIntro()
+        {
             // UI が動画を上書きしてしまったので、再生終了まで非表示にする
             _mainCanvas.gameObject.SetActive(false);
+
+            _introCanvas.gameObject.SetActive(true);
 
             // 動画準備開始
             _introPlayer.Prepare();
@@ -59,17 +71,11 @@ namespace App.Ui.Title
             // 動画再生のために、各種システムが安定化するまで待つ
             await UniTask.WaitForSeconds(0.5f);
 
-            // completed しても動画の読み込みが続いていることがある
-            //_introPlayer.prepareCompleted += (vp) =>
-            //{
-            //    vp.Play();
-            //    // 再生開始までの背景
-            //    _introCanvas.gameObject.SetActive(false);
-            //};
+            var isVideoFinished = false;
 
             _introPlayer.loopPointReached += (vp) =>
             {
-                _isVideoFinished = true;
+                isVideoFinished = true;
             };
 
             await UniTask.WaitUntil(() => _introPlayer.isPrepared);
@@ -81,7 +87,7 @@ namespace App.Ui.Title
             var lastClickedTime = -10.0f;
             while (true)
             {
-                if (_isVideoFinished)
+                if (isVideoFinished)
                 {
                     break;
                 }
@@ -103,6 +109,10 @@ namespace App.Ui.Title
             }
 
             _introCanvas.gameObject.SetActive(false);
+        }
+
+        async UniTask AppearLogo()
+        {
             _mainCanvas.gameObject.SetActive(true);
 
             // ロゴのアニメーション
@@ -160,118 +170,83 @@ namespace App.Ui.Title
             }
 
             await UniTask.WaitForSeconds(1.2f);
+        }
 
-            // START・EXITのアニメーション
-            _start.DOScale(Vector3.one * 1.1f, 0.15f);
-            _exit.DOScale(Vector3.one, 0.15f);
-            // BGMの再生
-            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
+        async UniTask SelectItem()
+        {
+            // 項目生成
+
+            var _selectedIdx = 0;
+
+            for (int idx = 0; idx < _items.Count; ++idx)
+            {
+                if (_selectedIdx == idx)
+                {
+                    _items[idx].OnSelected();
+                }
+                else
+                {
+                    _items[idx].OnUnselected();
+                }
+
+                _items[idx].GetComponent<RectTransform>().DOScale(Vector3.one, 0.15f);
+            }
 
             await UniTask.WaitForSeconds(0.2f);
 
+            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(0);
+
+            while (true)
             {
-                var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(0);
-                var isPushed = false;
-                var isStartSelected = true;
-                var isInputValid = true;
-                inputProxy.OnAction += OnActoinTrigged;
-                inputProxy.OnMove += OnMove;
-
-                while (true)
+                // 決定優先
+                if (inputProxy.IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
                 {
-                    if (isPushed)
-                    {
-                        if (isStartSelected)
-                        {
-                            // SE再生
-                            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
-                            inputProxy.OnAction -= OnActoinTrigged;
-                            inputProxy.OnMove -= OnMove;
-                            TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f);
-                            break;
-                        }
-                        else
-                        {
-#if UNITY_EDITOR
-                            UnityEditor.EditorApplication.isPlaying = false;
-#else
-                        Application.Quit();
-#endif
-                        }
-                    }
-                    await UniTask.Yield();
+                    break;
                 }
 
-                void OnActoinTrigged()
+                // 次点で移動
+                if (inputProxy.AxisTrigger(TadaLib.Input.AxisCode.Vertical, out var isPositive))
                 {
-                    isPushed = true;
-                }
+                    // 移動
+                    var idxPrev = _selectedIdx;
+                    _selectedIdx = (_selectedIdx + (isPositive ? 1 : -1) + _items.Count) % _items.Count;
 
-                void OnMove(Vector2 value)
-                {
-                    if (!isInputValid || value.x == 0)
-                    {
-                        isInputValid = true;
-                        return;
-                    }
+                    _items[idxPrev].OnUnselected();
+                    _items[_selectedIdx].OnSelected();
 
-                    isInputValid = false;
-                    isStartSelected = !isStartSelected;
-                    // 表示イメージの切替
-                    _startOnImage.SetActive(isStartSelected);
-                    _startOffImage.SetActive(!isStartSelected);
-                    _exitOnImage.SetActive(!isStartSelected);
-                    _exitOffImage.SetActive(isStartSelected);
-                    // 文字サイズの設定
-                    var (startValue, exitvalue) = isStartSelected ? (1.1f, 1f) : (1f, 1.1f);
-                    _start.DOScale(Vector3.one * startValue, 0.1f);
-                    _exit.DOScale(Vector3.one * exitvalue, 0.1f);
-                    // SE再生
+                    // SE 再生
                     SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
                 }
+
+                await UniTask.Yield();
+            }
+
+            // この時点で決定確定
+
+            // SE 再生
+            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+
+            if (_selectedIdx == 0)
+            {
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f);
+            }
+            else if (_selectedIdx == 1)
+            {
+                Debug.Log("Credit");
+            }
+            //                else if(_selectedIdx == 2)
+            //                {
+            //#if UNITY_EDITOR
+            //                    UnityEditor.EditorApplication.isPlaying = false;
+            //#else
+            //                        Application.Quit();
+            //#endif
+            //                }
+            else
+            {
+                Debug.LogError("未設定");
             }
         }
-
-        // ロールバックできるように、もとの実装を残している
-        //public async UniTask Staging()
-        //{
-        //    // 最低 2 秒は待つ
-
-        //    await UniTask.WaitForSeconds(2.0f);
-
-        //    // 誰かがボタンを押したら次へ
-        //    var gameController = GameController.Instance;
-        //    bool isPushed = false;
-
-        //    void OnActoinTrigged()
-        //    {
-        //        isPushed = true;
-        //    }
-
-        //    for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
-        //    {
-        //        gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction += OnActoinTrigged;
-        //    }
-
-        //    while (!isPushed)
-        //    {
-        //        await UniTask.Yield();
-        //    }
-
-        //    // TODO: UI が動く
-
-        //    // コールバック解除
-        //    for (int idx = 0; idx < gameController.MaxPlayerCount; ++idx)
-        //    {
-        //        gameController.GetPlayerInput(idx).GetComponent<PlayerInputHandler>().OnAction -= OnActoinTrigged;
-        //    }
-
-        //    // 次のシーンへ
-
-        //    TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.5f, 0.5f);
-        //}
-
-
         #endregion
     }
 }

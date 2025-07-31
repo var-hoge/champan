@@ -79,10 +79,7 @@ namespace Ui.Main
                 // 上下移動
                 for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
                 {
-                    var axis = inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical);
-
-                    // 入力値が少ない場合はなし
-                    if (Mathf.Abs(axis) < 0.5f)
+                    if (inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical, out var isPositive) is false)
                     {
                         continue;
                     }

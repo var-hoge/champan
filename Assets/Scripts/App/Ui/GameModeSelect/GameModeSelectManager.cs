@@ -198,15 +198,10 @@ namespace App.Ui.GameModeSelect
             //for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
             for (int idx = 0; idx < 1; ++idx)
             {
-                var axis = inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical);
-
-                // 入力値が少ない場合はなし
-                if (Mathf.Abs(axis) < 0.5f)
+                if (inputManager.InputProxy(idx).AxisTrigger(TadaLib.Input.AxisCode.Vertical, out var isPositive))
                 {
-                    continue;
+                    return isPositive ? InputResult.Cancel : InputResult.Decide;
                 }
-
-                return axis > 0.0f ? InputResult.Cancel : InputResult.Decide;
             }
 
             // ボタン入力

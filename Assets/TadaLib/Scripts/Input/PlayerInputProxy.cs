@@ -92,8 +92,10 @@ namespace TadaLib.Input
             return AxisImpl(code, _playerInput);
         }
 
-        public float AxisTrigger(AxisCode code)
+        public bool AxisTrigger(AxisCode code, out bool isPositive)
         {
+            isPositive = false;
+
             var deadZone = 0.5f;
 
             var prev = code is AxisCode.Horizontal ? _axisPrev.x : _axisPrev.y;
@@ -101,20 +103,21 @@ namespace TadaLib.Input
 
             if (Mathf.Abs(cur) < deadZone)
             {
-                return 0.0f;
+                return false;
             }
 
             // 入力開始時ではない
             if (cur > deadZone && prev > deadZone)
             {
-                return 0.0f;
+                return false;
             }
             if (cur < -deadZone && prev < -deadZone)
             {
-                return 0.0f;
+                return false;
             }
 
-            return cur > 0.0f ? 1.0f : -1.0f;
+            isPositive = cur > 0.0f;
+            return true;
         }
 
         public void Vibrate(VibrateType type)
