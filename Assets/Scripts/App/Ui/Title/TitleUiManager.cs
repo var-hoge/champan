@@ -11,7 +11,6 @@ using DG.Tweening;
 using KanKikuchi.AudioManager;
 using UnityEngine.Video;
 using TadaLib.Ui;
-using static UnityEditor.PlayerSettings;
 
 namespace App.Ui.Title
 {

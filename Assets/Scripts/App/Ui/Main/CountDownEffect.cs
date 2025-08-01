@@ -7,7 +7,6 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using DG.Tweening;
-using UnityEditor.Build;
 
 namespace Ui.Main
 {
