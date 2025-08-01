@@ -112,6 +112,9 @@ namespace App.Ui.CharaSelect
             {
                 // @todo: アニメ
                 _startArea.gameObject.SetActive(true);
+                var view = _startArea.transform.Find("View");
+                view.localScale = Vector3.zero;
+                view.DOScale(1.0f, 0.5f).SetEase(Ease.OutBack);
             }
 
             return true;
@@ -214,7 +217,6 @@ namespace App.Ui.CharaSelect
                     continue;
                 }
                 _charas[idx].ChangeSprite(_unselectedCharaSprites[SelectIdxToCharaIdx(idx)]);
-                _charas[idx].SetRotateZero();
             }
 
             _isSceneChanging = true;

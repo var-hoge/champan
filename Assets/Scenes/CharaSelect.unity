@@ -669,12 +669,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 628695491}
   - {fileID: 1041836961}
   - {fileID: 1599544566}
   - {fileID: 540480597}
   - {fileID: 1418645086}
   - {fileID: 1451592240}
+  - {fileID: 628695491}
   m_Father: {fileID: 973324583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -694,7 +694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8de80d4d1f14e45b25d08f32fd90e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 628695492}
+  _body: {fileID: 1041836962}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_FuransuPan
 --- !u!1 &129883390
@@ -3266,7 +3266,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000015258789, y: 0}
   m_SizeDelta: {x: 512, y: 345}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &628695492
@@ -3386,11 +3386,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.73, y: -4.04, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 1664207074}
+  - {fileID: 1755203247}
   - {fileID: 1671308594}
-  - {fileID: 1531763402}
   - {fileID: 2058510189}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7354,12 +7353,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1531763401}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: -0.1, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.3, y: 2.5, z: 0}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 640371193}
+  m_Father: {fileID: 1755203247}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1531763404
 SpriteRenderer:
@@ -8125,12 +8124,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1664207073}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.5, y: 2.6, z: 0}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 640371193}
+  m_Father: {fileID: 1755203247}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1664207075
 SpriteRenderer:
@@ -8758,6 +8757,39 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1746926960}
   m_CullTransparentMesh: 1
+--- !u!1 &1755203246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1755203247}
+  m_Layer: 0
+  m_Name: View
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1755203247
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755203246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.5, y: -2.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 1664207074}
+  - {fileID: 1531763402}
+  m_Father: {fileID: 640371193}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1756401163 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3705494403083139999, guid: d0ebf3bdb9bb37d498a419a8e5f8a2f4, type: 3}
@@ -9288,12 +9320,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2044831126}
   - {fileID: 1766533455}
   - {fileID: 905379830}
   - {fileID: 820059089}
   - {fileID: 1746926961}
   - {fileID: 1109516106}
+  - {fileID: 2044831126}
   m_Father: {fileID: 973324583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -9313,7 +9345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8de80d4d1f14e45b25d08f32fd90e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 2044831127}
+  _body: {fileID: 1766533456}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_NekoPan
 --- !u!1 &1870122505
@@ -9805,12 +9837,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1704100676}
   - {fileID: 32860632}
   - {fileID: 746656416}
   - {fileID: 350650459}
   - {fileID: 2021513639}
   - {fileID: 531287571}
+  - {fileID: 1704100676}
   m_Father: {fileID: 973324583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -9830,7 +9862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8de80d4d1f14e45b25d08f32fd90e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 1704100677}
+  _body: {fileID: 32860633}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_MelonPan
 --- !u!1001 &1934664028
@@ -10284,12 +10316,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 53101558}
   - {fileID: 1870122506}
   - {fileID: 1399600055}
   - {fileID: 104371434}
   - {fileID: 2000787930}
   - {fileID: 1408265427}
+  - {fileID: 53101558}
   m_Father: {fileID: 973324583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -10309,7 +10341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8de80d4d1f14e45b25d08f32fd90e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 53101559}
+  _body: {fileID: 1870122507}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_KaniPan
 --- !u!1 &2021513638
