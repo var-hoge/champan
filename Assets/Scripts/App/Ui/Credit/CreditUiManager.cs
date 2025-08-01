@@ -70,6 +70,7 @@ namespace App.Ui.Credit
                 await UniTask.Yield();
             }
 
+            Title.TitleUiManager.IsBackFromCredit = true;
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.3f, 0.3f);
         }
         #endregion
