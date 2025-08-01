@@ -214,6 +214,7 @@ namespace App.Ui.CharaSelect
                     continue;
                 }
                 _charas[idx].ChangeSprite(_unselectedCharaSprites[SelectIdxToCharaIdx(idx)]);
+                _charas[idx].SetRotateZero();
             }
 
             _isSceneChanging = true;

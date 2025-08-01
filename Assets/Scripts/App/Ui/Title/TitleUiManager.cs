@@ -42,6 +42,9 @@ namespace App.Ui.Title
         [SerializeField]
         List<Button> _items;
 
+        [SerializeField]
+        UnityEngine.UI.Image _bgCharaSelect;
+
         int _selectedIdx = 0;
 
         public static bool IsBackFromCredit = false;
@@ -257,18 +260,49 @@ namespace App.Ui.Title
 
             if (_selectedIdx == 0)
             {
+                // 次シーンへと繋ぐ
                 async UniTask PreUnload()
                 {
                     var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-                    DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(0.0f, 0.0f, 0.0f), 0.5f);
+                    DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(titleBgmask.Scale.x * 0.8f, 0.0f, 0.0f), 0.5f);
+
+                    Vector2 ParentPos = new Vector3(0.0f, 82.11f);
+                    const float ParentScale = 0.84f;
+                    var charInfos = new (string name, Vector2 pos, float rotZ, float scale)[]
+                    {
+                        ("Chara1", new Vector2(-481.7f, -37.5f), 17.49f, 1.08f),
+                        ("Chara2", new Vector2(187.3f, -68.8f), 0.0f, 1.2f),
+                        ("Chara3", new Vector2(542.3f, 149.7f), -13.3f, 1.12f),
+                        ("Chara4", new Vector2(-104.4f, 188.7f), -10.06f, 1.16f),
+                    };
+
+                    foreach (var (name, pos, rotZ, scale) in charInfos)
+                    {
+                        var rt = GameObject.Find(name).GetComponent<RectTransform>();
+                        rt.DOKill();
+                        rt.DOMove(pos * ParentScale + ParentPos + new Vector2(960.0f, 540.0f), 0.5f);
+                        rt.DORotate(new Vector3(0.0f, 0.0f, rotZ), 0.5f);
+                        rt.DOScale(Vector3.one * scale * ParentScale, 0.5f);
+                    }
+
+                    var main = GameObject.Find("Main").GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f);
+
+                    foreach (var item in _items)
+                    {
+                        item.GetComponent<CanvasGroup>().DOFade(0.0f, 0.2f);
+                    }
+
+                    _bgCharaSelect.DOFade(1.0f, 0.5f);
 
                     await UniTask.WaitForSeconds(0.5f);
                 }
 
-                TadaLib.Scene.TransitionManager.Instance.StartTransitionAdvanced(
+                TadaLib.Scene.TransitionManager.Instance.StartTransitionAdvancedForTitle(
                     nextScene: "CharaSelect",
                     preUnloadFunc: PreUnload
                     );
+
+                //TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f);
             }
             else if (_selectedIdx == 1)
             {

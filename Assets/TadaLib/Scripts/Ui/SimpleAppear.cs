@@ -26,22 +26,47 @@ namespace TadaLib.Ui
         void OnEnable()
         {
             var rectTrasnform = GetComponent<RectTransform>();
-            var initPos = rectTrasnform.position;
-            var pos = initPos;
-            pos.x -= _movePixel.x;
-            pos.y -= _movePixel.y;
-            rectTrasnform.position = pos;
-            rectTrasnform.DOMove(initPos, _durationSec);
+            if (rectTrasnform != null)
+            {
+                var initPos = rectTrasnform.position;
+                var pos = initPos;
+                pos.x -= _movePixel.x;
+                pos.y -= _movePixel.y;
+                rectTrasnform.position = pos;
+                rectTrasnform.DOMove(initPos, _durationSec);
+            }
 
             if (GetComponent<UnityEngine.UI.Image>() is { } image)
             {
+                image.color = image.color.SetAlpha(0.0f);
                 image.DOFade(1.0f, _durationSec);
             }
 
             if (GetComponent<TMPro.TextMeshProUGUI>() is { } text)
             {
+                text.color = text.color.SetAlpha(0.0f);
                 text.DOFade(1.0f, _durationSec);
             }
+
+            var canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0.0f;
+                canvasGroup.DOFade(1.0f, _durationSec);
+            }
+
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = spriteRenderer.color.SetAlpha(0.0f);
+                spriteRenderer.DOFade(1.0f, _durationSec);
+            }
+
+            //if (GetComponent<CanvasGroup>() is { } group)
+            //{
+            //    group.alpha = 0.0f;
+            //    group.DOFade(1.0f, _durationSec);
+            //}
         }
         #endregion
 

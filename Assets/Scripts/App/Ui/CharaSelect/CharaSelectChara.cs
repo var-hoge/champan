@@ -65,6 +65,11 @@ namespace App.Ui.CharaSelect
         {
             _body.SetSprite(sprite);
         }
+
+        public void SetRotateZero()
+        {
+            _body.rectTransform.localEulerAngles = Vector3.zero;
+        }
         #endregion
 
         #region privateフィールド

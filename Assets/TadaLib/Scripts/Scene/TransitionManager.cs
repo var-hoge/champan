@@ -99,7 +99,8 @@ namespace TadaLib.Scene
             OnTransitionEnd();
         }
 
-        public async void StartTransitionAdvanced(
+        // タイトル以外では使用禁止
+        public async void StartTransitionAdvancedForTitle(
             string nextScene,
             Func<UniTask> preUnloadFunc,
             float fadeInDurationSec = 0.0f,
@@ -127,47 +128,33 @@ namespace TadaLib.Scene
                 await UniTask.Delay(TimeSpan.FromSeconds(guranteedWaitDurationSec));
             }
 
-            //// 次シーンロード (Activate は後ほど)
-            //{
-            //    var loadScenes = new List<string>();
-            //    loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
-            //    loadScenes.Add(nextScene);
-            //}
+            // 次シーンロード (Activate は後ほど)
+            var loadScenes = new List<string>();
+            //loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
+            loadScenes.Add(nextScene);
+
+            var loadHandle = Scenes.LoadScenesAsync(loadScenes.ToArray());
+            loadHandle.AllowSceneActivation(false);
+
+            var loadStartTime = Time.time;
+            await UniTask.WaitUntil(() => loadHandle.Progress > 0.85f || (Time.time - loadStartTime) > 0.3f);
 
             // 前シーンアンロード前処理
             await preUnloadFunc();
+
+            // 次シーンアクティベート
+            loadHandle.AllowSceneActivation(true);
+
+            await loadHandle.ToYieldInteraction();
 
             // 前シーンアンロード
             {
                 var unloadScenes = new List<string>() {
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
                 };
-                unloadScenes.AddRange(_reloadTargetScenes);
+                //unloadScenes.AddRange(_reloadTargetScenes);
 
                 Scenes.UnloadScenes(unloadScenes.ToArray());
-                //var unloadScene = Scenes.UnloadScenesAsync(unloadScenes.ToArray());
-                //await UniTask.Yield();
-                //while (!unloadScene.IsDone)
-                //{
-                //    await UniTask.Yield();
-                //}
-            }
-
-            //// 次シーンアクティベート
-
-            // 次シーンロード
-            {
-                var loadScenes = new List<string>();
-                loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
-                loadScenes.Add(nextScene);
-
-                Scenes.LoadScenes(loadScenes.ToArray());
-                //var loadScene = Scenes.LoadScenesAsync(loadScenes.ToArray());
-                //await UniTask.Yield();
-                //while (!loadScene.IsDone)
-                //{
-                //    await UniTask.Yield();
-                //}
             }
 
             // nextScene を activeScene にする (メインはこれなので)
