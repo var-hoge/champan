@@ -223,7 +223,7 @@ namespace App.Ui.CharaSelect
 
             await UniTask.WaitForSeconds(0.8f);
 
-            TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 0.5f, 0.5f);
+            TadaLib.Scene.TransitionManager.Instance.StartTransition("GameModeSelect", 0.3f, 0.3f);
         }
 
         // キャラクター ID に変換

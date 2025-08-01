@@ -157,7 +157,7 @@ namespace App.Ui.GameModeSelect
             if (nextIndex == _items.Count)
             {
                 // シーン遷移
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.8f, 0.8f);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.4f);
                 _items[_selectedIndex].OnDecide();
                 _isEnd = true;
                 return true;
@@ -279,7 +279,7 @@ namespace App.Ui.GameModeSelect
             if (rate >= 1.0f)
             {
                 // scene transition
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.4f, 0.4f, isReverse: true);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f, isReverse: true);
                 _isEnd = true;
 
                 _backUi.rectTransform.parent.DOPunchScale(Vector3.one * 1.06f, 0.2f);

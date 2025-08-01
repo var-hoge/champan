@@ -31,6 +31,8 @@ namespace App.Ui.CharaSelect
             _body.rectTransform.localPosition = _localPositionDefault;
             _body.rectTransform.localEulerAngles = _localEulerAnglesDefault;
 
+            _isMoveDisabled = true;
+
             _body.rectTransform.DOPunchScale(Vector3.one * 0.5f, 0.15f)
                 .OnComplete(() =>
                 {
@@ -47,6 +49,8 @@ namespace App.Ui.CharaSelect
 
         public void OnCancelSelected()
         {
+            _isMoveDisabled = false;
+
             _body.rectTransform.DOKill();
             _body.SetSprite(_unselectedSprite);
             _body.rectTransform.localScale = _localScaleDefault;
@@ -63,6 +67,7 @@ namespace App.Ui.CharaSelect
 
         public void ChangeSprite(Sprite sprite)
         {
+            _isMoveDisabled = true;
             _body.SetSprite(sprite);
         }
 
@@ -83,6 +88,16 @@ namespace App.Ui.CharaSelect
         [SerializeField]
         string _sePath;
 
+        [SerializeField]
+        float _moveAmount = 30.0f;
+        [SerializeField]
+        Vector2 _moveDir = Vector3.up;
+        [SerializeField]
+        float _moveSpeed = 1.0f;
+
+        bool _isMoveDisabled = false;
+        float _moveDurationSec = 0.0f;
+
         Sprite _unselectedSprite;
         Vector3 _localScaleDefault;
         Vector3 _localPositionDefault;
@@ -96,6 +111,20 @@ namespace App.Ui.CharaSelect
             _localScaleDefault = _body.rectTransform.localScale;
             _localPositionDefault = _body.rectTransform.localPosition;
             _localEulerAnglesDefault = _body.rectTransform.localEulerAngles;
+        }
+
+        private void Update()
+        {
+            if (_isMoveDisabled)
+            {
+                return;
+            }
+
+            _moveDurationSec += Time.deltaTime * _moveSpeed;
+            var rate = Mathf.Sin(_moveDurationSec);
+
+            var pos = _localPositionDefault + (Vector3)(rate * _moveDir.normalized * _moveAmount);
+            _body.rectTransform.localPosition = pos;
         }
         #endregion
     }

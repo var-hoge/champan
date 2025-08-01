@@ -697,6 +697,9 @@ MonoBehaviour:
   _body: {fileID: 1041836962}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_FuransuPan
+  _moveAmount: 10
+  _moveDir: {x: 0.1, y: 1}
+  _moveSpeed: 1.2
 --- !u!1 &129883390
 GameObject:
   m_ObjectHideFlags: 0
@@ -1586,6 +1589,9 @@ MonoBehaviour:
   _body: {fileID: 1318156215}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_KaniPan
+  _moveAmount: 30
+  _moveDir: {x: 0, y: 1}
+  _moveSpeed: 1
 --- !u!1 &256883463
 GameObject:
   m_ObjectHideFlags: 0
@@ -3023,6 +3029,7 @@ GameObject:
   - component: {fileID: 609495260}
   - component: {fileID: 609495259}
   - component: {fileID: 609495261}
+  - component: {fileID: 609495262}
   m_Layer: 5
   m_Name: SelectMessage
   m_TagString: Untagged
@@ -3101,6 +3108,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _durationSec: 0.3
   _movePixel: {x: 0, y: 0.4}
+  _onAppeared:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 609495262}
+        m_TargetAssemblyTypeName: TadaLib.Ui.IdleAnimator, Assembly-CSharp
+        m_MethodName: set_IsEnabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 609495262}
+        m_TargetAssemblyTypeName: TadaLib.Ui.IdleAnimator, Assembly-CSharp
+        m_MethodName: ResetBasePos
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &609495262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609495257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fd3ddf04fd6464ea364b79b5bb9d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultEnabled: 0
+  _animRate: 1.2
+  _moveAmount: 4
+  _moveDir: {x: -0.4, y: 1}
 --- !u!1 &617983639
 GameObject:
   m_ObjectHideFlags: 0
@@ -3157,6 +3209,9 @@ MonoBehaviour:
   _body: {fileID: 382515768}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_NekoPan
+  _moveAmount: 30
+  _moveDir: {x: 0, y: 1}
+  _moveSpeed: 1
 --- !u!1 &620420665
 GameObject:
   m_ObjectHideFlags: 0
@@ -5066,6 +5121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _durationSec: 0.3
   _movePixel: {x: 0, y: 0.4}
+  _onAppeared: []
 --- !u!225 &1051072478
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5714,6 +5770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _durationSec: 0.6
   _movePixel: {x: 0, y: 0}
+  _onAppeared: []
 --- !u!1 &1198766706 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5877469189964907171, guid: f785d3e6d1e80b546be5d6c5a9d23031, type: 3}
@@ -6488,6 +6545,9 @@ MonoBehaviour:
   _body: {fileID: 2146925569}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_FuransuPan
+  _moveAmount: 30
+  _moveDir: {x: 0, y: 1}
+  _moveSpeed: 1
 --- !u!1 &1354626687
 GameObject:
   m_ObjectHideFlags: 0
@@ -8992,6 +9052,9 @@ MonoBehaviour:
   _body: {fileID: 1013480729}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_MelonPan
+  _moveAmount: 30
+  _moveDir: {x: 0, y: 1}
+  _moveSpeed: 1
 --- !u!1 &1804070405
 GameObject:
   m_ObjectHideFlags: 0
@@ -9348,6 +9411,9 @@ MonoBehaviour:
   _body: {fileID: 1766533456}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_NekoPan
+  _moveAmount: 10
+  _moveDir: {x: -0.5, y: 1}
+  _moveSpeed: 1.2
 --- !u!1 &1870122505
 GameObject:
   m_ObjectHideFlags: 0
@@ -9865,6 +9931,9 @@ MonoBehaviour:
   _body: {fileID: 32860633}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_MelonPan
+  _moveAmount: 10
+  _moveDir: {x: 0.5, y: 1}
+  _moveSpeed: 1.2
 --- !u!1001 &1934664028
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10344,6 +10413,9 @@ MonoBehaviour:
   _body: {fileID: 1870122507}
   _selectedSprite: {fileID: 21300000, guid: 1d0c618512a960a40865c951a18e5a33, type: 3}
   _sePath: SE/Character Selection/Player_Selection_KaniPan
+  _moveAmount: 10
+  _moveDir: {x: 0.2, y: 1}
+  _moveSpeed: 1.2
 --- !u!1 &2021513638
 GameObject:
   m_ObjectHideFlags: 0

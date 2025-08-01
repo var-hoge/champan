@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using DG.Tweening;
 
 namespace TadaLib.Ui
 {
@@ -20,12 +21,26 @@ namespace TadaLib.Ui
         #endregion
 
         #region メソッド
+        public void SetBasePos(Vector3 pos)
+        {
+            _basePos = pos;
+        }
+
+        public void ResetBasePos()
+        {
+            _basePos = GetComponent<RectTransform>().localPosition;
+        }
         #endregion
 
         #region MonoBehavior の実装
         void Start()
         {
             IsEnabled = _defaultEnabled;
+
+            if (_basePos is null)
+            {
+                ResetBasePos();
+            }
         }
 
         void Update()
@@ -34,6 +49,12 @@ namespace TadaLib.Ui
             {
                 return;
             }
+
+            _moveDurationSec += Time.deltaTime * _animRate;
+            var rate = Mathf.Sin(_moveDurationSec);
+
+            var pos = _basePos.Value + (Vector3)(rate * _moveDir.normalized * _moveAmount);
+            GetComponent<RectTransform>().localPosition = pos;
         }
         #endregion
 
@@ -42,9 +63,16 @@ namespace TadaLib.Ui
         bool _defaultEnabled = true;
 
         [SerializeField]
-        float _animRate = 1.0f;
+        float _animRate = 1.2f;
 
-        float _durationSec = 0.0f;
+        [SerializeField]
+        float _moveAmount = 12.0f;
+        [SerializeField]
+        Vector2 _moveDir = Vector3.up;
+
+        float _moveDurationSec = 0.0f;
+
+        Vector3? _basePos;
         #endregion
 
         #region privateメソッド
