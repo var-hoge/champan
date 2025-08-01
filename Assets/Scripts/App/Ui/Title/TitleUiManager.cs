@@ -264,17 +264,26 @@ namespace App.Ui.Title
                 async UniTask PreUnload()
                 {
                     var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-                    DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(titleBgmask.Scale.x * 0.8f, 0.0f, 0.0f), 0.5f);
+                    DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(titleBgmask.Scale.x * 0.8f, 0.0f, 0.0f), 0.3f);
 
                     Vector2 ParentPos = new Vector3(0.0f, 82.11f);
                     const float ParentScale = 0.84f;
+                    //var charInfos = new (string name, Vector2 pos, float rotZ, float scale)[]
+                    //{
+                    //    ("Chara1", new Vector2(-481.7f, -37.5f), 17.49f, 1.08f),
+                    //    ("Chara2", new Vector2(187.3f, -68.8f), 0.0f, 1.2f),
+                    //    ("Chara3", new Vector2(542.3f, 149.7f), -13.3f, 1.12f),
+                    //    ("Chara4", new Vector2(-104.4f, 188.7f), -10.06f, 1.16f),
+                    //};
+
                     var charInfos = new (string name, Vector2 pos, float rotZ, float scale)[]
                     {
-                        ("Chara1", new Vector2(-481.7f, -37.5f), 17.49f, 1.08f),
-                        ("Chara2", new Vector2(187.3f, -68.8f), 0.0f, 1.2f),
-                        ("Chara3", new Vector2(542.3f, 149.7f), -13.3f, 1.12f),
-                        ("Chara4", new Vector2(-104.4f, 188.7f), -10.06f, 1.16f),
+                        ("Chara1", new Vector2(-481.7f, -37.5f), 0.0f, 1.02f),
+                        ("Chara2", new Vector2(187.3f, -68.8f), 0.0f, 1.01f),
+                        ("Chara3", new Vector2(542.3f, 149.7f), 0.0f, 1f),
+                        ("Chara4", new Vector2(-104.4f, 188.7f), 0.0f, 1.08f),
                     };
+
 
                     foreach (var (name, pos, rotZ, scale) in charInfos)
                     {
@@ -283,6 +292,8 @@ namespace App.Ui.Title
                         rt.DOMove(pos * ParentScale + ParentPos + new Vector2(960.0f, 540.0f), 0.5f);
                         rt.DORotate(new Vector3(0.0f, 0.0f, rotZ), 0.5f);
                         rt.DOScale(Vector3.one * scale * ParentScale, 0.5f);
+
+                        rt.GetComponent<CharaImageChanger>().Change();
                     }
 
                     var main = GameObject.Find("Main").GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f);
