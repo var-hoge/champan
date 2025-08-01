@@ -35,13 +35,13 @@ namespace Ui.Main
             if (_isFirstInnter)
             {
                 _isFirstInnter = false;
-                _initPos = rectTransform.position;
+                _initPos = rectTransform.localPosition;
                 _initLocalEulerAngles = rectTransform.localEulerAngles;
                 _initScale = rectTransform.localScale;
             }
             else
             {
-                rectTransform.position = _initPos;
+                rectTransform.localPosition = _initPos;
                 rectTransform.localEulerAngles = _initLocalEulerAngles;
                 rectTransform.localScale = _initScale;
             }
@@ -59,13 +59,14 @@ namespace Ui.Main
 
             GetComponent<UnityEngine.UI.Image>().color = Color.white;
 
-            var initPos = rectTransform.position;
+            var initPos = rectTransform.localPosition;
             var initLocalEulerAngles = rectTransform.localEulerAngles;
             var initScale = rectTransform.localScale;
 
-            var targetPos = initPos + (initPos - _center.position).normalized * (_moveDist * (IsLast ? 2.0f : 1.0f));
+            var useMoveDist = _moveDist * 0.7f;
+            var targetPos = initPos + (initPos - _center.localPosition).normalized * (useMoveDist * (IsLast ? 2.0f : 1.0f));
             var seq = DOTween.Sequence();
-            seq.Append(rectTransform.DOMove(targetPos, _moveDurationSec).SetEase(Ease.OutBack));
+            seq.Append(rectTransform.DOLocalMove(targetPos, _moveDurationSec).SetEase(Ease.OutBack));
 
             if (_type == Type.GameFinish)
             {

@@ -89,8 +89,10 @@ namespace App.Ui.Common
 
             _offsetY = TadaLib.Util.InterpUtil.Linier(_offsetY, offsetY, 0.1f, Time.deltaTime);
 
+            var useOffsetY = _offsetY * (Screen.height / 1080.0f);
+
             GetComponent<RectTransform>().localEulerAngles = new Vector3(0.0f, 0.0f, -angle);
-            GetComponent<RectTransform>().position = screenPos + _offsetY * new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0.0f);
+            GetComponent<RectTransform>().position = screenPos + useOffsetY * new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0.0f);
         }
         #endregion
 

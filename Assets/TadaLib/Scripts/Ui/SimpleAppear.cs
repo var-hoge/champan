@@ -29,12 +29,12 @@ namespace TadaLib.Ui
             var rectTrasnform = GetComponent<RectTransform>();
             if (rectTrasnform != null)
             {
-                var initPos = rectTrasnform.position;
+                var initPos = rectTrasnform.localPosition;
                 var pos = initPos;
                 pos.x -= _movePixel.x;
                 pos.y -= _movePixel.y;
-                rectTrasnform.position = pos;
-                rectTrasnform.DOMove(initPos, _durationSec).OnComplete(() =>
+                rectTrasnform.localPosition = pos;
+                rectTrasnform.DOLocalMove(initPos, _durationSec).OnComplete(() =>
                 {
                     foreach (var ev in _onAppeared)
                     {

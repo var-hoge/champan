@@ -329,7 +329,7 @@ namespace App.Ui.Title
                     {
                         var rt = GameObject.Find(name).GetComponent<RectTransform>();
                         rt.DOKill();
-                        rt.DOMove(pos * ParentScale + ParentPos + new Vector2(960.0f, 540.0f), 0.5f);
+                        rt.DOLocalMove(pos * ParentScale + ParentPos, 0.5f);
                         rt.DORotate(new Vector3(0.0f, 0.0f, rotZ), 0.5f);
                         rt.DOScale(Vector3.one * scale * ParentScale, 0.5f);
 
