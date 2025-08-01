@@ -55,6 +55,16 @@ namespace App.Ui.Common
 
                 _timeSecToReturnToTitle = 0.0f;
             }
+
+            // ESC キーでゲーム終了
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#else
+                Application.Quit();
+#endif
+            }
         }
         #endregion
 

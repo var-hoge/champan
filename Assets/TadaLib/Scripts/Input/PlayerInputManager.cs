@@ -29,6 +29,19 @@ namespace TadaLib.Input
         }
 
         public IEnumerable<PlayerInputProxy> InputProxies => _playerInputProxies;
+
+        public bool IsExistGamePad()
+        {
+            foreach (var proxy in _playerInputProxies)
+            {
+                if (proxy.IsExistGamePad)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         #endregion
 
         #region MonoBehavior の実装

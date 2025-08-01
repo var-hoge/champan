@@ -204,50 +204,91 @@ namespace App.Ui.Title
             }
         }
 
+        static bool IsFirst = true;
+
         async UniTask SelectItem()
         {
             // 項目生成
 
-            //var _selectedIdx = 0;
-
             for (int idx = 0; idx < _items.Count; ++idx)
             {
-                if (_selectedIdx == idx)
-                {
-                    _items[idx].OnSelected();
-                }
-                else
-                {
-                    _items[idx].OnUnselected();
-                }
-
+                _items[idx].OnUnselected();
                 _items[idx].GetComponent<RectTransform>().DOScale(Vector3.one, 0.15f);
             }
 
-            await UniTask.WaitForSeconds(0.2f);
+            // コントローラー接続がなければ、接続を待つ
+            // キーボードの場合も考慮する
+            if (IsFirst)
+            {
+                IsFirst = false;
+                var playSe = false;
+                while (true)
+                {
+                    if (TadaLib.Input.PlayerInputManager.Instance.IsExistGamePad())
+                    {
+                        break;
+                    }
 
-            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(0);
+                    var isFinish = false;
+                    foreach (var inputProxy in TadaLib.Input.PlayerInputManager.Instance.InputProxies)
+                    {
+                        if (inputProxy.IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
+                        {
+                            isFinish = true;
+                            break;
+                        }
+                    }
+
+                    if (isFinish)
+                    {
+                        break;
+                    }
+
+                    playSe = true;
+                    await UniTask.Yield();
+                }
+                if (playSe)
+                {
+                    SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+                }
+            }
+
+            _items[_selectedIdx].OnSelected();
+
+            await UniTask.WaitForSeconds(0.2f);
 
             while (true)
             {
-                // 決定優先
-                if (inputProxy.IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
+                var isFinish = false;
+                foreach (var inputProxy in TadaLib.Input.PlayerInputManager.Instance.InputProxies)
                 {
-                    break;
+                    // 決定優先
+                    if (inputProxy.IsPressedTrigger(TadaLib.Input.ButtonCode.Action))
+                    {
+                        isFinish = true;
+                        break;
+                    }
+
+                    // 次点で移動
+                    if (inputProxy.AxisTrigger(TadaLib.Input.AxisCode.Vertical, out var isPositive))
+                    {
+                        // 移動
+                        var idxPrev = _selectedIdx;
+                        _selectedIdx = (_selectedIdx + (isPositive ? 1 : -1) + _items.Count) % _items.Count;
+
+                        _items[idxPrev].OnUnselected();
+                        _items[_selectedIdx].OnSelected();
+
+                        // SE 再生
+                        SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+
+                        break;
+                    }
                 }
 
-                // 次点で移動
-                if (inputProxy.AxisTrigger(TadaLib.Input.AxisCode.Vertical, out var isPositive))
+                if (isFinish)
                 {
-                    // 移動
-                    var idxPrev = _selectedIdx;
-                    _selectedIdx = (_selectedIdx + (isPositive ? 1 : -1) + _items.Count) % _items.Count;
-
-                    _items[idxPrev].OnUnselected();
-                    _items[_selectedIdx].OnSelected();
-
-                    // SE 再生
-                    SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+                    break;
                 }
 
                 await UniTask.Yield();
@@ -318,16 +359,7 @@ namespace App.Ui.Title
             else if (_selectedIdx == 1)
             {
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Credits", 0.3f, 0.3f);
-                Debug.Log("Credit");
             }
-            //                else if(_selectedIdx == 2)
-            //                {
-            //#if UNITY_EDITOR
-            //                    UnityEditor.EditorApplication.isPlaying = false;
-            //#else
-            //                        Application.Quit();
-            //#endif
-            //                }
             else
             {
                 Debug.LogError("未設定");

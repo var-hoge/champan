@@ -41,6 +41,7 @@ namespace TadaLib.Input
         public Action OnAction { get; set; }
         public Action OnCancel { get; set; }
         public Action<Vector2> OnMove { get; set; }
+        public bool IsExistGamePad => _gamePadInput != null;
         #endregion
 
         #region メソッド
@@ -52,44 +53,44 @@ namespace TadaLib.Input
 
         public void SetPlayerInput(UnityEngine.InputSystem.PlayerInput playerInput)
         {
-            if (_playerInput != null)
+            if (_gamePadInput != null)
             {
-                _playerInput.onActionTriggered -= OnSystemTrigger;
+                _gamePadInput.onActionTriggered -= OnSystemTrigger;
             }
 
-            _playerInput = playerInput;
+            _gamePadInput = playerInput;
 
-            if (_playerInput != null)
+            if (_gamePadInput != null)
             {
-                _playerInput.onActionTriggered += OnSystemTrigger;
+                _gamePadInput.onActionTriggered += OnSystemTrigger;
             }
         }
 
         public bool IsPressed(ButtonCode code)
         {
-            if (_playerInput == null)
+            if (_gamePadInput == null)
             {
                 return IsPressedImpl(code, _basePlayerInput);
             }
-            return IsPressedImpl(code, _playerInput);
+            return IsPressedImpl(code, _gamePadInput);
         }
 
         public bool IsPressedTrigger(ButtonCode code)
         {
-            if (_playerInput == null)
+            if (_gamePadInput == null)
             {
                 return IsPressedTriggerImpl(code, _basePlayerInput);
             }
-            return IsPressedTriggerImpl(code, _playerInput);
+            return IsPressedTriggerImpl(code, _gamePadInput);
         }
 
         public float Axis(AxisCode code)
         {
-            if (_playerInput == null)
+            if (_gamePadInput == null)
             {
                 return AxisImpl(code, _basePlayerInput);
             }
-            return AxisImpl(code, _playerInput);
+            return AxisImpl(code, _gamePadInput);
         }
 
         public bool AxisTrigger(AxisCode code, out bool isPositive)
@@ -135,18 +136,18 @@ namespace TadaLib.Input
 
         public void VibrateAdvanced(float lowFrequency, float highFrequency, float durationSec)
         {
-            if (_playerInput == null)
+            if (_gamePadInput == null)
             {
                 VibrateImpl(lowFrequency, highFrequency, durationSec, _basePlayerInput);
                 return;
             }
-            VibrateImpl(lowFrequency, highFrequency, durationSec, _playerInput);
+            VibrateImpl(lowFrequency, highFrequency, durationSec, _gamePadInput);
         }
         #endregion
 
         #region privateフィールド
         UnityEngine.InputSystem.PlayerInput _basePlayerInput;
-        UnityEngine.InputSystem.PlayerInput _playerInput;
+        UnityEngine.InputSystem.PlayerInput _gamePadInput;
         Vector2 _axis;
         Vector2 _axisPrev;
         #endregion
