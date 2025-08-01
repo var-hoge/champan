@@ -155,7 +155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -2}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 24.94, y: -434.4}
+  m_AnchoredPosition: {x: 24.94, y: -445.3}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &73568
@@ -651,6 +651,7 @@ GameObject:
   - component: {fileID: 136943447}
   - component: {fileID: 136943449}
   - component: {fileID: 136943450}
+  - component: {fileID: 136943451}
   m_Layer: 0
   m_Name: Chara
   m_TagString: Untagged
@@ -674,9 +675,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.54, y: 106.4}
+  m_AnchoredPosition: {x: 2.1, y: 106.4}
   m_SizeDelta: {x: 463, y: 484}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0.1}
 --- !u!114 &136943447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -747,6 +748,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outlineKind: 0
   _considerCpu: 1
+--- !u!114 &136943451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136943445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fd3ddf04fd6464ea364b79b5bb9d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultEnabled: 0
+  _animRate: 1
+  _moveAmount: 0
+  _moveDir: {x: 0, y: 1}
+  _rotZAmount: -1
+  _enabledForAnim: 0
 --- !u!1 &164571595
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,7 +968,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 483, y: -92}
+  m_AnchoredPosition: {x: 483, y: -118.6}
   m_SizeDelta: {x: 1200, y: 371}
   m_Pivot: {x: 0.1, y: 0.5}
 --- !u!114 &172423000
@@ -3873,7 +3892,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 2}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 24.94, y: -309.74}
+  m_AnchoredPosition: {x: 24.94, y: -322.6}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &700407602
@@ -5104,6 +5123,10 @@ MonoBehaviour:
     defaultState: 0
   - clip: {fileID: 7400000, guid: 0744a8ddcbfad8547b218e86f2fc3163, type: 2}
     name: GameFinish
+    speed: 0.9
+    defaultState: 0
+  - clip: {fileID: 7400000, guid: 9043c38dce0f3154787fde989041a94f, type: 2}
+    name: Empty
     speed: 1.2
     defaultState: 0
 --- !u!95 &929919583
@@ -8684,6 +8707,7 @@ GameObject:
   - component: {fileID: 1768144833}
   - component: {fileID: 1768144836}
   - component: {fileID: 1768144835}
+  - component: {fileID: 1768144837}
   m_Layer: 0
   m_Name: Crown
   m_TagString: Untagged
@@ -8748,6 +8772,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1768144832}
   m_CullTransparentMesh: 1
+--- !u!114 &1768144837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768144832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fd3ddf04fd6464ea364b79b5bb9d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultEnabled: 0
+  _animRate: 1
+  _moveAmount: 12
+  _moveDir: {x: 1, y: 0}
+  _rotZAmount: 0
+  _enabledForAnim: 0
 --- !u!1001 &1781958862
 PrefabInstance:
   m_ObjectHideFlags: 0

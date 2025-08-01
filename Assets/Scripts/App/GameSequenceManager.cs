@@ -55,6 +55,11 @@ namespace App
             }
 
         }
+
+        public void AnimFinish()
+        {
+            GetComponent<SimpleAnimation>().Play("Empty");
+        }
         #endregion
 
         #region MonoBehavior の実装

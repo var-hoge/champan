@@ -45,7 +45,7 @@ namespace TadaLib.Ui
 
         void Update()
         {
-            if (IsEnabled is false)
+            if (IsEnabled is false && _enabledForAnim is false)
             {
                 return;
             }
@@ -53,8 +53,18 @@ namespace TadaLib.Ui
             _moveDurationSec += Time.deltaTime * _animRate;
             var rate = Mathf.Sin(_moveDurationSec);
 
-            var pos = _basePos.Value + (Vector3)(rate * _moveDir.normalized * _moveAmount);
-            GetComponent<RectTransform>().localPosition = pos;
+            if (_moveAmount != 0.0f)
+            {
+                var pos = _basePos.Value + (Vector3)(rate * _moveDir.normalized * _moveAmount);
+                GetComponent<RectTransform>().localPosition = pos;
+            }
+
+            if(_rotZAmount != 0.0f)
+            {
+                var angles = GetComponent<RectTransform>().localEulerAngles;
+                angles.z = rate * _rotZAmount;
+                GetComponent<RectTransform>().localEulerAngles = angles;
+            }
         }
         #endregion
 
@@ -69,6 +79,12 @@ namespace TadaLib.Ui
         float _moveAmount = 12.0f;
         [SerializeField]
         Vector2 _moveDir = Vector3.up;
+
+        [SerializeField]
+        float _rotZAmount = 0.0f;
+
+        [SerializeField]
+        bool _enabledForAnim = false;
 
         float _moveDurationSec = 0.0f;
 

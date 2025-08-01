@@ -2570,6 +2570,8 @@ MonoBehaviour:
   _animRate: 1.2
   _moveAmount: 4
   _moveDir: {x: -0.4, y: 1}
+  _rotZAmount: 0
+  _enabledForAnim: 0
 --- !u!1 &628695490
 GameObject:
   m_ObjectHideFlags: 0
