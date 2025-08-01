@@ -27,6 +27,8 @@ namespace TadaLib.Input
             Assert.IsTrue(number < _playerInputProxies.Count);
             return _playerInputProxies[number];
         }
+
+        public IEnumerable<PlayerInputProxy> InputProxies => _playerInputProxies;
         #endregion
 
         #region MonoBehavior の実装
@@ -81,6 +83,7 @@ namespace TadaLib.Input
             }
             else
             {
+                // @todo: 存在していないコントローラを探す
                 _playerInputProxies[(_playerInputs.Count - 1) % 4].SetPlayerInput(input);
             }
         }

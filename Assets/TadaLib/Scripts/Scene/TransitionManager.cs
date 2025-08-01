@@ -98,6 +98,89 @@ namespace TadaLib.Scene
             // すべて完了
             OnTransitionEnd();
         }
+
+        public async void StartTransitionAdvanced(
+            string nextScene,
+            Func<UniTask> preUnloadFunc,
+            float fadeInDurationSec = 0.0f,
+            float fadeOutDurationSec = 0.0f,
+            float guranteedWaitDurationSec = 0.0f,
+            bool isReverse = false)
+        {
+            if (_isLocked)
+            {
+                Debug.LogWarning("Scene.TransitionManager: 既に遷移を開始しています");
+                return;
+            }
+
+            OnTransitionBegin();
+
+            if (fadeInDurationSec > 0.0f)
+            {
+                // 遷移エフェクトを開始
+                await TransitionEffectManager.Instance.FadeIn(fadeInDurationSec, isReverse);
+            }
+
+            if (guranteedWaitDurationSec > 0.0f)
+            {
+                // 最低待ち時間
+                await UniTask.Delay(TimeSpan.FromSeconds(guranteedWaitDurationSec));
+            }
+
+            //// 次シーンロード (Activate は後ほど)
+            //{
+            //    var loadScenes = new List<string>();
+            //    loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
+            //    loadScenes.Add(nextScene);
+            //}
+
+            // 前シーンアンロード前処理
+            await preUnloadFunc();
+
+            // 前シーンアンロード
+            {
+                var unloadScenes = new List<string>() {
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
+                };
+                unloadScenes.AddRange(_reloadTargetScenes);
+
+                Scenes.UnloadScenes(unloadScenes.ToArray());
+                //var unloadScene = Scenes.UnloadScenesAsync(unloadScenes.ToArray());
+                //await UniTask.Yield();
+                //while (!unloadScene.IsDone)
+                //{
+                //    await UniTask.Yield();
+                //}
+            }
+
+            //// 次シーンアクティベート
+
+            // 次シーンロード
+            {
+                var loadScenes = new List<string>();
+                loadScenes.AddRange(Enumerable.Reverse(_reloadTargetScenes).ToList());
+                loadScenes.Add(nextScene);
+
+                Scenes.LoadScenes(loadScenes.ToArray());
+                //var loadScene = Scenes.LoadScenesAsync(loadScenes.ToArray());
+                //await UniTask.Yield();
+                //while (!loadScene.IsDone)
+                //{
+                //    await UniTask.Yield();
+                //}
+            }
+
+            // nextScene を activeScene にする (メインはこれなので)
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.GetSceneByName(nextScene));
+
+            if (fadeOutDurationSec > 0.0f)
+            {
+                await TransitionEffectManager.Instance.FadeOut(fadeOutDurationSec, isReverse);
+            }
+
+            // すべて完了
+            OnTransitionEnd();
+        }
         #endregion
 
         #region private static フィールド

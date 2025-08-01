@@ -11,6 +11,7 @@ using DG.Tweening;
 using KanKikuchi.AudioManager;
 using UnityEngine.Video;
 using TadaLib.Ui;
+using static UnityEditor.PlayerSettings;
 
 namespace App.Ui.Title
 {
@@ -42,17 +43,27 @@ namespace App.Ui.Title
         List<Button> _items;
 
         int _selectedIdx = 0;
+
+        public static bool IsBackFromCredit = false;
         #endregion
 
         #region privateメソッド
         public async UniTask Staging()
         {
-            await PlayIntro();
+            if (IsBackFromCredit)
+            {
+                AppearLogo(isImmediate: true);
+                IsBackFromCredit = false;
+            }
+            else
+            {
+                await PlayIntro();
 
-            await AppearLogo();
+                await AppearLogo(isImmediate: false);
 
+                BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
+            }
             // BGMの再生
-            BGMManager.Instance.Play(BGMPath.TITLE_SCREEN);
 
             // 選択
             await SelectItem();
@@ -84,7 +95,7 @@ namespace App.Ui.Title
             _introPlayer.Play();
 
             // 動画が終わるまで待つ
-            var lastClickedTime = -10.0f;
+            var lastClickedTime = float.MinValue;
             while (true)
             {
                 if (isVideoFinished)
@@ -111,38 +122,10 @@ namespace App.Ui.Title
             _introCanvas.gameObject.SetActive(false);
         }
 
-        async UniTask AppearLogo()
+        async UniTask AppearLogo(bool isImmediate)
         {
             _mainCanvas.gameObject.SetActive(true);
-
-            // ロゴのアニメーション
             var main = GameObject.Find("Main").transform;
-            main.DOScale(Vector3.one, 0.6f)
-                .SetEase(Ease.OutBack)
-                .OnComplete(() => MainYoyo());
-
-            void MainYoyo()
-            {
-                main.GetComponent<RectTransform>()
-                    .DOAnchorPos(new(-67, 89), 2f)
-                    .SetEase(Ease.Linear)
-                    .SetLoops(-1, LoopType.Yoyo);
-            }
-
-            await UniTask.WaitForSeconds(0.1f);
-
-            // 「チャン・ピョン・パン！」の再生
-            SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
-
-            await UniTask.WaitForSeconds(0.2f);
-
-            // 背景のアニメーション
-            var titleBgmask = FindAnyObjectByType<TitleBgMask>();
-            //DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, Vector3.one * 1.5f, 0.5f);
-            //DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(1.32f, 1.14f, 1.5f), 0.5f);
-            DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(1.21f, 1.25f, 1.5f), 0.5f);
-
-            await UniTask.WaitForSeconds(0.4f);
 
             // パンのアニメーション
             var charInfos = new (string name, Vector2 pos, float moveAmount)[]
@@ -152,31 +135,77 @@ namespace App.Ui.Title
                 ("Chara3", new(543, -38), 20f),
                 ("Chara4", new(-428, -66), 20f),
             };
-            foreach (var (name, pos, moveAmount) in charInfos)
-            {
-                var rt = GameObject.Find(name).GetComponent<RectTransform>();
-                var startPos = rt.anchoredPosition;
-                rt.DOAnchorPos(pos, 0.8f)
-                  .SetEase(Ease.OutBack)
-                  .OnComplete(() => CharYoyo());
 
-                void CharYoyo()
-                {
-                    var moveVec = (startPos - pos).normalized * moveAmount;
-                    rt.DOAnchorPos(moveVec + pos, 2f)
-                      .SetEase(Ease.Linear)
-                      .SetLoops(-1, LoopType.Yoyo);
-                }
+            void MainYoyo()
+            {
+                main.GetComponent<RectTransform>()
+                    .DOAnchorPos(new(-67, 89), 2f)
+                    .SetEase(Ease.Linear)
+                    .SetLoops(-1, LoopType.Yoyo);
             }
 
-            await UniTask.WaitForSeconds(1.2f);
+            void CharYoyo(Vector3 startPos, Vector3 anchorPos, float moveAmount, RectTransform rt)
+            {
+                var moveVec = (startPos - anchorPos).normalized * moveAmount;
+                rt.DOAnchorPos(moveVec + anchorPos, 2f)
+                  .SetEase(Ease.Linear)
+                  .SetLoops(-1, LoopType.Yoyo);
+            }
+
+            if (isImmediate)
+            {
+                main.localScale = Vector3.one;
+                MainYoyo();
+
+                var titleBgmask = FindAnyObjectByType<TitleBgMask>();
+                titleBgmask.SetScale(new Vector3(1.21f, 1.25f, 1.5f));
+
+                foreach (var (name, pos, moveAmount) in charInfos)
+                {
+                    var rt = GameObject.Find(name).GetComponent<RectTransform>();
+                    var startPos = rt.anchoredPosition;
+                    rt.anchoredPosition = pos;
+                    CharYoyo(startPos, pos, moveAmount, rt);
+                }
+            }
+            else
+            {
+                // ロゴのアニメーション
+                main.DOScale(Vector3.one, 0.6f)
+                    .SetEase(Ease.OutBack)
+                    .OnComplete(() => MainYoyo());
+
+                await UniTask.WaitForSeconds(0.1f);
+
+                // 「チャン・ピョン・パン！」の再生
+                SEManager.Instance.Play(SEPath.TITLE_SCREEN_04);
+
+                await UniTask.WaitForSeconds(0.2f);
+
+                // 背景のアニメーション
+                var titleBgmask = FindAnyObjectByType<TitleBgMask>();
+                DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(1.21f, 1.25f, 1.5f), 0.5f);
+
+                await UniTask.WaitForSeconds(0.4f);
+
+                foreach (var (name, pos, moveAmount) in charInfos)
+                {
+                    var rt = GameObject.Find(name).GetComponent<RectTransform>();
+                    var startPos = rt.anchoredPosition;
+                    rt.DOAnchorPos(pos, 0.8f)
+                      .SetEase(Ease.OutBack)
+                      .OnComplete(() => CharYoyo(startPos, pos, moveAmount, rt));
+                }
+
+                await UniTask.WaitForSeconds(1.2f);
+            }
         }
 
         async UniTask SelectItem()
         {
             // 項目生成
 
-            var _selectedIdx = 0;
+            //var _selectedIdx = 0;
 
             for (int idx = 0; idx < _items.Count; ++idx)
             {
@@ -228,10 +257,22 @@ namespace App.Ui.Title
 
             if (_selectedIdx == 0)
             {
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f);
+                async UniTask PreUnload()
+                {
+                    var titleBgmask = FindAnyObjectByType<TitleBgMask>();
+                    DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(0.0f, 0.0f, 0.0f), 0.5f);
+
+                    await UniTask.WaitForSeconds(0.5f);
+                }
+
+                TadaLib.Scene.TransitionManager.Instance.StartTransitionAdvanced(
+                    nextScene: "CharaSelect",
+                    preUnloadFunc: PreUnload
+                    );
             }
             else if (_selectedIdx == 1)
             {
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("Credits", 0.3f, 0.3f);
                 Debug.Log("Credit");
             }
             //                else if(_selectedIdx == 2)
