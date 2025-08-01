@@ -170,8 +170,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8388189f3453748ad7f07306038127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _alphaFrom: 0
   _durationSec: 0.3
   _movePixel: {x: 0, y: 30}
+  _onAppeared: []
 --- !u!114 &73569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3886,8 +3888,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8388189f3453748ad7f07306038127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _alphaFrom: 0
   _durationSec: 0.3
   _movePixel: {x: 0, y: 30}
+  _onAppeared: []
 --- !u!114 &700407603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4432,7 +4436,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1681386153}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -5215,8 +5219,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8388189f3453748ad7f07306038127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _alphaFrom: 0
   _durationSec: 0.15
   _movePixel: {x: 0, y: 30}
+  _onAppeared: []
 --- !u!114 &932615569
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,7 +25,9 @@ namespace App.Ui.Main
             GetComponent<UnityEngine.UI.Image>().SetSprite(sprite);
 
             var rectTransform = GetComponent<RectTransform>();
-            var toPos = rectTransform.position + Vector3.up * _moveY;
+            rectTransform.localScale *= (Screen.height / 1080.0f);
+
+            var toPos = rectTransform.localPosition + Vector3.up * _moveY;
             var toRot = rectTransform.eulerAngles + Vector3.forward * _rotateDeg;
 
             var sec = _stagingDurationSec;
@@ -35,7 +37,7 @@ namespace App.Ui.Main
             }
 
             var seq = DOTween.Sequence();
-            seq.Append(rectTransform.DOMove(toPos, sec).SetEase(Ease.OutQuint));
+            seq.Append(rectTransform.DOLocalMove(toPos, sec).SetEase(Ease.OutQuint));
             seq.Join(rectTransform.DORotate(toRot, sec).SetEase(Ease.OutBack));
             seq.Append(GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f));
             seq.OnComplete(() =>

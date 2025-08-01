@@ -26,16 +26,17 @@ namespace App.Ui.Main
 
             if (playAnim)
             {
-                rectTrasnform.position = new Vector3(pos.x + _crownAnimPosOffsetX, _crownAnimStartPosY, pos.z);
+                var screenRate = Screen.height / 1080.0f;
+                rectTrasnform.position = new Vector3(pos.x + _crownAnimPosOffsetX * screenRate, _crownAnimStartPosY * screenRate, pos.z);
                 var angles = rectTrasnform.localEulerAngles;
                 angles.z = _crownAnimStartDegZ;
                 rectTrasnform.localEulerAngles = angles;
-                var moveY = pos.y - _crownAnimStartPosY;
-                var durationSec = (Mathf.Abs(moveY) / 4000.0f + 0.4f) * _crownAnimDurationSecRate * animRate;
+                var moveY = pos.y - _crownAnimStartPosY * screenRate;
+                var durationSec = (Mathf.Abs(moveY) / screenRate / 4000.0f + 0.4f) * _crownAnimDurationSecRate * animRate;
                 var dir = pos - rectTrasnform.position;
 
                 var seq = DOTween.Sequence();
-                seq.Append(rectTrasnform.DOMove(pos + dir.normalized * _crownAnimEndPosOffset, durationSec).SetEase(_crownAnimEase));
+                seq.Append(rectTrasnform.DOMove(pos + dir.normalized * _crownAnimEndPosOffset * screenRate, durationSec).SetEase(_crownAnimEase));
                 seq.Join(rectTrasnform.DOLocalRotate(new Vector3(0.0f, 0.0f, -360.0f), durationSec, RotateMode.FastBeyond360));
                 seq.Append(rectTrasnform.DOMove(pos, _crownAnimBackDurationSec * animRate).SetEase(_crownAnimBackEase));
             }

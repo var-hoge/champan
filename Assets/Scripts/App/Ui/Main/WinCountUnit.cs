@@ -159,7 +159,8 @@ namespace App.Ui.Main
             var ret = new List<Vector3>();
 
             var width = _panel.rectTransform.rect.width - _panelLeftPadding - _panelRightPadding;
-            var center = (Vector3)_panel.rectTransform.rect.center + _panel.rectTransform.localPosition;
+            width *= (Screen.width / 1920.0f);
+            var center = (Vector3)_panel.rectTransform.rect.center + _panel.rectTransform.position;
             center.x += _panelLeftPadding * 0.5f;
             center.x -= _panelRightPadding * 0.5f;
 

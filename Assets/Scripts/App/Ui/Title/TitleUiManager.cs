@@ -122,6 +122,7 @@ namespace App.Ui.Title
             }
 
             _introCanvas.gameObject.SetActive(false);
+            _introPlayer.enabled = false;
         }
 
         async UniTask AppearLogo(bool isImmediate)
