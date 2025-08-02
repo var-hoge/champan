@@ -5,6 +5,9 @@
 /// </summary>
 public static class SEPath{
 
+	public const string BREAD_CRUNCH_1                  = "SE/Character Selection/Bread_Crunch_1";
+	public const string BREAD_CRUNCH_2                  = "SE/Character Selection/Bread_Crunch_2";
+	public const string BREAD_CRUNCH_3                  = "SE/Character Selection/Bread_Crunch_3";
 	public const string BUBBLE_JUMP_01                  = "SE/Bubble Jump/Bubble_Jump_01";
 	public const string BUBBLE_JUMP_02                  = "SE/Bubble Jump/Bubble_Jump_02";
 	public const string BUBBLE_JUMP_03                  = "SE/Bubble Jump/Bubble_Jump_03";
@@ -27,6 +30,7 @@ public static class SEPath{
 	public const string BUBBLE_POP_09                   = "SE/Bubble Pop/Bubble_Pop_09";
 	public const string BUBBLE_SPAWN_01                 = "SE/Bubble Spawn/Bubble_Spawn_01";
 	public const string BUBBLE_SPAWN_02                 = "SE/Bubble Spawn/Bubble_Spawn_02";
+	public const string CANCEL_SELECTION                = "SE/Character Selection/Cancel_Selection";
 	public const string COUNTDOWN                       = "SE/Crown Bubble/countdown";
 	public const string CROWN_BUBBLE_JUMP               = "SE/Crown Bubble/Crown_Bubble_Jump";
 	public const string CROWN_BUBBLE_REPOSITION         = "SE/Crown Bubble/Crown_Bubble_Reposition";
@@ -34,6 +38,7 @@ public static class SEPath{
 	public const string JINGLE10                        = "SE/Jingle/jingle10";
 	public const string MENU_NAVIGATION                 = "SE/Menu Interactions/Menu_Navigation";
 	public const string MENU_VALIDATION                 = "SE/Menu Interactions/Menu_Validation";
+	public const string MOVING_CURSOR                   = "SE/Character Selection/Moving_Cursor";
 	public const string PLAYER_DEATH_01                 = "SE/Player Death/Player_Death_01";
 	public const string PLAYER_DEATH_02                 = "SE/Player Death/Player_Death_02";
 	public const string PLAYER_DEATH_03                 = "SE/Player Death/Player_Death_03";
@@ -56,6 +61,7 @@ public static class SEPath{
 	public const string PLAYER_DOUBLE_JUMP_11           = "SE/PlayerDoubleJump/Player_DoubleJump_11";
 	public const string PLAYER_DOUBLE_JUMP_12           = "SE/PlayerDoubleJump/Player_DoubleJump_12";
 	public const string PLAYER_DOUBLE_JUMP_13           = "SE/PlayerDoubleJump/Player_DoubleJump_13";
+	public const string PLAYER_JOIN                     = "SE/Character Selection/Player_Join";
 	public const string PLAYER_JUMP_01                  = "SE/Player Jump/Player_Jump_01";
 	public const string PLAYER_JUMP_02                  = "SE/Player Jump/Player_Jump_02";
 	public const string PLAYER_JUMP_03                  = "SE/Player Jump/Player_Jump_03";
@@ -105,6 +111,7 @@ public static class SEPath{
 	public const string TITLE_SCREEN_02                 = "SE/Title Screen/TitleScreen_02";
 	public const string TITLE_SCREEN_03                 = "SE/Title Screen/TitleScreen_03";
 	public const string TITLE_SCREEN_04                 = "SE/Title Screen/TitleScreen_04";
+	public const string TRANSITION_TO_NEXT_SCREEN       = "SE/Character Selection/Transition_to_Next_Screen";
 
 }
 
