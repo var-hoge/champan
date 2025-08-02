@@ -174,6 +174,8 @@ namespace App.Ui.CharaSelect
 
         void OnCharaCanceled()
         {
+            SEManager.Instance.Play(SEPath.CANCEL_SELECTION);
+
             // キャラ削除
             _player.gameObject.SetActive(false);
             _joinButton.gameObject.SetActive(true);
