@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using KanKikuchi.AudioManager;
 
 namespace App.Actor.Gimmick.Crown
 {
@@ -22,7 +23,7 @@ namespace App.Actor.Gimmick.Crown
             var finishCrown = GameObject.Instantiate<FinishCrown>(prefab);
             finishCrown.transform.position = pos;
             //finishCrown.transform.localScale = new Vector3(scale, scale, scale);
-
+            SEManager.Instance.Play(SEPath.WINNER_GET_THE_CROWN);
             finishCrown.GetComponent<SimpleAnimation>().Play("Appear");
 
             return finishCrown;

@@ -11,6 +11,7 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using static App.GameSequenceManager;
 using Ui.Main;
+using KanKikuchi.AudioManager;
 
 namespace App.Ui.Main
 {
@@ -50,6 +51,7 @@ namespace App.Ui.Main
             // 勝ち点を表示
             _winCountPanel.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
+            SEManager.Instance.Play(SEPath.CHEERING_CROWD, volumeRate: 1, delay: 1.5f);
 
             await UniTask.WaitForSeconds(2.2f);
 
@@ -88,6 +90,7 @@ namespace App.Ui.Main
                 Time.timeScale = 1.0f;
             }
 
+            SEManager.Instance.FadeOut(SEPath.CHEERING_CROWD, 0.5f);
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
         }
