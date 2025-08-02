@@ -3430,6 +3430,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _numOfBubble: 10
   _bubblePrafab: {fileID: 7550832157192918740, guid: 3c36c27af2c81604390aa104daf23241, type: 3}
+  _bubbleRoot: {fileID: 627858308}
 --- !u!4 &627858308
 Transform:
   m_ObjectHideFlags: 0

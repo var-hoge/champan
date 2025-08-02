@@ -69,7 +69,7 @@ namespace App.Ui.Common
         #endregion
 
         #region private フィールド
-        float _needTimeSecToReturnToTitle = 2.0f;
+        float _needTimeSecToReturnToTitle = 1.0f;
         float _timeSecToReturnToTitle = 0.0f;
         #endregion
 

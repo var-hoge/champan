@@ -129,7 +129,9 @@ namespace App.Graphics.Shadow
                 return shadow;
             }
 
-            return GameObject.Instantiate<SpriteRenderer>(_shadowPrefab);
+            var obj = GameObject.Instantiate<SpriteRenderer>(_shadowPrefab);
+            obj.transform.SetParent(transform);
+            return obj;
         }
         #endregion
     }

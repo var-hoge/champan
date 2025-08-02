@@ -13,6 +13,7 @@ namespace App.Actor.Gimmick.Bubble
     {
         [SerializeField] private int _numOfBubble = 6;
         [SerializeField] private GameObject _bubblePrafab;
+        [SerializeField] private Transform _bubbleRoot;
 
         void Start()
         {
@@ -44,6 +45,7 @@ namespace App.Actor.Gimmick.Bubble
         {
             var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
             var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
+            bubble.transform.SetParent(_bubbleRoot);
             bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
             return bubble.GetComponent<Bubble>();
         }

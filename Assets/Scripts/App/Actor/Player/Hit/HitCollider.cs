@@ -106,6 +106,13 @@ namespace App.Actor.Player.Hit
         #region MonoBehavior の実装
         void Start()
         {
+            if (Cpu.CpuManager.Instance.IsCpu(PlayerIdx))
+            {
+                if (GameMatchManager.Instance.IsExistCpu is false)
+                {
+                    return;
+                }
+            }
             Manager.Instance.Register(this);
         }
         #endregion
