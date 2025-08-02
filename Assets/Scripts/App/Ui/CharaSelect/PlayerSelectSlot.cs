@@ -189,6 +189,7 @@ namespace App.Ui.CharaSelect
 
             // キャラ削除
             _player.gameObject.SetActive(false);
+            _charaGroup.gameObject.SetActive(false);
             _joinButton.gameObject.SetActive(true);
 
             _phase = Phase.WaitingForEntry;

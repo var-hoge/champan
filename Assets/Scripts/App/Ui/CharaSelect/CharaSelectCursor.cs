@@ -139,15 +139,6 @@ namespace App.Ui.CharaSelect
             if (IsSelectDone)
             {
                 return;
-                //if (!_manager.NotifyCancelSelect(_playerIdx, _selectIdx))
-                //{
-                //    // キャンセルできなかった
-                //    return;
-                //}
-
-                //OnCancelSelect();
-
-                //return;
             }
 
             if (!_manager.NotifySelect(_playerIdx, _selectIdx))
@@ -160,6 +151,22 @@ namespace App.Ui.CharaSelect
             OnSelect();
         }
 
+        void OnCancel()
+        {
+            if (IsSelectDone)
+            {
+                return;
+            }
+
+            if (!_isReady)
+            {
+                return;
+            }
+
+            OnCancelSelect(isPreEntry: true);
+        }
+
+
         private void Start()
         {
             _selectIdx = _manager.CharaIdxToSelectIdx(CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx));
@@ -167,6 +174,7 @@ namespace App.Ui.CharaSelect
             var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
             inputProxy.OnAction += OnAction;
             inputProxy.OnMove += OnMove;
+            inputProxy.OnCancel += OnCancel;
 
             // 最初は非表示
             var image = GetComponent<UnityEngine.UI.Image>();
@@ -233,16 +241,19 @@ namespace App.Ui.CharaSelect
             TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.2f, 0.8f, 0.04f);
         }
 
-        void OnCancelSelect()
+        void OnCancelSelect(bool isPreEntry = false)
         {
-            // なぜか何度も呼ばれる
-            if (!IsSelectDone)
+            if (!isPreEntry)
             {
-                return;
-            }
-            Debug.Assert(IsSelectDone);
+                // なぜか何度も呼ばれる
+                if (!IsSelectDone)
+                {
+                    return;
+                }
+                Debug.Assert(IsSelectDone);
 
-            _manager.NotifyCancelSelect(PlayerIdx);
+                _manager.NotifyCancelSelect(PlayerIdx);
+            }
 
             IsSelectDone = false;
             _body.enabled = false;
