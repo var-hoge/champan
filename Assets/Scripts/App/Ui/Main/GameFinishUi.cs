@@ -90,6 +90,8 @@ namespace Ui.Main
                     {
                         continue;
                     }
+                    
+                    SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
 
                     selectedIdx = 1 - selectedIdx;
                     if (selectedIdx == 0)
@@ -119,6 +121,8 @@ namespace Ui.Main
             {
                 _meinMenuButton.OnDecided();
             }
+
+            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
 
             if (isRematch)
             {

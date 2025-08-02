@@ -71,6 +71,8 @@ namespace App.Ui.Credit
             }
 
 
+            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+
             _backButton.OnDecided();
             Title.TitleUiManager.IsBackFromCredit = true;
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.3f, 0.3f);

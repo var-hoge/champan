@@ -94,6 +94,9 @@ namespace App.Ui.Main
             }
 
             SEManager.Instance.FadeOut(SEPath.CHEERING_CROWD, 0.5f);
+
+            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
         }
@@ -160,6 +163,9 @@ namespace App.Ui.Main
             _ = _canvas.DOFade(0.0f, 0.2f);
 
             SEManager.Instance.FadeOut(SEPath.CHEERING_CROWD, 0.5f);
+
+            SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+
             await UniTask.WaitForSeconds(0.5f);
 
             await _gameFinishUi.Staging(animation);
