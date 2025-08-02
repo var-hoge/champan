@@ -67,7 +67,14 @@ namespace App.Actor.Player.State
         public static void ChangeState(GameObject obj, JumpPowerKind jumpPowerKind, float uncontrollableDurationSec = 0.0f)
         {
             var state = obj.GetComponent<StateMachine>().GetStateInstance<StateJump>();
-            state._jumpPower = jumpPowerKind;
+            state._jumpSpeed = state._jumpPowerArray[(int)jumpPowerKind];
+            state.ChangeState(typeof(StateJump));
+        }
+
+        public static void ChangeState(GameObject obj, float jumpSpeedY, float uncontrollableDurationSec = 0.0f)
+        {
+            var state = obj.GetComponent<StateMachine>().GetStateInstance<StateJump>();
+            state._jumpSpeed = jumpSpeedY;
             state.ChangeState(typeof(StateJump));
         }
         #endregion
@@ -79,7 +86,7 @@ namespace App.Actor.Player.State
         // ステートが始まった時に呼ばれるメソッド
         public override void OnStart()
         {
-            obj.GetComponent<DataHolder>().JumpPower = _jumpPowerArray[(int)_jumpPower];
+            obj.GetComponent<DataHolder>().JumpPower = _jumpSpeed;
 
             //// 最後に乗っていたバブルを割る
             //var lastLandingBubble = obj.GetComponent<DataHolder>().LastLandingBubble;
@@ -95,7 +102,7 @@ namespace App.Actor.Player.State
             var animator = obj.GetComponent<Animator>();
             //animator.Play("Jump");
             //animator.SetBool("IsGround", false);
-            var speedY = _jumpPowerArray[(int)_jumpPower];
+            var speedY = _jumpSpeed;
             var moveCtrl = obj.GetComponent<MoveCtrl>();
             moveCtrl.SetVelocityForceY(speedY);
             moveCtrl.GravityRateState = 0.0f;
@@ -177,7 +184,8 @@ namespace App.Actor.Player.State
         #region privateフィールド
         [SerializeField, TadaLib.Attribute.EnumList(typeof(JumpPowerKind))]
         float[] _jumpPowerArray;
-        JumpPowerKind _jumpPower;
+        float _jumpSpeed;
+
         [SerializeField]
         float _gravityIgnoreMaxSec = 1.0f;
         TadaLib.Util.Timer _gravityTimer;

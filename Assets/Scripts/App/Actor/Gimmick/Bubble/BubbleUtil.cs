@@ -33,8 +33,11 @@ namespace App.Actor.Gimmick.Bubble
                 dirUnit = Vector3.up;
             }
 
+            // 強制ジャンプ
+            Player.State.StateJump.ChangeState(obj, dirUnit.y * blowPower);
+
             var moveCtrl = obj.GetComponent<Actor.Player.MoveCtrl>();
-            moveCtrl.SetVelocityForce(dirUnit * blowPower);
+            moveCtrl.SetVelocityForceX(dirUnit.x * blowPower);
             moveCtrl.SetUncontrollableTime(0.3f);
         }
     }
