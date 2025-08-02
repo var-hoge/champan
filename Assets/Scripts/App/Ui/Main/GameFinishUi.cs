@@ -122,11 +122,15 @@ namespace Ui.Main
 
             if (isRematch)
             {
+                BGMSwitcher.FadeOutAndFadeIn(BGMPath.TITLE_SCREEN, 0.4f, 0.4f);
+
                 // シーン遷移
-                TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
+                TadaLib.Scene.TransitionManager.Instance.StartTransition("CharaSelect", 0.3f, 0.3f);
             }
             else
             {
+                BGMManager.Instance.FadeOut(0.4f);
+
                 // シーン遷移
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.6f, 0.4f);
             }
