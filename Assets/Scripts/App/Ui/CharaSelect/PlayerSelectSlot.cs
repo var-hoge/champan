@@ -9,7 +9,6 @@ using UniRx;
 using App.Actor;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
-using static UnityEngine.GraphicsBuffer;
 
 namespace App.Ui.CharaSelect
 {
@@ -99,6 +98,18 @@ namespace App.Ui.CharaSelect
         #region privateメソッド
         void WaitingForEntry()
         {
+            // 最初から CPU じゃなければ自動エントリーする
+            if (Cpu.CpuManager.Instance.IsCpu(_playerIdx) is false)
+            {
+                // 決定するまでは CPU 状態に戻す
+                Cpu.CpuManager.Instance.SetIsCpu(_playerIdx, true);
+                _phase = Phase.InCharacterSelection;
+
+                _cursor.Show();
+                ShowChara();
+                return;
+            }
+
             // ボタン入力待ち
             if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {

@@ -148,10 +148,17 @@ namespace App.Ui.CharaSelect
                 _isUsedList.Add(false);
                 _charaSelectCursors[idx].Setup(this, CharaIdxToSelectIdx(PlayerUseCharaIdList(idx)));
             }
-            for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
+
+            // 最初以外は CPU 状態を引き継ぐ
+            if (_isFirst)
             {
-                // デフォルトで CPU 扱いに
-                Cpu.CpuManager.Instance.SetIsCpu(idx, true);
+                for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
+                {
+                    // デフォルトで CPU 扱いに
+                    Cpu.CpuManager.Instance.SetIsCpu(idx, true);
+                }
+
+                _isFirst = false;
             }
         }
         #endregion
@@ -178,6 +185,8 @@ namespace App.Ui.CharaSelect
 
         [SerializeField]
         List<Sprite> _unselectedCharaSprites;
+
+        static bool _isFirst = true;
         #endregion
 
         #region privateメソッド
