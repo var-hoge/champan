@@ -55,15 +55,13 @@ namespace App.Ui.CharaSelect
                     continue;
                 }
 
+                // (良くない)
+                checkerUnit.SetDoorPos(_doorTrans.position);
+
                 if (!checkerUnit.IsFinishReady)
                 {
                     continue;
                 }
-
-                // 動けなくする
-                player.GetComponent<Actor.Player.MoveCtrl>().enabled = false;
-                player.GetComponent<TadaLib.ActionStd.StateMachine>().enabled = false;
-                checkerUnit.EnterTheDoor(_doorTrans.position);
 
                 isFinished = true;
             }

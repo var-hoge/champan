@@ -17,6 +17,11 @@ namespace App.Ui.CharaSelect
     public class CharaSelectFinishCheckerUnit
         : MonoBehaviour
     {
+        public void SetDoorPos(Vector3 doorPos)
+        {
+            _doorPos = doorPos;
+        }
+
         public void EnterTheDoor(Vector3 doorPos)
         {
             transform.DOMove(doorPos, 0.3f);
@@ -29,10 +34,23 @@ namespace App.Ui.CharaSelect
         void Update()
         {
             IsFinishReady = IsInner();
+
+            if (IsFinishReady && !_isEntered)
+            {
+                // 動けなくする
+                GetComponent<Actor.Player.MoveCtrl>().enabled = false;
+                GetComponent<TadaLib.ActionStd.StateMachine>().enabled = false;
+                EnterTheDoor(_doorPos);
+
+                _isEntered = true;
+            }
         }
 
         [SerializeField]
         BoxCollider2D _collider;
+
+        bool _isEntered = false;
+        Vector3 _doorPos = Vector3.zero;
 
         bool IsInner()
         {
