@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using DG.Tweening;
+using KanKikuchi.AudioManager;
 
 namespace App.Ui.GameModeSelect
 {
@@ -162,6 +163,8 @@ namespace App.Ui.GameModeSelect
                 _isEnd = true;
                 return true;
             }
+
+            SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
 
             if (moveIdx > 0)
             {
