@@ -7,7 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using TadaLib.Util;
-using Unity.VisualScripting;
+using System.Linq;
 
 namespace App
 {
@@ -182,6 +182,11 @@ namespace App
         {
             return _winCounts[playerIdx] == WinCountToMatchFinish - 1;
         }
+
+        /// <summary>
+        /// 最終ラウンドか
+        /// </summary>
+        public bool IslastRound => WinCountToMatchFinish > 1 && _winCounts.Any(count => count >= WinCountToMatchFinish - 1);
         #endregion
 
         #region MonoBehavior の実装

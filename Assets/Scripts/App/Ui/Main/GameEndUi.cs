@@ -121,6 +121,7 @@ namespace App.Ui.Main
                 // 勝ち点を表示
                 _winCountPanel.gameObject.SetActive(true);
                 _continueButton.gameObject.SetActive(false);
+                SEManager.Instance.Play(SEPath.CHEERING_CROWD, volumeRate: 1, delay: 1.5f);
 
                 await UniTask.WaitForSeconds(2.2f);
 
@@ -158,6 +159,7 @@ namespace App.Ui.Main
 
             _ = _canvas.DOFade(0.0f, 0.2f);
 
+            SEManager.Instance.FadeOut(SEPath.CHEERING_CROWD, 0.5f);
             await UniTask.WaitForSeconds(0.5f);
 
             await _gameFinishUi.Staging(animation);

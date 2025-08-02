@@ -75,7 +75,10 @@ namespace App.Ui.Main
 
             // GO
             {
-                BGMManager.Instance.Play(BGMPath.FIGHT);
+                var path = FindAnyObjectByType<GameMatchManager>().IslastRound
+                           ? BGMPath.LAST_ROUND
+                           : BGMPath.FIGHT;
+                BGMManager.Instance.Play(path);
                 _main.SetSprite(_goSprite);
                 _main.rectTransform.localScale = Vector3.one * 5.0f;
                 _ = _main.rectTransform.DOScale(1.0f, 0.3f).SetEase(Ease.OutQuart);
