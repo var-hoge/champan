@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using App.Actor;
 using DG.Tweening;
+using KanKikuchi.AudioManager;
 using static UnityEngine.GraphicsBuffer;
 
 namespace App.Ui.CharaSelect
@@ -93,6 +94,7 @@ namespace App.Ui.CharaSelect
             // ボタン入力待ち
             if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {
+                SEManager.Instance.Play(SEPath.PLAYER_JOIN, 20f);
                 _phase = Phase.InCharacterSelection;
 
                 _cursor.Show();
