@@ -52,6 +52,8 @@ namespace App.Ui.Title
         #region privateメソッド
         public async UniTask Staging()
         {
+            BGMManager.Instance.FadeOut(0.4f);
+
             if (IsBackFromCredit)
             {
                 AppearLogo(isImmediate: true);
