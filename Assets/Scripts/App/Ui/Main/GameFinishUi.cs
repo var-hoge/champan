@@ -29,6 +29,14 @@ namespace Ui.Main
         #region メソッド
         public async UniTask Staging(SimpleAnimation animation)
         {
+            var name = BGMManager.Instance.GetCurrentAudioNames()[0];
+            BGMManager.Instance.FadeOut(0.25f);
+            BGMManager.Instance.Play(audioPath: name, volumeRate: 1f, delay: 5f);
+
+            var path = _playerWinPaths[Random.Range(0, _playerWinPaths.Length)];
+            SEManager.Instance.Play(SEPath.VICTORY_SCREEN_START);
+            SEManager.Instance.Play(audioPath: path, volumeRate: 1f, delay: 3.5f);
+
             _canvas.gameObject.SetActive(true);
             _canvas.GetComponent<CanvasGroup>().alpha = 0.0f;
             _ = _canvas.GetComponent<CanvasGroup>().DOFade(1.0f, 0.3f);
@@ -48,7 +56,6 @@ namespace Ui.Main
             animation.Play("GameFinish");
 
             await UniTask.WaitForSeconds(3.0f);
-
             _rematchButton.gameObject.SetActive(true);
             _meinMenuButton.gameObject.SetActive(true);
 
@@ -135,6 +142,20 @@ namespace Ui.Main
 
         [SerializeField]
         TadaLib.Ui.Button _meinMenuButton;
+
+        string[] _playerWinPaths = null;
+        #endregion
+
+        #region MonoBehavior の実装
+        void Start()
+        {
+            _playerWinPaths = new[]
+            {
+                SEPath.PLAYER_WIN_01,
+                SEPath.PLAYER_WIN_02,
+                SEPath.PLAYER_WIN_03,
+            };
+        }
         #endregion
 
         #region privateメソッド
