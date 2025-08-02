@@ -132,6 +132,7 @@ namespace App.Ui.CharaSelect
 
         void OnCharaChanged()
         {
+            SEManager.Instance.Play(SEPath.MOVING_CURSOR, 20f);
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
