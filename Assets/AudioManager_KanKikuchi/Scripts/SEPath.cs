@@ -31,6 +31,7 @@ public static class SEPath{
 	public const string BUBBLE_SPAWN_01                 = "SE/Bubble Spawn/Bubble_Spawn_01";
 	public const string BUBBLE_SPAWN_02                 = "SE/Bubble Spawn/Bubble_Spawn_02";
 	public const string CANCEL_SELECTION                = "SE/Character Selection/Cancel_Selection";
+	public const string CHEERING_CROWD                  = "SE/Score Board screen/CheeringCrowd";
 	public const string COUNTDOWN                       = "SE/Crown Bubble/countdown";
 	public const string CROWN_BUBBLE_JUMP               = "SE/Crown Bubble/Crown_Bubble_Jump";
 	public const string CROWN_BUBBLE_REPOSITION         = "SE/Crown Bubble/Crown_Bubble_Reposition";
@@ -112,6 +113,7 @@ public static class SEPath{
 	public const string TITLE_SCREEN_03                 = "SE/Title Screen/TitleScreen_03";
 	public const string TITLE_SCREEN_04                 = "SE/Title Screen/TitleScreen_04";
 	public const string TRANSITION_TO_NEXT_SCREEN       = "SE/Character Selection/Transition_to_Next_Screen";
+	public const string WINNER_GET_THE_CROWN            = "SE/Score Board screen/WinnerGetTheCrown";
 
 }
 
