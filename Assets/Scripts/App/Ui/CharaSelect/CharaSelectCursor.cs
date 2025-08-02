@@ -42,9 +42,9 @@ namespace App.Ui.CharaSelect
             TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx).VibrateAdvanced(0.3f, 0.3f, 0.04f);
 
             var rectTransform = GetComponent<RectTransform>();
-            var initScale = rectTransform.localScale;
+            _initScale = rectTransform.localScale;
             rectTransform.localScale = Vector3.zero;
-            GetComponent<RectTransform>().DOScale(initScale, 0.4f).SetEase(Ease.OutBack);
+            GetComponent<RectTransform>().DOScale(_initScale, 0.4f).SetEase(Ease.OutBack);
             GetComponent<UnityEngine.UI.Image>().DOFade(1.0f, 0.2f);
 
             _manager.NotifyCursorOver(_playerIdx, _selectIdx);
@@ -91,6 +91,7 @@ namespace App.Ui.CharaSelect
 
         float _moveInputValuePrev = 0.0f;
         bool _isReady = false;
+        Vector3 _initScale;
 
         List<System.Action> _moveCallbacks = new List<System.Action>();
         List<System.Action> _selectCallbacks = new List<System.Action>();
@@ -179,6 +180,8 @@ namespace App.Ui.CharaSelect
             // 最初は非表示
             var image = GetComponent<UnityEngine.UI.Image>();
             image.color = image.color.SetAlpha(0.0f);
+
+            _initScale = GetComponent<RectTransform>().localScale;
         }
 
         private void OnDestroy()
@@ -212,6 +215,7 @@ namespace App.Ui.CharaSelect
             {
                 _selectIdx = nextSelectIdx;
                 GetComponent<RectTransform>().DOKill();
+                GetComponent<RectTransform>().localScale = _initScale;
                 GetComponent<RectTransform>().DOMove(_manager.GetPickIconTransform(_playerIdx, _selectIdx).position, 0.2f);
                 GetComponent<RectTransform>().DORotate(_manager.GetPickIconTransform(_playerIdx, _selectIdx).eulerAngles, 0.2f);
 
