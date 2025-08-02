@@ -34,9 +34,9 @@ namespace TadaLib.Ui
             var idx = App.Ui.CharaSelect.CharaSelectUiManager.PlayerUseCharaIdList(playerIndex);
             GetComponent<UnityEngine.UI.Image>().SetSprite(_sprites[idx]);
 
-            if (playerIndex < _scaleRate.Count)
+            if (idx < _scaleRate.Count)
             {
-                GetComponent<RectTransform>().sizeDelta *= _scaleRate[playerIndex];
+                GetComponent<RectTransform>().sizeDelta *= _scaleRate[idx];
             }
         }
 
