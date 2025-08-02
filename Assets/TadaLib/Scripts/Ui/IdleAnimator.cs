@@ -50,6 +50,12 @@ namespace TadaLib.Ui
                 return;
             }
 
+            if (_enabledForAnimPrev is false)
+            {
+                _enabledForAnimPrev = true;
+                ResetBasePos();
+            }
+
             _moveDurationSec += Time.deltaTime * _animRate;
             var rate = Mathf.Sin(_moveDurationSec);
 
@@ -59,7 +65,7 @@ namespace TadaLib.Ui
                 GetComponent<RectTransform>().localPosition = pos;
             }
 
-            if(_rotZAmount != 0.0f)
+            if (_rotZAmount != 0.0f)
             {
                 var angles = GetComponent<RectTransform>().localEulerAngles;
                 angles.z = rate * _rotZAmount;
@@ -85,6 +91,7 @@ namespace TadaLib.Ui
 
         [SerializeField]
         bool _enabledForAnim = false;
+        bool _enabledForAnimPrev = false;
 
         float _moveDurationSec = 0.0f;
 

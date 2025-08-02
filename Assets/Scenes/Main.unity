@@ -733,6 +733,11 @@ MonoBehaviour:
   - {fileID: -7781421827392551784, guid: 35c1be33193e4f247a94369c374d306b, type: 3}
   - {fileID: -201573519503496745, guid: 85bf0ee8749d8c1499a02dac41ee362d, type: 3}
   - {fileID: 4898443101035212444, guid: 24c97a97ebd4173409dcb1341ef3bba2, type: 3}
+  _scaleRate:
+  - 0.9
+  - 1
+  - 1
+  - 0.915
   _kind: 0
 --- !u!114 &136943450
 MonoBehaviour:

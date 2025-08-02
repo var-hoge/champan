@@ -58,7 +58,9 @@ namespace App
 
         public void AnimFinish()
         {
-            GetComponent<SimpleAnimation>().Play("Empty");
+            // @memo: アニメの最終フレームの座標が維持され続ける不具合が出てきた
+            //        対策としてアニメ機能自体を無効かできるようにする
+            GetComponent<Animator>().enabled = false;
         }
         #endregion
 
