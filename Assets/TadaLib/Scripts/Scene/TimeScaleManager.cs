@@ -48,7 +48,6 @@ namespace TadaLib.Scene
                 }
 
                 Time.timeScale = timeScale;
-                BGMManager.Instance.ChangeBaseVolume(timeScale);
 
                 if (durationSec > 0.0f)
                 {
@@ -56,12 +55,10 @@ namespace TadaLib.Scene
                 }
 
                 Time.timeScale = _originalTimeScale;
-                BGMManager.Instance.ChangeBaseVolume(1.0f);
             }
             catch (OperationCanceledException)
             {
                 Time.timeScale = _originalTimeScale;
-                BGMManager.Instance.ChangeBaseVolume(1.0f);
             }
         }
         #endregion

@@ -44,12 +44,17 @@ namespace TadaLib.Sound
                 _volume = Util.InterpUtil.Linier(_volume, targetVolume, 0.25f, Time.deltaTime);
             }
 
-            BGMManager.Instance.ChangeBaseVolume(_volume);
+            if (_volumePrev != _volume)
+            {
+                _volumePrev = _volume;
+                BGMManager.Instance.ChangeBaseVolume(_volume);
+            }
         }
         #endregion
 
         #region private フィールド
         float _volume = 1.0f;
+        float _volumePrev = 1.0f;
         #endregion
 
         #region private メソッド
