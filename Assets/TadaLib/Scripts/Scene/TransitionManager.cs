@@ -184,7 +184,7 @@ namespace TadaLib.Scene
             _isLocked = true;
 
             // 入力を無効化
-            InputUtil.DisablePlayerInput();
+            //InputUtil.DisablePlayerInput();
         }
 
         void OnTransitionEnd()
@@ -192,7 +192,7 @@ namespace TadaLib.Scene
             _isLocked = false;
 
             // 入力復活
-            InputUtil.EnablePlayerInput();
+            //InputUtil.EnablePlayerInput();
         }
 
         List<string> GetReloadScenes()

@@ -1918,10 +1918,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1256487583}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
 --- !u!1 &358681846
 GameObject:
@@ -5501,26 +5498,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996308851}
   m_CullTransparentMesh: 1
---- !u!1 &1000403866 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-  m_PrefabInstance: {fileID: 1494561162}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1000403881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000403866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fa2a5198e5bc02479be64b1b8e3b455, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _jumpWaitDurationSec: {x: 0.1, y: 0.6}
-  _reactionSec: 0.3
-  _targetBubbleTargetPosShift: 1
 --- !u!1 &1012344688
 GameObject:
   m_ObjectHideFlags: 0
@@ -6283,26 +6260,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237619418}
   m_CullTransparentMesh: 1
---- !u!1 &1256487568 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-  m_PrefabInstance: {fileID: 348653663}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1256487583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1256487568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fa2a5198e5bc02479be64b1b8e3b455, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _jumpWaitDurationSec: {x: 0.1, y: 0.6}
-  _reactionSec: 0.3
-  _targetBubbleTargetPosShift: 1
 --- !u!1 &1275120979
 GameObject:
   m_ObjectHideFlags: 0
@@ -6758,10 +6715,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2086522497}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
 --- !u!1001 &1345548457
 PrefabInstance:
@@ -7880,10 +7834,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1000403881}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
 --- !u!1001 &1495031618
 PrefabInstance:
@@ -9778,26 +9729,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011361201}
   m_CullTransparentMesh: 1
---- !u!1 &2086522482 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9139938000420098449, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
-  m_PrefabInstance: {fileID: 1324569719}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2086522497
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2086522482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fa2a5198e5bc02479be64b1b8e3b455, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _jumpWaitDurationSec: {x: 0.1, y: 0.6}
-  _reactionSec: 0.3
-  _targetBubbleTargetPosShift: 1
 --- !u!1001 &7186915300099605228
 PrefabInstance:
   m_ObjectHideFlags: 0

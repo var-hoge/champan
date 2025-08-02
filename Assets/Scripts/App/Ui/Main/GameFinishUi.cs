@@ -133,8 +133,6 @@ namespace Ui.Main
             }
             else
             {
-                BGMManager.Instance.FadeOut(0.4f);
-
                 // シーン遷移
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.6f, 0.4f);
             }

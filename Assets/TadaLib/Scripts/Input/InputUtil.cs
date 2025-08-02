@@ -85,6 +85,8 @@ namespace TadaLib.Input
 
                 if (input is MonoBehaviour { enabled: true })
                 {
+                    //var mono = input as MonoBehaviour;
+                    //Debug.Log($"{obj.name}: {mono.GetType().Name}");
                     return input;
                 }
             }
