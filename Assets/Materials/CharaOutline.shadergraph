@@ -14,6 +14,9 @@
         },
         {
             "m_Id": "96a6a4989a85486ea85a9863ed8ba76b"
+        },
+        {
+            "m_Id": "06fdf0be9b464162b406dbc51fe8072c"
         }
     ],
     "m_Keywords": [],
@@ -203,6 +206,9 @@
         },
         {
             "m_Id": "64d2f12b59b44ee9814a9100ac6455bf"
+        },
+        {
+            "m_Id": "a1da0dfcff814ceab0917e80db6621d0"
         }
     ],
     "m_GroupDatas": [],
@@ -1079,6 +1085,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "a1da0dfcff814ceab0917e80db6621d0"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "69ad908e00dd4a00a231267db97da65e"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "a5d69dad19b44c3fa4edd9048f968524"
                 },
                 "m_SlotId": 2
@@ -1649,6 +1669,34 @@
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "06fdf0be9b464162b406dbc51fe8072c",
+    "m_Guid": {
+        "m_GuidSerialized": "6d1087b6-77d2-4bd6-a007-3ca730a7174c"
+    },
+    "m_Name": "AddThr",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "AddThr",
+    "m_DefaultReferenceName": "_AddThr",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 0.0,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
     }
 }
 
@@ -3397,7 +3445,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"2d3267bc28fdaef46833990f9de15478\",\"type\":3}}",
+        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"655972215347d4144b63515656dd6d92\",\"type\":3}}",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -5477,7 +5525,7 @@
     "overrideHLSLDeclaration": true,
     "hlslDeclarationOverride": 2,
     "m_Hidden": false,
-    "m_Value": 2.799999952316284,
+    "m_Value": 2.9000000953674318,
     "m_FloatType": 0,
     "m_RangeValues": {
         "x": 0.0,
@@ -5520,6 +5568,9 @@
         },
         {
             "m_Id": "96a6a4989a85486ea85a9863ed8ba76b"
+        },
+        {
+            "m_Id": "06fdf0be9b464162b406dbc51fe8072c"
         }
     ]
 }
@@ -5571,6 +5622,42 @@
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "a1da0dfcff814ceab0917e80db6621d0",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 3091.359130859375,
+            "y": 6215.310546875,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "fd8d4f0c7f78450d98997e14177970e4"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "06fdf0be9b464162b406dbc51fe8072c"
+    }
 }
 
 {
@@ -8152,6 +8239,21 @@
     "m_Labels": [
         "Y"
     ]
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "fd8d4f0c7f78450d98997e14177970e4",
+    "m_Id": 0,
+    "m_DisplayName": "AddThr",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
 }
 
 {

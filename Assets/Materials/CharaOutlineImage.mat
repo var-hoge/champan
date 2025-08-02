@@ -106,7 +106,7 @@ Material:
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
     - _Surface: 0
-    - _Thr: 2.8
+    - _Thr: 2.9
     - _UIMaskSoftnessX: 1
     - _UIMaskSoftnessY: 1
     - _UvScroll: 0.013
