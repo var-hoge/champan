@@ -20,7 +20,7 @@ namespace App.Actor.Player.Hit
         , IScaleChanger
     {
         #region プロパティ
-        public bool IsEnabled => gameObject != null && GetComponent<DataHolder>().IsValidDummyPlayerPos is false;
+        public bool IsEnabled => gameObject != null && gameObject.activeInHierarchy && GetComponent<DataHolder>().IsValidDummyPlayerPos is false;
 
         public Vector2 CenterPos => (Vector2)(_root.transform.position + _offset);
 
