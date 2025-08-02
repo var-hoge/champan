@@ -42,7 +42,7 @@ namespace App.Ui.Credit
         async UniTask Staging()
         {
             _backButton.GetComponent<RectTransform>().localScale = Vector3.zero;
-            
+
             await UniTask.WaitForSeconds(0.2f);
 
             _backButton.GetComponent<RectTransform>().DOScale(Vector3.one, 0.15f);
@@ -70,6 +70,8 @@ namespace App.Ui.Credit
                 await UniTask.Yield();
             }
 
+
+            _backButton.OnDecided();
             Title.TitleUiManager.IsBackFromCredit = true;
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Title", 0.3f, 0.3f);
         }

@@ -298,6 +298,7 @@ namespace App.Ui.Title
 
             // SE 再生
             SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+            _items[_selectedIdx].OnDecided();
 
             if (_selectedIdx == 0)
             {
