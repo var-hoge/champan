@@ -97,6 +97,8 @@ namespace App.Ui.Main
 
             SEManager.Instance.Play(SEPath.MENU_VALIDATION);
 
+            BGMManager.Instance.FadeOut(0.6f);
+
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.3f, 0.3f);
         }

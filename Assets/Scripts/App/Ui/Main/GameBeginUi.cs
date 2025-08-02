@@ -26,8 +26,6 @@ namespace App.Ui.Main
         #region メソッド
         public async UniTask CountDown()
         {
-            BGMManager.Instance.FadeOut(0.6f);
-
             // 二回目以降はテンポをよくする
             var skipStaging = GameMatchManager.Instance.IsExistScoreGottenPlayer;
 
