@@ -153,7 +153,7 @@ namespace App.Ui.CharaSelect
         void OnCharaSelected()
         {
             var path = _breadCrunchPaths[Random.Range(0, _breadCrunchPaths.Length)];
-            SEManager.Instance.Play(path);
+            SEManager.Instance.Play(path, 0.3f);
 
             // キャラ生成
             _player.gameObject.SetActive(true);
