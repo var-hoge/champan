@@ -30,6 +30,11 @@ namespace App.Ui.Main
             _playerIdx = playerIdx;
             _isWinPlayer = isWinPlayer;
         }
+
+        public void ShowReachText()
+        {
+            _reachText.gameObject.SetActive(true);
+        }
         #endregion
 
         #region MonoBehavior の実装
@@ -58,6 +63,8 @@ namespace App.Ui.Main
         UnityEngine.UI.Image _playerIdImage;
         [SerializeField]
         UnityEngine.UI.Image _panel;
+        [SerializeField]
+        ReachText _reachText;
 
         [SerializeField]
         WinCountCrownProvider _winCountCrownProvider;
@@ -142,16 +149,13 @@ namespace App.Ui.Main
                 _ = rectTransform.DOLocalMoveX(0, _moveDurationSec).SetEase(Ease.OutBack);
             }
 
-            if (!_isWinPlayer)
-            {
-                // 勝者じゃなければここで終了
-                return;
-            }
-
             await UniTask.WaitForSeconds(_crownAppearWaitDurationSec);
 
-            // 王冠が降ってくる
-            _winCountCrownProvider.RentCrown(crownSlotGlobalPosList[curWinCount - 1], playAnim: true);
+            if (_isWinPlayer)
+            {
+                // 王冠が降ってくる
+                _winCountCrownProvider.RentCrown(crownSlotGlobalPosList[curWinCount - 1], playAnim: true);
+            }
         }
 
         List<Vector3> CalcCrownSlotGlobalPosList(int winSlotCount)

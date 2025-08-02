@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using TadaLib.Util;
+using Unity.VisualScripting;
 
 namespace App
 {
@@ -84,6 +85,23 @@ namespace App
                 return sum;
             }
         }
+
+        public bool IsExistWinner
+        {
+            get
+            {
+                for (int idx = 0; idx < _winCounts.Count; ++idx)
+                {
+                    if (_winCounts[idx] == WinCountToMatchFinish)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+
+            }
+        }
         #endregion
 
         /// <summary>
@@ -153,6 +171,16 @@ namespace App
         public int GetWinCount(int playerIdx)
         {
             return _winCounts[playerIdx];
+        }
+
+        /// <summary>
+        /// 指定したプレイヤーがリーチプレイヤーかどうか
+        /// </summary>
+        /// <param name="playerIdx"></param>
+        /// <returns></returns>
+        public bool IsReachPlayer(int playerIdx)
+        {
+            return _winCounts[playerIdx] == WinCountToMatchFinish - 1;
         }
         #endregion
 

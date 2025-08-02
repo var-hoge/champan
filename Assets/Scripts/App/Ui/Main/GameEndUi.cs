@@ -55,6 +55,9 @@ namespace App.Ui.Main
 
             await UniTask.WaitForSeconds(2.2f);
 
+            // リーチテキスト表示
+            _winCountPanel.ShowReachTextIfNeed();
+
             _continueButton.gameObject.SetActive(true);
             _continueButton.OnSelected();
 
@@ -97,12 +100,7 @@ namespace App.Ui.Main
 
         public async UniTask GameEnd(SimpleAnimation animation, int winnerPlayerIdx)
         {
-            // スローにする
-            Time.timeScale = 0.02f;
-
-            await UniTask.WaitForSeconds(1.0f * Time.timeScale);
-
-            Time.timeScale = 1.0f;
+            await UniTask.WaitForSeconds(0.25f);
 
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
 
