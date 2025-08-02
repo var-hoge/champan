@@ -113,6 +113,7 @@ public static class SEPath{
 	public const string TITLE_SCREEN_03                 = "SE/Title Screen/TitleScreen_03";
 	public const string TITLE_SCREEN_04                 = "SE/Title Screen/TitleScreen_04";
 	public const string TRANSITION_TO_NEXT_SCREEN       = "SE/Character Selection/Transition_to_Next_Screen";
+	public const string VICTORY_SCREEN_START            = "SE/Game Over Screen/VictoryScreenStart";
 	public const string WINNER_GET_THE_CROWN            = "SE/Score Board screen/WinnerGetTheCrown";
 
 }
