@@ -33,6 +33,12 @@ namespace App.Ui.CharaSelect
             _cursor.AddMoveCallback(() => OnCharaChanged());
             _cursor.AddSelectCallback(() => OnCharaSelected());
             _cursor.AddCancelCallback(() => OnCharaCanceled());
+            _breadCrunchPaths = new[]
+            {
+                SEPath.BREAD_CRUNCH_1,
+                SEPath.BREAD_CRUNCH_2,
+                SEPath.BREAD_CRUNCH_3,
+            };
         }
         #endregion
 
@@ -86,6 +92,8 @@ namespace App.Ui.CharaSelect
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
 
         bool _isReselect = false;
+
+        string[] _breadCrunchPaths = null;
         #endregion
 
         #region privateメソッド
@@ -94,7 +102,7 @@ namespace App.Ui.CharaSelect
             // ボタン入力待ち
             if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {
-                SEManager.Instance.Play(SEPath.PLAYER_JOIN, 20f);
+                SEManager.Instance.Play(SEPath.PLAYER_JOIN);
                 _phase = Phase.InCharacterSelection;
 
                 _cursor.Show();
@@ -132,7 +140,7 @@ namespace App.Ui.CharaSelect
 
         void OnCharaChanged()
         {
-            SEManager.Instance.Play(SEPath.MOVING_CURSOR, 20f);
+            SEManager.Instance.Play(SEPath.MOVING_CURSOR);
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
 
@@ -144,6 +152,9 @@ namespace App.Ui.CharaSelect
 
         void OnCharaSelected()
         {
+            var path = _breadCrunchPaths[Random.Range(0, _breadCrunchPaths.Length)];
+            SEManager.Instance.Play(path);
+
             // キャラ生成
             _player.gameObject.SetActive(true);
 
