@@ -41,9 +41,9 @@ namespace App.Actor.Gimmick.Bubble
             TeleportImpl().Forget();
         }
 
-        private Bubble Generate()
+        private Bubble Generate(bool isCrown = false)
         {
-            var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4f, 4f), 1f);
+            var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4.0f, isCrown ? 2.5f : 4.0f), 1f);
             var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
             bubble.transform.SetParent(_bubbleRoot);
             bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
@@ -73,7 +73,7 @@ namespace App.Actor.Gimmick.Bubble
             }
 
             var target = (bubbles.Count == 0)
-                            ? Generate()
+                            ? Generate(isCrown: true)
                             : bubbles[Random.Range(0, bubbles.Count - 1)];
             Bubble.SetupCrown(target);
             //crown.DOMove(Crown.Manager.Instance.CrownBubble.transform.position, 1f).OnComplete(() => { Destroy(crown.gameObject); }).Play();
