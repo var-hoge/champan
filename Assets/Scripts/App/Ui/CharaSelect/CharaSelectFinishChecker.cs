@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using KanKikuchi.AudioManager;
 
 namespace App.Ui.CharaSelect
 {
@@ -25,6 +26,7 @@ namespace App.Ui.CharaSelect
 
             if (IsFinished())
             {
+                SEManager.Instance.Play(SEPath.TRANSITION_TO_NEXT_SCREEN);
                 foreach (var starParticle in _starParticles.GetComponentsInChildren<ParticleSystem>())
                 {
                     starParticle.Play();
