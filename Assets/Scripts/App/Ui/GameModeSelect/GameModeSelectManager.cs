@@ -157,6 +157,7 @@ namespace App.Ui.GameModeSelect
 
             if (nextIndex == _items.Count)
             {
+                SEManager.Instance.Play(SEPath.MENU_VALIDATION);
                 // シーン遷移
                 TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.4f);
                 _items[_selectedIndex].OnDecide();
