@@ -50,13 +50,13 @@ namespace App.Actor.Gimmick.Crown
 
             ShieldValue = _setting.InitShieldValue;
 
-            if (Random.Range(0, 3) <= 0)
+            if (Random.Range(0, 4) <= 0)
             {
                 ShieldValue--;
             }
 
             ExShieldValue = 0;
-            if (Random.Range(0, 3) <= 0)
+            if (Random.Range(0, 4) <= 0)
             {
                 ExShieldValue++;
             }

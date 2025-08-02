@@ -328,7 +328,7 @@ namespace App.Actor.Gimmick.Bubble
 
         private IEnumerator EnableAnimation()
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(3f);
             GetComponent<BubbleAnimator>().AnimationEnabled = true;
             IsSpawning = false;
         }
