@@ -146,7 +146,7 @@ namespace App.Ui.CharaSelect
             for (int idx = 0; idx < CharaMaxCount; idx++)
             {
                 _isUsedList.Add(false);
-                _charaSelectCursors[idx].Setup(this, PlayerUseCharaIdList(idx));
+                _charaSelectCursors[idx].Setup(this, CharaIdxToSelectIdx(PlayerUseCharaIdList(idx)));
             }
             for (int idx = 0; idx < Actor.Player.Constant.PlayerCountMax; ++idx)
             {
@@ -239,7 +239,7 @@ namespace App.Ui.CharaSelect
                 _ => throw new System.Exception()
             };
         }
-        int CharaIdxToSelectIdx(int charaIdx)
+        public int CharaIdxToSelectIdx(int charaIdx)
         {
             return charaIdx switch
             {

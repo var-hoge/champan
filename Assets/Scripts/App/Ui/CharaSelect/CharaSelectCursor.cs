@@ -162,7 +162,7 @@ namespace App.Ui.CharaSelect
 
         private void Start()
         {
-            _selectIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
+            _selectIdx = _manager.CharaIdxToSelectIdx(CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx));
 
             var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
             inputProxy.OnAction += OnAction;
