@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using KanKikuchi.AudioManager;
 
 namespace App.Ui.GameModeSelect
 {
@@ -121,6 +122,7 @@ namespace App.Ui.GameModeSelect
             {
                 return false;
             }
+            SEManager.Instance.Play(SEPath.MOVING_CURSOR);
 
             var itemCount = _items.Count;
             _curIndex = (_curIndex + inputValue + itemCount) % itemCount;
