@@ -11,6 +11,7 @@ using DG.Tweening;
 using KanKikuchi.AudioManager;
 using UnityEngine.Video;
 using TadaLib.Ui;
+using App.Ui.CharaSelect;
 
 namespace App.Ui.Title
 {
@@ -52,7 +53,7 @@ namespace App.Ui.Title
         #region privateメソッド
         public async UniTask Staging()
         {
-            BGMManager.Instance.FadeOut(0.4f);
+            CharaSelectUiManager._isFirst = true;
 
             if (IsBackFromCredit)
             {
@@ -61,6 +62,8 @@ namespace App.Ui.Title
             }
             else
             {
+                BGMManager.Instance.FadeOut(0.4f);
+                
                 await PlayIntro();
 
                 await AppearLogo(isImmediate: false);

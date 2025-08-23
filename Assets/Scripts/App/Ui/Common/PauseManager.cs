@@ -6,6 +6,7 @@ using TadaLib.ProcSystem;
 using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
+using App.Ui.CharaSelect;
 
 namespace App.Ui.Common
 {

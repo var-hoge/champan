@@ -186,7 +186,7 @@ namespace App.Ui.CharaSelect
         [SerializeField]
         List<Sprite> _unselectedCharaSprites;
 
-        static bool _isFirst = true;
+        static public bool _isFirst = true;
         #endregion
 
         #region privateメソッド
