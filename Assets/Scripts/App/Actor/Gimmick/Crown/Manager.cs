@@ -74,7 +74,8 @@ namespace App.Actor.Gimmick.Crown
             {
                 _doFaleFinishStaging = Random.Range(0, 8) <= 0;
             }
-
+            // 強制的にふさぐ
+            _doFaleFinishStaging = false;
         }
         #endregion
 
