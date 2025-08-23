@@ -8,6 +8,7 @@ using TadaLib.ActionStd;
 using UniRx;
 using UnityEngine.UIElements;
 using DG.Tweening;
+using App.Actor.Player.Hit;
 
 namespace App.Ui.CharaSelect
 {
@@ -26,7 +27,8 @@ namespace App.Ui.CharaSelect
         {
             transform.DOMove(doorPos, 0.3f);
             transform.GetChild(1).DOLocalMoveY(0.2f, 0.2f).SetLoops(-1, LoopType.Yoyo);
-            transform.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
+            transform.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().DOFade(0.0f, 0.8f).SetEase(Ease.InCirc).OnComplete(() => gameObject.SetActive(false));
+            _playerId.DOFade(0.0f, 0.8f).SetEase(Ease.InCirc);
         }
 
         public bool IsFinishReady { private set; get; }
@@ -48,6 +50,9 @@ namespace App.Ui.CharaSelect
 
         [SerializeField]
         BoxCollider2D _collider;
+
+        [SerializeField]
+        UnityEngine.UI.Image _playerId;
 
         bool _isEntered = false;
         Vector3 _doorPos = Vector3.zero;

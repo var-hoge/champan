@@ -7,6 +7,7 @@ using TadaLib.Extension;
 using TadaLib.ActionStd;
 using UniRx;
 using KanKikuchi.AudioManager;
+using System.Linq;
 
 namespace App.Ui.CharaSelect
 {
@@ -39,7 +40,7 @@ namespace App.Ui.CharaSelect
 
         bool IsFinished()
         {
-            var isFinished = false;
+            var isFinishedList = new List<bool>();
             for (int idx = 0; idx < _playerParents.childCount; ++idx)
             {
                 var player = _playerParents.GetChild(idx);
@@ -60,13 +61,19 @@ namespace App.Ui.CharaSelect
 
                 if (!checkerUnit.IsFinishReady)
                 {
+                    isFinishedList.Add(false);
                     continue;
                 }
 
-                isFinished = true;
+                isFinishedList.Add(true);
             }
 
-            return isFinished;
+            if(isFinishedList.Count == 0)
+            {
+                return false;
+            }
+
+            return isFinishedList.All(b => b);
         }
 
         [SerializeField]

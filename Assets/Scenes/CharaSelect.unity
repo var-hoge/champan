@@ -1893,6 +1893,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 2058510188}
+  _playerId: {fileID: 1840944798}
 --- !u!1 &478916166
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,6 +2089,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 2058510188}
+  _playerId: {fileID: 1064702582}
 --- !u!1 &493312964
 GameObject:
   m_ObjectHideFlags: 0
@@ -7670,6 +7672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 2058510188}
+  _playerId: {fileID: 871595279}
 --- !u!1 &1840944795
 GameObject:
   m_ObjectHideFlags: 0
@@ -9144,6 +9147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 2058510188}
+  _playerId: {fileID: 1804070408}
 --- !u!1 &2092240311
 GameObject:
   m_ObjectHideFlags: 0
