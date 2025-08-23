@@ -9,6 +9,7 @@ using UniRx;
 using App.Actor;
 using DG.Tweening;
 using KanKikuchi.AudioManager;
+using UnityEngine.UIElements;
 
 namespace App.Ui.CharaSelect
 {
@@ -29,7 +30,7 @@ namespace App.Ui.CharaSelect
         void Start()
         {
             _inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
-            _cursor.AddMoveCallback(() => OnCharaChanged());
+            _cursor.AddMoveCallback((bool isRight) => OnCharaChanged(isRight));
             _cursor.AddSelectCallback(() => OnCharaSelected());
             _cursor.AddCancelCallback(() => OnCharaCanceled());
             _breadCrunchPaths = new[]
@@ -38,6 +39,8 @@ namespace App.Ui.CharaSelect
                 SEPath.BREAD_CRUNCH_2,
                 SEPath.BREAD_CRUNCH_3,
             };
+
+            _arrowOriginalScale = _arrowLeft.rectTransform.localScale;
         }
         #endregion
 
@@ -87,12 +90,20 @@ namespace App.Ui.CharaSelect
         [SerializeField]
         GameObject _player;
 
+        [SerializeField]
+        UnityEngine.UI.Image _arrowLeft;
+
+        [SerializeField]
+        UnityEngine.UI.Image _arrowRight;
+
         Phase _phase = Phase.WaitingForEntry;
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
 
         bool _isReselect = false;
 
         string[] _breadCrunchPaths = null;
+
+        Vector3 _arrowOriginalScale = Vector3.one;
         #endregion
 
         #region privateメソッド
@@ -139,7 +150,7 @@ namespace App.Ui.CharaSelect
 
             _charaGroup.GetComponent<RectTransform>().localScale = Vector3.zero;
             _charaGroup.GetComponent<RectTransform>().DOScale(1.2f, 0.4f).SetEase(Ease.OutBack);
-            _charaGroup.alpha = 0.0f; ;
+            _charaGroup.alpha = 0.0f;
             _charaGroup.DOFade(1.0f, 0.2f);
 
             foreach (var chara in _charaImages)
@@ -149,7 +160,7 @@ namespace App.Ui.CharaSelect
             _joinButton.gameObject.SetActive(false);
         }
 
-        void OnCharaChanged()
+        void OnCharaChanged(bool isRight)
         {
             SEManager.Instance.Play(SEPath.MOVING_CURSOR);
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
@@ -159,6 +170,12 @@ namespace App.Ui.CharaSelect
             {
                 chara.SetSprite(charaImage);
             }
+
+            var reactionedArrow = isRight ? _arrowRight : _arrowLeft;
+
+            reactionedArrow.rectTransform.localScale = _arrowOriginalScale;
+            reactionedArrow.rectTransform.DOKill();
+            reactionedArrow.rectTransform.DOPunchScale(Vector3.one * 0.3f, 0.2f);
         }
 
         void OnCharaSelected()

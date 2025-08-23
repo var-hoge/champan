@@ -52,7 +52,7 @@ namespace App.Ui.CharaSelect
             _isReady = true;
         }
 
-        public void AddMoveCallback(System.Action callback)
+        public void AddMoveCallback(System.Action<bool> callback)
         {
             _moveCallbacks.Add(callback);
         }
@@ -93,7 +93,7 @@ namespace App.Ui.CharaSelect
         bool _isReady = false;
         Vector3 _initScale;
 
-        List<System.Action> _moveCallbacks = new List<System.Action>();
+        List<System.Action<bool>> _moveCallbacks = new List<System.Action<bool>>();
         List<System.Action> _selectCallbacks = new List<System.Action>();
         List<System.Action> _cancelCallbacks = new List<System.Action>();
         #endregion
@@ -223,7 +223,7 @@ namespace App.Ui.CharaSelect
 
                 foreach (var callback in _moveCallbacks)
                 {
-                    callback();
+                    callback(isRight);
                 }
             }
         }
