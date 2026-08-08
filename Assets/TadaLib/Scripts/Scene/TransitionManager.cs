@@ -123,6 +123,15 @@ namespace TadaLib.Scene
                 return;
             }
 
+            // オンラインでは Fusion のシーンロードを通す (StartTransition と同じ理由)
+            if (App.Network.NetworkSession.IsOnline)
+            {
+                // preUnloadFunc はタイトルの演出用。遷移前に必ず走らせる
+                await preUnloadFunc();
+                App.Network.NetworkTransition.RequestSceneChange(nextScene);
+                return;
+            }
+
             OnTransitionBegin();
 
             if (fadeInDurationSec > 0.0f)
