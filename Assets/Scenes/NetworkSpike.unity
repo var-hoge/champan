@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 8897585857551658740, guid: 3151ef1987f42a84887a229366528d68, type: 3}
+  _seatTablePrefab: {fileID: 9135396544825123981, guid: 31629101de6ce6043b24cde9110a3b5c, type: 3}
   _sessionName: champan-spike
   _localPlayerCount: 2
   _autoJoinOnStart: 1

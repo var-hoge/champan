@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
@@ -51,6 +52,8 @@ namespace App.Network.Spike
 
                 _status = $"接続成功 PlayerRef={_runner.LocalPlayer.PlayerId}";
                 Debug.Log($"[SpikeLauncher] {_status}");
+
+                await SetUpSeatsAsync();
 
                 SpawnLocalPlayers();
             }
@@ -106,6 +109,41 @@ namespace App.Network.Spike
 
         #region private メソッド
         /// <summary>
+        /// 席テーブルを用意し、自分のピアの人数分の席が割り当てられるまで待つ
+        /// </summary>
+        async UniTask SetUpSeatsAsync()
+        {
+            // テーブルの実体は MasterClient が 1 つだけ持つ
+            if (_runner.IsSharedModeMasterClient)
+            {
+                _runner.Spawn(_seatTablePrefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+            }
+
+            // MasterClient が席テーブルを持たないまま入室すると永久に待ち続けるため、
+            // 待機には必ず上限を設ける
+            await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
+                .Timeout(_seatWaitTimeout);
+
+            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount);
+
+            // 割り当ては MasterClient が行うため、結果が返るまで 1 往復かかる
+            await UniTask.WaitUntil(() =>
+            {
+                for (int slot = 0; slot < _localPlayerCount; ++slot)
+                {
+                    if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out _))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }).Timeout(_seatWaitTimeout);
+
+            Debug.Log($"[SpikeLauncher] 席の割り当てが完了しました (使用中: {NetworkSeatTable.Instance.OccupiedSeatCount} 席)");
+        }
+
+        /// <summary>
         /// このピアが担当するローカルプレイヤーを Spawn する
         ///
         /// Shared Mode では各ピアが自分のオブジェクトを Spawn し、そのまま権威を持つ。
@@ -115,9 +153,12 @@ namespace App.Network.Spike
         {
             for (int idx = 0; idx < _localPlayerCount; ++idx)
             {
-                // 検証用の暫定的な席割り当て
-                // 本実装では MasterClient が席テーブルを管理して配る
-                var seatIdx = (_runner.LocalPlayer.PlayerId - 1) * 2 + idx;
+                // 席番号はローカルで計算せず、MasterClient が配ったものを使う
+                if (!NetworkSeatTable.Instance.TryGetSeatIdx(idx, out var seatIdx))
+                {
+                    Debug.LogError($"[SpikeLauncher] 席が割り当てられていません: localSlot={idx}");
+                    continue;
+                }
 
                 var position = new Vector3(-6.0f + seatIdx * 4.0f, 0.0f, 0.0f);
 
@@ -153,6 +194,9 @@ namespace App.Network.Spike
         SpikePlayer _playerPrefab;
 
         [SerializeField]
+        NetworkSeatTable _seatTablePrefab;
+
+        [SerializeField]
         string _sessionName = "champan-spike";
 
         [SerializeField]
@@ -164,6 +208,11 @@ namespace App.Network.Spike
         /// </summary>
         [SerializeField]
         bool _autoJoinOnStart = true;
+
+        /// <summary>
+        /// 席が割り当てられるのを待つ上限時間
+        /// </summary>
+        static readonly System.TimeSpan _seatWaitTimeout = System.TimeSpan.FromSeconds(10.0);
 
         NetworkRunner _runner = null;
         string _status = string.Empty;
