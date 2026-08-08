@@ -171,7 +171,14 @@ namespace App.Network
                     return;
                 }
 
-                _runner.Spawn(prefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+                var seatTable = _runner.Spawn(prefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+
+                // 実行時に Spawn したオブジェクトはシーン切り替えで破棄される。
+                // 席テーブルはタイトルからキャラセレクト、対戦まで持ち越す必要がある。
+                if (_runner.SceneManager is NetworkSceneManagerDefault sceneManager)
+                {
+                    sceneManager.MakeDontDestroyOnLoad(seatTable.gameObject);
+                }
             }
 
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
