@@ -54,6 +54,11 @@ namespace App.Network
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             if (Runner.Tick % 120 != 0)
             {
                 return;
@@ -89,6 +94,7 @@ namespace App.Network
             // 従来通りローカルに動かす。ここで止めるとキャラが落下も操作もできなくなる。
             if (!NetworkSession.IsInMatchScene(gameObject))
             {
+                DisableNetworkTransform();
                 return;
             }
 
@@ -124,6 +130,23 @@ namespace App.Network
             Debug.Log(
                 $"[NetworkPlayerBinder] 権威を{(isLocal ? "取得" : "喪失")}しました:"
                 + $" seatIdx={SeatIdx} networkId={Object.Id} 権威者={Object.StateAuthority}");
+        }
+
+        /// <summary>
+        /// 対戦シーン以外では NetworkTransform を止める
+        ///
+        /// 権威を持たない側では Fusion が毎フレーム座標を上書きするため、
+        /// MoveCtrl を動かしていてもキャラがその場に固定されてしまう。
+        /// キャラセレクトなどはローカルで完結させたいので、同期そのものを切る。
+        /// </summary>
+        void DisableNetworkTransform()
+        {
+            var networkTransform = GetComponent<Fusion.NetworkTransform>();
+            if (networkTransform != null && networkTransform.enabled)
+            {
+                networkTransform.enabled = false;
+                Debug.Log($"[NetworkPlayerBinder] 対戦シーン外のため座標同期を止めました: {gameObject.scene.name}");
+            }
         }
 
         /// <summary>
