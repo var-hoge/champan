@@ -106,6 +106,12 @@ namespace App.Network
             // 通常は Title からの流れで JoinAsync を呼ぶため、既定では何もしない
             if (_autoJoinOnStart)
             {
+                // 有効のまま放置するとローカルプレイが壊れるため、はっきり残す
+                Debug.LogWarning(
+                    "[NetworkGameLauncher] 検証用の自動参加が有効です。"
+                    + "ローカル対戦を遊ぶ場合は Main シーンの NetworkGameLauncher で "
+                    + "AutoJoinOnStart を切ってください");
+
                 JoinAsync(_debugSessionName, _debugLocalPlayerCount).Forget();
             }
         }
