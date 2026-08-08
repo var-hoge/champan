@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d153b7499893994caafa835d3ce6d28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 4444523018140323707, guid: 0a44d045ab2adff46bbc2774740c752a, type: 3}
+  _playerPrefab: {fileID: 9023508136276926088, guid: dda2a2c63bb7c7b4dbc8ef27ceff6846, type: 3}
   _seatTablePrefab: {fileID: 9135396544825123981, guid: 31629101de6ce6043b24cde9110a3b5c, type: 3}
   _sessionName: champan-player-test
   _localPlayerCount: 2
