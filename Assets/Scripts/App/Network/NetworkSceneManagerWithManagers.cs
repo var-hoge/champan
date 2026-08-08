@@ -36,6 +36,14 @@ namespace App.Network
                 yield return effect.FadeIn(_fadeDurationSec, false).ToCoroutine();
             }
 
+            // Single モードで読み込むと Unity がマネージャシーンごと破棄し、
+            // その直後に新しいシーンの Start が走ってしまう。
+            // (PlayerInputManager などが無い状態で初期化されて NullReference になる)
+            //
+            // NetworkLoadSceneParameters は差し替えられないため、
+            // マネージャ側を DontDestroyOnLoad へ移して破棄されないようにする。
+            PersistManagerScenes();
+
             yield return base.LoadSceneCoroutine(sceneRef, sceneParams);
 
             // ロード後は別のシーンのインスタンスになっているため取り直す
@@ -61,8 +69,47 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// マネージャシーンの中身を DontDestroyOnLoad へ移して、
+        /// Fusion の Single ロードで破棄されないようにする
+        ///
+        /// オンラインではシーン遷移を Fusion が行うため、
+        /// オフラインのようにマネージャシーンを毎回読み直す必要はない。
+        /// </summary>
+        void PersistManagerScenes()
+        {
+            if (_isPersisted)
+            {
+                return;
+            }
+
+            _isPersisted = true;
+
+            foreach (var sceneName in ManagerSceneNames)
+            {
+                var scene = SceneManager.GetSceneByName(sceneName);
+                if (!scene.isLoaded)
+                {
+                    continue;
+                }
+
+                foreach (var root in scene.GetRootGameObjects())
+                {
+                    Object.DontDestroyOnLoad(root);
+                }
+
+                Debug.Log($"[NetworkSceneManagerWithManagers] マネージャを常駐させました: {sceneName}");
+            }
+        }
+
         IEnumerator LoadManagerScenes()
         {
+            // 常駐させた後に読み直すとマネージャが二重になる
+            if (_isPersisted)
+            {
+                yield break;
+            }
+
             foreach (var sceneName in ManagerSceneNames)
             {
                 if (SceneManager.GetSceneByName(sceneName).isLoaded)
@@ -78,6 +125,8 @@ namespace App.Network
 
         #region private フィールド
         const float _fadeDurationSec = 0.3f;
+
+        bool _isPersisted = false;
 
         /// <summary>
         /// ManagerSceneLoader と揃えること
