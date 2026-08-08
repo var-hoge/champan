@@ -67,6 +67,10 @@ namespace App.Network
 
                 await SetUpSeatsAsync(localPlayerCount);
 
+                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存するため、
+                // 権威を取りに行くより先に確定させる
+                ApplyCpuSeats();
+
                 TakeAuthorityOfLocalSeats(localPlayerCount);
 
                 IsReady = true;
@@ -155,6 +159,32 @@ namespace App.Network
 
                 return true;
             }).Timeout(_seatWaitTimeout);
+        }
+
+        /// <summary>
+        /// 人間が着いていない席を CPU 席として CpuManager に反映する
+        ///
+        /// 席テーブルは全員に複製されているため、どのピアでも同じ結果になる。
+        /// CPU を出すかどうかはルール設定 (GameMatchManager.IsExistCpu) に従う。
+        /// </summary>
+        void ApplyCpuSeats()
+        {
+            var cpuManager = Cpu.CpuManager.Instance;
+            if (cpuManager == null)
+            {
+                Debug.LogError("[NetworkGameLauncher] CpuManager が見つかりません");
+                return;
+            }
+
+            var isExistCpu = GameMatchManager.Instance.IsExistCpu;
+
+            for (int seatIdx = 0; seatIdx < NetworkSeatTable.SeatCountMax; ++seatIdx)
+            {
+                var isCpuSeat = isExistCpu && NetworkSeatTable.Instance.IsCpuSeat(seatIdx);
+                cpuManager.SetIsCpu(seatIdx, isCpuSeat);
+            }
+
+            Debug.Log($"[NetworkGameLauncher] CPU 席を反映しました (CPU 有無: {isExistCpu}, CPU 数: {cpuManager.CpuCount()})");
         }
 
         /// <summary>

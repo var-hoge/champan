@@ -90,6 +90,19 @@ Phase 3 で `Player.prefab` のバリアントとして `PlayerNetwork.prefab` �
 
 **本来は `Player.prefab` 本体に `NetworkObject` を持たせ、オフライン時は Runner を通さずに使っても無害である状態を目指すべき。** バリアントは Phase 3 時点での暫定措置として扱い、Main シーンへの統合時に解消する。
 
+## CPU の扱い
+
+参加人数が 4 人に満たないとき、余った席は **CPU が埋める、または空のままにする**。
+どちらになるかは既存のルール設定画面 (GameModeSelect) の `GameMatchManager.IsExistCpu` に従う。
+ネットワーク対戦のために新しい設定を増やさない。
+
+- **CPU 席の判定**: 人間が着いていない席 (`NetworkSeatTable.IsCpuSeat`) が CPU 席になる。
+  席テーブルは全員に複製されているため、どのピアでも同じ結論になり、これ自体を同期する必要はない
+- **CPU の制御**: MasterClient が権威を持ち、その動きが他のピアへ配られる。
+  非権威側では `NetworkPlayerBinder` が `CpuInput` を無効にするため、CPU が二重に動くことはない
+- **Player の生成可否**: `PlayerRegistorator` は CPU 判定を見て Player を破棄するため、
+  オンラインでは席の割り当てが済むまで判断を待つ (`NetworkGameLauncher.IsReady`)
+
 ## 実装フェーズ
 
 | # | 内容 | 既存コードへの影響 |

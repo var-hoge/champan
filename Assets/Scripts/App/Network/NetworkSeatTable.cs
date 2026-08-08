@@ -72,6 +72,18 @@ namespace App.Network
         }
 
         /// <summary>
+        /// CPU が担当する席かどうか
+        ///
+        /// 人間が着いていない席が CPU 席になる。
+        /// 席テーブルは全員に複製されているので、どのピアでも同じ結論になり、
+        /// これ自体を別途同期する必要はない。
+        /// </summary>
+        public bool IsCpuSeat(int seatIdx)
+        {
+            return Seats[seatIdx].IsEmpty;
+        }
+
+        /// <summary>
         /// 使用中の席数
         /// </summary>
         public int OccupiedSeatCount
