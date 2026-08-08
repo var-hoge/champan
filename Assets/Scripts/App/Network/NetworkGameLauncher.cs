@@ -52,7 +52,9 @@ namespace App.Network
                     SessionName = sessionName,
                     // シーン上の NetworkObject を Fusion に管理させるために指定する
                     Scene = sceneRef,
-                    SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                    // Fusion は Single モードでロードするため、
+                    // そのままだとマネージャシーンが落ちてしまう
+                    SceneManager = gameObject.AddComponent<NetworkSceneManagerWithManagers>(),
                 });
 
                 if (!result.Ok)
