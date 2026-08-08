@@ -52,6 +52,15 @@ namespace TadaLib.Scene
                 return;
             }
 
+            // ネットワーク対戦では、シーン上の NetworkObject を全員で共有するために
+            // Fusion のシーンロードを通す必要がある。
+            // 呼び出し側 (各 UI Manager) を変えずに済むよう、ここで分岐する。
+            if (App.Network.NetworkSession.IsOnline)
+            {
+                App.Network.NetworkTransition.RequestSceneChange(nextScene);
+                return;
+            }
+
             OnTransitionBegin();
 
             // 遷移エフェクトを開始

@@ -1,18 +1,19 @@
 using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace App.Network
 {
     /// <summary>
-    /// Main シーンでネットワーク対戦のセッションを開始する
+    /// ネットワーク対戦のセッションを管理する
     ///
-    /// Main シーンはローカル対戦と共通のものを使うため、Player はシーンに直接置かれている。
-    /// そのため実行時に生成するのではなく、席が決まったピアが
-    /// 対応する Player の権威を取りに行く形になる。
+    /// セッションはシーンをまたいで存続するため、特定のシーンには置かず
+    /// DontDestroyOnLoad で持つ。
     ///
-    /// Fusion にシーン上の NetworkObject を管理させるには、
-    /// StartGameArgs.Scene を指定して Fusion のシーンマネージャ経由でロードする必要がある。
+    /// 参加 (ロビー) と、対戦開始時の席・CPU の確定は分けている。
+    /// 参加した瞬間に対戦シーンへ飛び込む形にすると、
+    /// 参加者が揃う前に席や CPU が確定してしまい、台ごとに認識が食い違うため。
     /// </summary>
     public class NetworkGameLauncher
         : MonoBehaviour
@@ -21,14 +22,40 @@ namespace App.Network
         public static NetworkGameLauncher Instance { get; private set; }
 
         /// <summary>
-        /// セッションへの参加が完了しているか
+        /// セッションに参加し、自分の席が決まっているか
         /// </summary>
-        public bool IsReady { get; private set; } = false;
+        public bool IsSessionReady { get; private set; } = false;
+
+        /// <summary>
+        /// 対戦の準備 (席と CPU の確定、権威の取得) が済んでいるか
+        /// </summary>
+        public bool IsMatchReady { get; private set; } = false;
+
+        /// <summary>
+        /// このピアが担当するローカル人数
+        /// </summary>
+        public int LocalPlayerCount { get; private set; } = 1;
         #endregion
 
         #region メソッド
         /// <summary>
-        /// ネットワーク対戦を開始する
+        /// ランチャーを取得する (無ければ作る)
+        /// </summary>
+        public static NetworkGameLauncher GetOrCreate()
+        {
+            if (Instance != null)
+            {
+                return Instance;
+            }
+
+            var obj = new GameObject(nameof(NetworkGameLauncher));
+            DontDestroyOnLoad(obj);
+
+            return obj.AddComponent<NetworkGameLauncher>();
+        }
+
+        /// <summary>
+        /// セッションに参加する
         /// オフラインで遊ぶ場合はこれを呼ばなければよい
         /// </summary>
         public async UniTask JoinAsync(string sessionName, int localPlayerCount)
@@ -38,118 +65,127 @@ namespace App.Network
                 return;
             }
 
+            LocalPlayerCount = localPlayerCount;
+
             try
             {
                 _runner = gameObject.AddComponent<NetworkRunner>();
                 _runner.ProvideInput = false;
 
-                var sceneRef = SceneRef.FromIndex(
-                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
-
                 var result = await _runner.StartGame(new StartGameArgs
                 {
                     GameMode = GameMode.Shared,
                     SessionName = sessionName,
-                    // シーン上の NetworkObject を Fusion に管理させるために指定する
-                    Scene = sceneRef,
-                    // Fusion は Single モードでロードするため、
-                    // そのままだとマネージャシーンが落ちてしまう
+                    // ここではシーンを指定しない。
+                    // 対戦シーンへは参加者が揃ってから全員一緒に移動する。
                     SceneManager = gameObject.AddComponent<NetworkSceneManagerWithManagers>(),
                 });
 
                 if (!result.Ok)
                 {
-                    Debug.LogError($"[NetworkGameLauncher] StartGame に失敗しました: {result.ShutdownReason}");
+                    Debug.LogError($"[NetworkGameLauncher] 参加に失敗しました: {result.ShutdownReason}");
                     return;
                 }
 
-                Debug.Log($"[NetworkGameLauncher] 接続しました PlayerRef={_runner.LocalPlayer.PlayerId}");
+                Debug.Log($"[NetworkGameLauncher] 参加しました PlayerRef={_runner.LocalPlayer.PlayerId}");
 
-                await SetUpSeatsAsync(localPlayerCount);
+                await SetUpSeatsAsync();
 
-                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存するため、
-                // 権威を取りに行くより先に確定させる
-                ApplyCpuSeats();
-
-                TakeAuthorityOfLocalSeats(localPlayerCount);
-
-                IsReady = true;
+                IsSessionReady = true;
             }
             catch (System.Exception e)
             {
                 Debug.LogException(e);
             }
         }
+
+        /// <summary>
+        /// セッションから抜ける
+        /// </summary>
+        public async UniTask LeaveAsync()
+        {
+            if (_runner == null)
+            {
+                return;
+            }
+
+            await _runner.Shutdown();
+
+            IsSessionReady = false;
+            IsMatchReady = false;
+            _runner = null;
+
+            Debug.Log("[NetworkGameLauncher] セッションから抜けました");
+        }
         #endregion
 
         #region MonoBehaviour の実装
         void Awake()
         {
-            // Fusion はシーンを読み直すため、既に動いているランチャーがある状態で
-            // シーン側の新しいランチャーが現れる。
-            // 二重にセッションを開始しないよう、後から現れた方を消す。
             if (Instance != null && Instance != this)
             {
-                Debug.Log("[NetworkGameLauncher] 既に動作中のため、このインスタンスを破棄します");
                 Destroy(gameObject);
                 return;
             }
 
             Instance = this;
-        }
-
-        void Start()
-        {
-            // Awake で破棄された側はここに来ない想定だが、念のため
-            if (Instance != this)
-            {
-                return;
-            }
-
-            // 検証用の入口
-            // 通常は Title からの流れで JoinAsync を呼ぶため、既定では何もしない
-            if (_autoJoinOnStart)
-            {
-                // 有効のまま放置するとローカルプレイが壊れるため、はっきり残す
-                Debug.LogWarning(
-                    "[NetworkGameLauncher] 検証用の自動参加が有効です。"
-                    + "ローカル対戦を遊ぶ場合は Main シーンの NetworkGameLauncher で "
-                    + "AutoJoinOnStart を切ってください");
-
-                JoinAsync(_debugSessionName, _debugLocalPlayerCount).Forget();
-            }
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         void OnDestroy()
         {
             if (Instance == this)
             {
+                SceneManager.sceneLoaded -= OnSceneLoaded;
                 Instance = null;
             }
         }
         #endregion
 
         #region private メソッド
-        async UniTask SetUpSeatsAsync(int localPlayerCount)
+        void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, LoadSceneMode mode)
         {
-            // シーンのロードが終わる前に Spawn すると、
+            if (scene.name != MainSceneName)
+            {
+                return;
+            }
+
+            if (_runner == null)
+            {
+                return;
+            }
+
+            // 対戦シーンに入った時点で、席と CPU を確定させる
+            SetUpMatchAsync().Forget();
+        }
+
+        async UniTask SetUpSeatsAsync()
+        {
+            // シーンのロード中に Spawn すると
             // "spawned and despawned in the same tick" となって消えてしまう
             await UniTask.WaitUntil(() => !_runner.SceneManager.IsBusy)
-                .Timeout(_seatWaitTimeout);
+                .Timeout(_waitTimeout);
 
             if (_runner.IsSharedModeMasterClient)
             {
-                _runner.Spawn(_seatTablePrefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+                var prefab = Resources.Load<NetworkSeatTable>(SeatTableResourcePath);
+                if (prefab == null)
+                {
+                    Debug.LogError($"[NetworkGameLauncher] 席テーブルのプレハブが見つかりません: Resources/{SeatTableResourcePath}");
+                    return;
+                }
+
+                _runner.Spawn(prefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
             }
 
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
-                .Timeout(_seatWaitTimeout);
+                .Timeout(_waitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(localPlayerCount);
+            NetworkSeatTable.Instance.RequestSeats(LocalPlayerCount);
 
             await UniTask.WaitUntil(() =>
             {
-                for (int slot = 0; slot < localPlayerCount; ++slot)
+                for (int slot = 0; slot < LocalPlayerCount; ++slot)
                 {
                     if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out _))
                     {
@@ -158,7 +194,33 @@ namespace App.Network
                 }
 
                 return true;
-            }).Timeout(_seatWaitTimeout);
+            }).Timeout(_waitTimeout);
+        }
+
+        /// <summary>
+        /// 対戦シーンでの準備
+        /// </summary>
+        async UniTask SetUpMatchAsync()
+        {
+            IsMatchReady = false;
+
+            try
+            {
+                await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
+                    .Timeout(_waitTimeout);
+
+                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存するため、
+                // 権威を取りに行くより先に確定させる
+                ApplyCpuSeats();
+
+                TakeAuthorityOfLocalSeats();
+
+                IsMatchReady = true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         /// <summary>
@@ -189,12 +251,13 @@ namespace App.Network
 
         /// <summary>
         /// 自分の席に対応するシーン上の Player の権威を取りに行く
+        /// CPU 席は MasterClient が権威を持ったままにする
         /// </summary>
-        void TakeAuthorityOfLocalSeats(int localPlayerCount)
+        void TakeAuthorityOfLocalSeats()
         {
             var binders = FindObjectsByType<NetworkPlayerBinder>(FindObjectsSortMode.None);
 
-            for (int slot = 0; slot < localPlayerCount; ++slot)
+            for (int slot = 0; slot < LocalPlayerCount; ++slot)
             {
                 if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out var seatIdx))
                 {
@@ -218,23 +281,14 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        [SerializeField]
-        NetworkSeatTable _seatTablePrefab;
-
         /// <summary>
-        /// 起動時に自動でセッションへ参加するか (検証用)
-        /// オフラインのローカル対戦に影響しないよう、既定では false
+        /// ランチャーは実行時に生成されるため、参照は Resources から取る
         /// </summary>
-        [SerializeField]
-        bool _autoJoinOnStart = false;
+        const string SeatTableResourcePath = "Network/NetworkSeatTable";
 
-        [SerializeField]
-        string _debugSessionName = "champan-main";
+        const string MainSceneName = "Main";
 
-        [SerializeField]
-        int _debugLocalPlayerCount = 2;
-
-        static readonly System.TimeSpan _seatWaitTimeout = System.TimeSpan.FromSeconds(10.0);
+        static readonly System.TimeSpan _waitTimeout = System.TimeSpan.FromSeconds(15.0);
 
         NetworkRunner _runner = null;
         #endregion

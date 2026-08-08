@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,6 +22,31 @@ namespace App.Network
         : NetworkSceneManagerDefault
     {
         #region NetworkSceneManagerDefault の実装
+        /// <summary>
+        /// オンラインではシーンのロードを Fusion が行うため、
+        /// 遷移演出もここに合わせて再生する
+        /// (TransitionManager の遷移処理は通らない)
+        /// </summary>
+        protected override IEnumerator LoadSceneCoroutine(SceneRef sceneRef, NetworkLoadSceneParameters sceneParams)
+        {
+            var effect = TadaLib.Scene.TransitionEffectManager.Instance;
+
+            if (effect != null)
+            {
+                yield return effect.FadeIn(_fadeDurationSec, false).ToCoroutine();
+            }
+
+            yield return base.LoadSceneCoroutine(sceneRef, sceneParams);
+
+            // ロード後は別のシーンのインスタンスになっているため取り直す
+            effect = TadaLib.Scene.TransitionEffectManager.Instance;
+
+            if (effect != null)
+            {
+                yield return effect.FadeOut(_fadeDurationSec, false).ToCoroutine();
+            }
+        }
+
         protected override IEnumerator OnSceneLoaded(
             SceneRef sceneRef,
             UnityEngine.SceneManagement.Scene scene,
@@ -51,6 +77,8 @@ namespace App.Network
         #endregion
 
         #region private フィールド
+        const float _fadeDurationSec = 0.3f;
+
         /// <summary>
         /// ManagerSceneLoader と揃えること
         /// </summary>

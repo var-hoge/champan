@@ -48,6 +48,22 @@ namespace App.Network
             CacheLocalInputEnabled();
             ApplyAuthorityState();
         }
+
+        /// <summary>
+        /// @memo: 同期状況の調査用。原因が判明したら削除する
+        /// </summary>
+        public override void FixedUpdateNetwork()
+        {
+            if (Runner.Tick % 120 != 0)
+            {
+                return;
+            }
+
+            Debug.Log(
+                $"[同期調査] seatIdx={SeatIdx} networkId={Object.Id}"
+                + $" 権威={HasStateAuthority} 権威者={Object.StateAuthority}"
+                + $" pos={transform.position.x:F2},{transform.position.y:F2}");
+        }
         #endregion
 
         #region Fusion.IStateAuthorityChanged の実装
@@ -98,7 +114,9 @@ namespace App.Network
                 inputs[idx].ActionEnabled = isLocal && _localInputEnabledCache[idx];
             }
 
-            Debug.Log($"[NetworkPlayerBinder] 権威を{(isLocal ? "取得" : "喪失")}しました: seatIdx={SeatIdx}");
+            Debug.Log(
+                $"[NetworkPlayerBinder] 権威を{(isLocal ? "取得" : "喪失")}しました:"
+                + $" seatIdx={SeatIdx} networkId={Object.Id} 権威者={Object.StateAuthority}");
         }
 
         /// <summary>

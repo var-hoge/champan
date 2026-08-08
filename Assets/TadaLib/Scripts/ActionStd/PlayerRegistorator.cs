@@ -53,7 +53,7 @@ namespace TadaLib.ActionStd
             var isTimeout = await UniTask
                 .WaitUntil(() =>
                     App.Network.NetworkGameLauncher.Instance != null
-                    && App.Network.NetworkGameLauncher.Instance.IsReady)
+                    && App.Network.NetworkGameLauncher.Instance.IsMatchReady)
                 .TimeoutWithoutException(System.TimeSpan.FromSeconds(15.0));
 
             if (isTimeout)
