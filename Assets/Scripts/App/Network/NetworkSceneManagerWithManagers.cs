@@ -1,5 +1,4 @@
 using System.Collections;
-using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,19 +22,16 @@ namespace App.Network
     {
         #region NetworkSceneManagerDefault の実装
         /// <summary>
-        /// オンラインではシーンのロードを Fusion が行うため、
-        /// 遷移演出もここに合わせて再生する
+        /// オンラインではシーンのロードを Fusion が行う
         /// (TransitionManager の遷移処理は通らない)
+        ///
+        /// @memo: 遷移演出はここでは出さない。
+        ///        画面ごとにフェードの長さが違い (タイトルからはフェード無しでシームレス)、
+        ///        一律の演出を入れると本来と違う見た目になるため。
+        ///        演出を揃えるには遷移要求と一緒に長さを配る必要がある。
         /// </summary>
         protected override IEnumerator LoadSceneCoroutine(SceneRef sceneRef, NetworkLoadSceneParameters sceneParams)
         {
-            var effect = TadaLib.Scene.TransitionEffectManager.Instance;
-
-            if (effect != null)
-            {
-                yield return effect.FadeIn(_fadeDurationSec, false).ToCoroutine();
-            }
-
             // Single モードで読み込むと Unity がマネージャシーンごと破棄し、
             // その直後に新しいシーンの Start が走ってしまう。
             // (PlayerInputManager などが無い状態で初期化されて NullReference になる)
@@ -45,14 +41,6 @@ namespace App.Network
             PersistManagerScenes();
 
             yield return base.LoadSceneCoroutine(sceneRef, sceneParams);
-
-            // ロード後は別のシーンのインスタンスになっているため取り直す
-            effect = TadaLib.Scene.TransitionEffectManager.Instance;
-
-            if (effect != null)
-            {
-                yield return effect.FadeOut(_fadeDurationSec, false).ToCoroutine();
-            }
         }
 
         protected override IEnumerator OnSceneLoaded(
@@ -124,8 +112,6 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        const float _fadeDurationSec = 0.3f;
-
         bool _isPersisted = false;
 
         /// <summary>

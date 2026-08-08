@@ -43,8 +43,13 @@ namespace TadaLib.Input
         /// <returns></returns>
         public bool GetButtonDown(ButtonCode code, float precedeSec = 0.0f)
         {
+            // 画面によっては割り当てられていないボタンがある
+            if (!_buttonDict.TryGetValue(code, out var buff))
+            {
+                return false;
+            }
+
             // 先行入力を考慮する
-            var buff = _buttonDict[code];
             var prev = buff.First.Value.IsPushed;
             foreach (var data in buff)
             {
@@ -75,8 +80,13 @@ namespace TadaLib.Input
         /// <returns></returns>
         public bool GetButton(ButtonCode code, float precedeSec = 0.0f)
         {
+            // 画面によっては割り当てられていないボタンがある
+            if (!_buttonDict.TryGetValue(code, out var buff))
+            {
+                return false;
+            }
+
             // 先行入力を考慮する
-            var buff = _buttonDict[code];
 
             if (buff.First.Value.IsPushed)
             {
@@ -106,8 +116,13 @@ namespace TadaLib.Input
         /// <returns></returns>
         public bool GetButtonUp(ButtonCode code, float precedeSec = 0.0f)
         {
+            // 画面によっては割り当てられていないボタンがある
+            if (!_buttonDict.TryGetValue(code, out var buff))
+            {
+                return false;
+            }
+
             // 先行入力を考慮する
-            var buff = _buttonDict[code];
             var prev = buff.First.Value.IsPushed;
             foreach (var data in buff)
             {
