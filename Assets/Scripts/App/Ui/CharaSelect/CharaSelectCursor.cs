@@ -72,6 +72,21 @@ namespace App.Ui.CharaSelect
             MoveImpl(isRight);
         }
 
+        /// <summary>
+        /// 他の台が担当する席の決定状態を見た目に反映する
+        /// 決定するとカーソルは消える
+        /// </summary>
+        public void ApplyRemoteSelected(bool isSelected)
+        {
+            if (IsSelectDone == isSelected)
+            {
+                return;
+            }
+
+            IsSelectDone = isSelected;
+            _body.enabled = !isSelected;
+        }
+
         public void ForceCancel()
         {
             OnCancelSelect();

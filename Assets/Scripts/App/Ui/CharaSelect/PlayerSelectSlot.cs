@@ -101,8 +101,11 @@ namespace App.Ui.CharaSelect
             if (Network.NetworkSession.IsOnline && !Network.SeatInput.IsLocalSeat(_playerIdx))
             {
                 ApplyRemoteState();
+                ApplyRemoteCharaPos();
                 return;
             }
+
+            PublishCharaPos();
 
             switch (_phase)
             {
@@ -157,6 +160,9 @@ namespace App.Ui.CharaSelect
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
         bool _isInputProxyResolved = false;
 
+        const float PosPublishIntervalSec = 0.05f;
+        float _posPublishTimer = 0.0f;
+
         bool _isReselect = false;
 
         string[] _breadCrunchPaths = null;
@@ -193,12 +199,19 @@ namespace App.Ui.CharaSelect
             }
 
             // カーソル位置 (= 選んでいるキャラ)
+            // 位置を直接セットするとアニメが飛ぶので、ローカルと同じ移動を再生する
             var remoteSelectIdx = state.GetSelectIdx(_playerIdx);
             if (remoteSelectIdx != _cursor.SelectIdx)
             {
-                _cursor.Setup(_cursor.Manager, remoteSelectIdx);
-                _cursor.Manager.NotifyCursorOver(_playerIdx, remoteSelectIdx);
-                OnCharaChanged(true);
+                var isRight = IsRightDirection(_cursor.SelectIdx, remoteSelectIdx);
+
+                // 1 回の移動で追いつかない場合があるため、届くまで動かす
+                var guard = 0;
+                while (_cursor.SelectIdx != remoteSelectIdx && guard < _cursor.Manager.CharaMaxCount)
+                {
+                    _cursor.ForceMove(isRight);
+                    ++guard;
+                }
             }
 
             // 決定
@@ -211,6 +224,9 @@ namespace App.Ui.CharaSelect
 
                 _phase = Phase.CharacterSelected;
                 OnCharaSelected();
+
+                // 決定したらカーソルを消す
+                _cursor.ApplyRemoteSelected(true);
             }
 
             // 決定の取り消し
@@ -221,7 +237,22 @@ namespace App.Ui.CharaSelect
 
                 _phase = Phase.InCharacterSelection;
                 OnCharaCanceled();
+
+                // 取り消したらカーソルを戻す
+                _cursor.ApplyRemoteSelected(false);
             }
+        }
+
+        /// <summary>
+        /// 現在位置から目的位置へ動かすとき、右回りが近いかどうか
+        /// カーソルは端で折り返さず一周するため、近い方を選ぶ
+        /// </summary>
+        bool IsRightDirection(int fromIdx, int toIdx)
+        {
+            var count = _cursor.Manager.CharaMaxCount;
+            var rightSteps = ((toIdx - fromIdx) % count + count) % count;
+
+            return rightSteps <= count - rightSteps;
         }
 
         /// <summary>
@@ -241,7 +272,77 @@ namespace App.Ui.CharaSelect
                 _ => Network.NetworkCharaSelectState.Phase.WaitingForEntry,
             };
 
-            Network.NetworkCharaSelectState.Instance.Publish(_playerIdx, phase, _cursor.SelectIdx);
+            var charaPos = _player != null
+                ? (Vector2)_player.transform.position
+                : Vector2.zero;
+
+            Network.NetworkCharaSelectState.Instance.Publish(_playerIdx, phase, _cursor.SelectIdx, charaPos);
+        }
+
+        /// <summary>
+        /// 決定後のキャラの位置を配る
+        /// 座標は毎フレーム変わるため、状態の更新とは別に送る
+        /// </summary>
+        void PublishCharaPos()
+        {
+            if (_phase != Phase.CharacterSelected)
+            {
+                return;
+            }
+
+            if (!Network.NetworkSession.IsOnline || Network.NetworkCharaSelectState.Instance == null)
+            {
+                return;
+            }
+
+            // 毎フレーム送ると通信量が増えるので間引く
+            _posPublishTimer -= Time.deltaTime;
+            if (_posPublishTimer > 0.0f)
+            {
+                return;
+            }
+            _posPublishTimer = PosPublishIntervalSec;
+
+            Network.NetworkCharaSelectState.Instance.Publish(
+                _playerIdx,
+                Network.NetworkCharaSelectState.Phase.Selected,
+                _cursor.SelectIdx,
+                _player.transform.position);
+        }
+
+        /// <summary>
+        /// 他の台が担当する席のキャラは、受け取った位置へ動かす
+        /// 自前で動かすと二重に動いてしまうため、ローカルの移動は止める
+        /// </summary>
+        void ApplyRemoteCharaPos()
+        {
+            if (_player == null || !_player.gameObject.activeSelf)
+            {
+                return;
+            }
+
+            var moveCtrl = _player.GetComponent<Actor.Player.MoveCtrl>();
+            if (moveCtrl != null && moveCtrl.enabled)
+            {
+                moveCtrl.enabled = false;
+            }
+
+            var rigidbody = _player.GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
+            if (rigidbody != null && rigidbody.enabled)
+            {
+                rigidbody.enabled = false;
+            }
+
+            var targetPos = Network.NetworkCharaSelectState.Instance.GetCharaPos(_playerIdx);
+            if (targetPos == Vector2.zero)
+            {
+                return;
+            }
+
+            var current = _player.transform.position;
+            var next = Vector2.Lerp(current, targetPos, 0.35f);
+
+            _player.transform.position = new Vector3(next.x, next.y, current.z);
         }
 
         void WaitingForEntry()

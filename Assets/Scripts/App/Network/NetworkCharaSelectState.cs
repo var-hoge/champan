@@ -43,6 +43,16 @@ namespace App.Network
             /// カーソルが指している位置 (キャラ ID ではなく並び順)
             /// </summary>
             public int SelectIdx;
+
+            /// <summary>
+            /// 決定後のキャラの位置
+            ///
+            /// キャラセレクトのキャラは Fusion の権威では扱わない。
+            /// シーン上のオブジェクトが決定時に有効化される作りのため、
+            /// 権威の受け渡しが安定せず、何度もキャラが固まる原因になった。
+            /// カーソルと同じく状態として配る。
+            /// </summary>
+            public Vector2 CharaPos;
         }
         #endregion
 
@@ -65,17 +75,22 @@ namespace App.Network
             return Seats[seatIdx].SelectIdx;
         }
 
+        public Vector2 GetCharaPos(int seatIdx)
+        {
+            return Seats[seatIdx].CharaPos;
+        }
+
         /// <summary>
         /// 自分の席の状態を全員に知らせる
         /// </summary>
-        public void Publish(int seatIdx, Phase phase, int selectIdx)
+        public void Publish(int seatIdx, Phase phase, int selectIdx, Vector2 charaPos)
         {
             if (!SeatInput.IsLocalSeat(seatIdx))
             {
                 return;
             }
 
-            RPC_SetSeatState(seatIdx, (byte)phase, selectIdx);
+            RPC_SetSeatState(seatIdx, (byte)phase, selectIdx, charaPos);
         }
 
         /// <summary>
@@ -116,7 +131,7 @@ namespace App.Network
         /// 他人の席を勝手に書き換えないよう、送り主が担当している席かを確認する
         /// </summary>
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        void RPC_SetSeatState(int seatIdx, byte phaseValue, int selectIdx, RpcInfo info = default)
+        void RPC_SetSeatState(int seatIdx, byte phaseValue, int selectIdx, Vector2 charaPos, RpcInfo info = default)
         {
             if (NetworkSeatTable.Instance == null)
             {
@@ -139,6 +154,7 @@ namespace App.Network
             {
                 PhaseValue = phaseValue,
                 SelectIdx = selectIdx,
+                CharaPos = charaPos,
             });
         }
         #endregion

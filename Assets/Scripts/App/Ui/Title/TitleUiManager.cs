@@ -46,6 +46,71 @@ namespace App.Ui.Title
         UnityEngine.UI.Image _bgCharaSelect;
 
         int _selectedIdx = 0;
+        bool _isFlowStateMissingLogged = false;
+
+        /// <summary>
+        /// 現在のタイトルの状態をゲストに反映する
+        ///
+        /// 状態が変わった瞬間に送るだけだと、その前に合流したゲストには何も伝わらない。
+        /// (ホストがボタンを押してから合流した場合など)
+        /// 毎フレーム現在値を反映して、途中参加でも追いつけるようにする。
+        /// </summary>
+        void SyncTitleStateToGuests()
+        {
+            if (!Network.NetworkSession.IsOnline || !Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
+            var flowState = Network.NetworkFlowState.Instance;
+            if (flowState == null)
+            {
+                return;
+            }
+
+            // ここに来ている時点でメニューは出ている
+            if (!flowState.IsTitleStaged)
+            {
+                flowState.SetTitleStaged();
+            }
+
+            if (flowState.TitleSelectedIdx != _selectedIdx)
+            {
+                flowState.SetTitleSelectedIdx(_selectedIdx);
+            }
+        }
+
+        /// <summary>
+        /// ホストの選択に追従する
+        /// </summary>
+        /// <returns>決定されたら true</returns>
+        bool FollowHostTitleSelection()
+        {
+            var flowState = Network.NetworkFlowState.Instance;
+            if (flowState == null)
+            {
+                if (!_isFlowStateMissingLogged)
+                {
+                    _isFlowStateMissingLogged = true;
+                    Debug.LogWarning("[TitleUiManager] NetworkFlowState がまだ届いていません");
+                }
+
+                return false;
+            }
+
+            if (flowState.TitleSelectedIdx != _selectedIdx)
+            {
+                var idxPrev = _selectedIdx;
+                _selectedIdx = flowState.TitleSelectedIdx;
+
+                _items[idxPrev].OnUnselected();
+                _items[_selectedIdx].OnSelected();
+
+                SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+            }
+
+            return flowState.IsTitleDecided;
+        }
 
         public static bool IsBackFromCredit = false;
         #endregion
@@ -229,6 +294,20 @@ namespace App.Ui.Title
                 var playSe = false;
                 while (true)
                 {
+                    // ネットワーク対戦のゲストは、ここで自分の入力を待つと先に進めない。
+                    // メニューを出すのはホストの進行に合わせる
+                    if (Network.NetworkSession.IsOnline && !Network.NetworkSession.HasAuthority)
+                    {
+                        if (Network.NetworkFlowState.Instance != null
+                            && Network.NetworkFlowState.Instance.IsTitleStaged)
+                        {
+                            break;
+                        }
+
+                        await UniTask.Yield();
+                        continue;
+                    }
+
                     if (TadaLib.Input.PlayerInputManager.Instance.IsExistGamePad())
                     {
                         break;
@@ -258,13 +337,41 @@ namespace App.Ui.Title
                 }
             }
 
+            // ゲストにもメニューを出させる
+            Network.NetworkFlowState.Instance?.SetTitleStaged();
+
             _items[_selectedIdx].OnSelected();
 
             await UniTask.WaitForSeconds(0.2f);
 
             while (true)
             {
+                // シーンが切り替わってもこのループは止まらない。
+                // ネットワーク対戦ではゲストがホストの操作でシーンを移されるため、
+                // 破棄済みの UI に触って例外になる。
+                if (this == null || _items == null || _items.Count == 0 || _items[0] == null)
+                {
+                    return;
+                }
+
                 var isFinish = false;
+
+                // 途中から合流したゲストにも現在の状態が伝わるよう、常に反映しておく
+                SyncTitleStateToGuests();
+
+                // ネットワーク対戦ではホストが操作し、ゲストは追従する
+                if (Network.NetworkSession.IsOnline && !Network.NetworkSession.HasAuthority)
+                {
+                    if (FollowHostTitleSelection())
+                    {
+                        Debug.Log("[TitleUiManager] ホストの決定を受けて同じ演出を再生します");
+                        break;
+                    }
+
+                    await UniTask.Yield();
+                    continue;
+                }
+
                 foreach (var inputProxy in TadaLib.Input.PlayerInputManager.Instance.InputProxies)
                 {
                     // 決定優先
@@ -284,6 +391,9 @@ namespace App.Ui.Title
                         _items[idxPrev].OnUnselected();
                         _items[_selectedIdx].OnSelected();
 
+                        // ゲストにも選択内容を伝える
+                        Network.NetworkFlowState.Instance?.SetTitleSelectedIdx(_selectedIdx);
+
                         // SE 再生
                         SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
 
@@ -293,6 +403,8 @@ namespace App.Ui.Title
 
                 if (isFinish)
                 {
+                    // ゲストに決定を伝える (ゲストは同じ演出を再生する)
+                    Network.NetworkFlowState.Instance?.SetTitleDecided();
                     break;
                 }
 
@@ -311,6 +423,12 @@ namespace App.Ui.Title
                 async UniTask PreUnload()
                 {
                     var titleBgmask = FindAnyObjectByType<TitleBgMask>();
+                    if (titleBgmask == null)
+                    {
+                        // 演出中にシーンが切り替わっている
+                        return;
+                    }
+
                     DOTween.To(() => titleBgmask.Scale, titleBgmask.SetScale, new Vector3(titleBgmask.Scale.x * 0.8f, 0.0f, 0.0f), 0.3f);
 
                     Vector2 ParentPos = new Vector3(0.0f, 82.11f);
@@ -334,7 +452,14 @@ namespace App.Ui.Title
 
                     foreach (var (name, pos, rotZ, scale) in charInfos)
                     {
-                        var rt = GameObject.Find(name).GetComponent<RectTransform>();
+                        // 演出中にシーンが切り替わっていることがある
+                        var charaObj = GameObject.Find(name);
+                        if (charaObj == null)
+                        {
+                            continue;
+                        }
+
+                        var rt = charaObj.GetComponent<RectTransform>();
                         rt.DOKill();
                         rt.DOLocalMove(pos * ParentScale + ParentPos, 0.5f);
                         rt.DORotate(new Vector3(0.0f, 0.0f, rotZ), 0.5f);
@@ -343,10 +468,19 @@ namespace App.Ui.Title
                         rt.GetComponent<CharaImageChanger>().Change();
                     }
 
-                    var main = GameObject.Find("Main").GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f);
+                    var mainObj = GameObject.Find("Main");
+                    if (mainObj != null)
+                    {
+                        mainObj.GetComponent<UnityEngine.UI.Image>().DOFade(0.0f, 0.2f);
+                    }
 
                     foreach (var item in _items)
                     {
+                        if (item == null)
+                        {
+                            continue;
+                        }
+
                         item.GetComponent<CanvasGroup>().DOFade(0.0f, 0.2f);
                     }
 

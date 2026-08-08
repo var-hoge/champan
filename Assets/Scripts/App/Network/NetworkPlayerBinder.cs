@@ -116,8 +116,9 @@ namespace App.Network
         void ApplyAuthorityState()
         {
             // 対戦シーン以外 (キャラセレクトなど) の Player はネットワーク制御しない。
-            // キャラセレクトは状態同期 (NetworkCharaSelectState) で表現しており、
-            // ここで制御するとキャラが落下も操作もできなくなる。
+            // シーン上のオブジェクトが決定時に有効化される作りのため権威の受け渡しが安定せず、
+            // 何度もキャラが固まる原因になった。
+            // キャラセレクトの位置は NetworkCharaSelectState で配る。
             if (!NetworkSession.IsInMatchScene(gameObject))
             {
                 DisableNetworkTransform();

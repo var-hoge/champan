@@ -48,10 +48,21 @@ namespace App.Network
                 return Instance;
             }
 
-            var obj = new GameObject(nameof(NetworkGameLauncher));
-            DontDestroyOnLoad(obj);
+            // ネットワーク用プレハブへの参照を持たせるため、プレハブから生成する。
+            // Resources から NetworkObject を直接読むと、Fusion が同期生成に失敗することがある
+            // (NetworkObjectSpawnException: Failed to load prefab synchronously)
+            var prefab = Resources.Load<NetworkGameLauncher>(LauncherResourcePath);
+            if (prefab == null)
+            {
+                Debug.LogError($"[NetworkGameLauncher] プレハブが見つかりません: Resources/{LauncherResourcePath}");
+                return null;
+            }
 
-            return obj.AddComponent<NetworkGameLauncher>();
+            var instance = Instantiate(prefab);
+            instance.name = nameof(NetworkGameLauncher);
+            DontDestroyOnLoad(instance.gameObject);
+
+            return instance;
         }
 
         /// <summary>
@@ -164,31 +175,11 @@ namespace App.Network
 
             if (_runner.IsSharedModeMasterClient)
             {
-                var prefab = Resources.Load<NetworkSeatTable>(SeatTableResourcePath);
-                if (prefab == null)
-                {
-                    Debug.LogError($"[NetworkGameLauncher] 席テーブルのプレハブが見つかりません: Resources/{SeatTableResourcePath}");
-                    return;
-                }
-
-                var seatTable = _runner.Spawn(prefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
-
-                // 実行時に Spawn したオブジェクトはシーン切り替えで破棄される。
-                // タイトルからキャラセレクト、対戦まで持ち越す必要がある。
-                KeepAcrossScenes(seatTable.gameObject);
-
-                var charaSelectPrefab = Resources.Load<NetworkCharaSelectState>(CharaSelectStateResourcePath);
-                if (charaSelectPrefab != null)
-                {
-                    var charaSelectState = _runner.Spawn(
-                        charaSelectPrefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
-
-                    KeepAcrossScenes(charaSelectState.gameObject);
-                }
-                else
-                {
-                    Debug.LogError($"[NetworkGameLauncher] プレハブが見つかりません: Resources/{CharaSelectStateResourcePath}");
-                }
+                // 実行時に Spawn したオブジェクトはシーン切り替えで破棄されるため、
+                // タイトルからキャラセレクト、対戦まで持ち越す
+                SpawnSharedState(_seatTablePrefab);
+                SpawnSharedState(_charaSelectStatePrefab);
+                SpawnSharedState(_flowStatePrefab);
             }
 
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
@@ -250,6 +241,35 @@ namespace App.Network
         }
 
         /// <summary>
+        /// 全員で共有する状態オブジェクトを生成する
+        /// </summary>
+        void SpawnSharedState(NetworkBehaviour prefab)
+        {
+            if (prefab == null)
+            {
+                Debug.LogError("[NetworkGameLauncher] 共有状態のプレハブが設定されていません");
+                return;
+            }
+
+            // プレハブ資産では NetworkBehaviour.Object が null のため、コンポーネントから取る
+            var networkObject = prefab.GetComponent<NetworkObject>();
+            if (networkObject == null)
+            {
+                Debug.LogError($"[NetworkGameLauncher] NetworkObject がありません: {prefab.name}");
+                return;
+            }
+
+            var spawned = _runner.Spawn(networkObject, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+            if (spawned == null)
+            {
+                Debug.LogError($"[NetworkGameLauncher] 生成に失敗しました: {prefab.name}");
+                return;
+            }
+
+            KeepAcrossScenes(spawned.gameObject);
+        }
+
+        /// <summary>
         /// シーンが切り替わっても破棄されないようにする
         /// </summary>
         void KeepAcrossScenes(GameObject obj)
@@ -289,11 +309,19 @@ namespace App.Network
         #endregion
 
         #region private フィールド
+        [SerializeField]
+        NetworkSeatTable _seatTablePrefab;
+
+        [SerializeField]
+        NetworkCharaSelectState _charaSelectStatePrefab;
+
+        [SerializeField]
+        NetworkFlowState _flowStatePrefab;
+
         /// <summary>
-        /// ランチャーは実行時に生成されるため、参照は Resources から取る
+        /// ランチャー自身は実行時に生成するため、これだけ Resources から取る
         /// </summary>
-        const string SeatTableResourcePath = "Network/NetworkSeatTable";
-        const string CharaSelectStateResourcePath = "Network/NetworkCharaSelectState";
+        const string LauncherResourcePath = "Network/NetworkGameLauncher";
 
         static readonly System.TimeSpan _waitTimeout = System.TimeSpan.FromSeconds(15.0);
 

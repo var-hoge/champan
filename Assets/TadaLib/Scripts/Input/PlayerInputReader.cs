@@ -200,7 +200,34 @@ namespace TadaLib.Input
         public void SetLocalInputIdx(int localInputIdx)
         {
             _localInputIdx = localInputIdx;
+            _isInputResolved = true;
             _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx);
+        }
+
+        /// <summary>
+        /// 操作元を解決する
+        ///
+        /// ネットワーク対戦では席番号とローカルのコントローラ番号が一致しないため、
+        /// SeatInput を通して変換する。他の台が担当する席なら操作元は無い。
+        /// 席テーブルは後から届くので、決まるまで毎フレーム試す。
+        /// </summary>
+        void ResolveInputProxy()
+        {
+            if (_isInputResolved)
+            {
+                return;
+            }
+
+            var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
+
+            if (App.Network.NetworkSession.IsOnline && App.Network.NetworkSeatTable.Instance == null)
+            {
+                // まだ席が配られていない
+                return;
+            }
+
+            _isInputResolved = true;
+            _playerInputProxy = App.Network.SeatInput.GetProxyOrNull(playerIdx);
         }
         #endregion
 
@@ -209,13 +236,8 @@ namespace TadaLib.Input
         {
             var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
 
-            // ネットワーク側から既に割り当てられている場合は上書きしない
-            // (Spawned が Start より先に走ることがある)
-            if (_localInputIdx < 0)
-            {
-                // オフラインでは席番号がそのままローカルのコントローラ番号になる
-                SetLocalInputIdx(playerIdx);
-            }
+            // 操作元は OnUpdate の ResolveInputProxy で決める
+            // (席テーブルはセッション参加後に届くため、ここでは決まらない)
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
@@ -240,7 +262,9 @@ namespace TadaLib.Input
         /// </summary>
         public void OnUpdate()
         {
-            if (!ActionEnabled)
+            ResolveInputProxy();
+
+            if (!ActionEnabled || _playerInputProxy == null)
             {
                 ResetInput();
 
@@ -315,6 +339,7 @@ namespace TadaLib.Input
         /// 未設定なら -1
         /// </summary>
         int _localInputIdx = -1;
+        bool _isInputResolved = false;
         Dictionary<ButtonCode, LinkedList<ButtonData>> _buttonDict = new Dictionary<ButtonCode, LinkedList<ButtonData>>();
         Dictionary<AxisCode, float> _axisDict = new Dictionary<AxisCode, float>();
 
