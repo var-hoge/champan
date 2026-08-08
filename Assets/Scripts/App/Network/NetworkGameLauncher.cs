@@ -206,16 +206,17 @@ namespace App.Network
                     .Timeout(_waitTimeout);
 
                 // シーン上の Player が Spawn されるまで待つ
-                await UniTask.WaitUntil(
-                        () => FindObjectsByType<NetworkPlayerBinder>(FindObjectsSortMode.None).Length > 0)
+                // キャラセレクトの Player は非アクティブで置かれているため、
+                // 非アクティブも探索対象に含める必要がある
+                await UniTask.WaitUntil(() => FindObjectsByType<NetworkPlayerBinder>(
+                        FindObjectsInactive.Include,
+                        FindObjectsSortMode.None).Length > 0)
                     .Timeout(_waitTimeout);
 
-                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存するため、
-                // 権威を取りに行くより先に確定させる
+                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存する
                 ApplyCpuSeats();
 
-                TakeAuthorityOfLocalSeats();
-
+                // 権威の要求は各 Player が自分で行う (NetworkPlayerBinder)
                 IsMatchReady = true;
             }
             catch (System.Exception e)
@@ -250,35 +251,6 @@ namespace App.Network
             Debug.Log($"[NetworkGameLauncher] CPU 席を反映しました (CPU 有無: {isExistCpu}, CPU 数: {cpuManager.CpuCount()})");
         }
 
-        /// <summary>
-        /// 自分の席に対応するシーン上の Player の権威を取りに行く
-        /// CPU 席は MasterClient が権威を持ったままにする
-        /// </summary>
-        void TakeAuthorityOfLocalSeats()
-        {
-            var binders = FindObjectsByType<NetworkPlayerBinder>(FindObjectsSortMode.None);
-
-            for (int slot = 0; slot < LocalPlayerCount; ++slot)
-            {
-                if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out var seatIdx))
-                {
-                    Debug.LogError($"[NetworkGameLauncher] 席が割り当てられていません: localSlot={slot}");
-                    continue;
-                }
-
-                var target = System.Array.Find(binders, binder => binder.SeatIdx == seatIdx);
-                if (target == null)
-                {
-                    Debug.LogError($"[NetworkGameLauncher] 席に対応する Player が見つかりません: seatIdx={seatIdx}");
-                    continue;
-                }
-
-                // 権威の移動は非同期に完了するため、反映は StateAuthorityChanged 側で行う
-                target.Object.RequestStateAuthority();
-
-                Debug.Log($"[NetworkGameLauncher] 権威を要求しました: seatIdx={seatIdx}");
-            }
-        }
         #endregion
 
         #region private フィールド

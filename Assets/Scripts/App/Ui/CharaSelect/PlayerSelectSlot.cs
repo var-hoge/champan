@@ -30,6 +30,32 @@ namespace App.Ui.CharaSelect
         /// オフラインでは席番号がそのままコントローラ番号になる。
         /// 他の台が担当する席は、この台では操作できない (-1 を返す)。
         /// </summary>
+        /// <summary>
+        /// 操作元を解決する
+        /// 席テーブルはセッション参加後に届くため、決まるまで毎回試す
+        /// </summary>
+        void ResolveInputProxy()
+        {
+            if (_isInputProxyResolved)
+            {
+                return;
+            }
+
+            if (Network.NetworkSession.IsOnline && Network.NetworkSeatTable.Instance == null)
+            {
+                // まだ席が配られていない
+                return;
+            }
+
+            var localInputIdx = GetLocalInputIdx();
+
+            _inputProxy = localInputIdx >= 0
+                ? TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx)
+                : null;
+
+            _isInputProxyResolved = true;
+        }
+
         int GetLocalInputIdx()
         {
             if (!Network.NetworkSession.IsOnline || Network.NetworkSeatTable.Instance == null)
@@ -53,10 +79,7 @@ namespace App.Ui.CharaSelect
         {
             // 席番号とローカルのコントローラ番号は一致しない。
             // ネットワーク対戦では「2 台目の席 2」を、その台のローカル 1 人目が操作する。
-            var localInputIdx = GetLocalInputIdx();
-            _inputProxy = localInputIdx >= 0
-                ? TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx)
-                : null;
+            // 席テーブルは後から届くため、ここでは解決しない (ResolveInputProxy で毎回見る)
             _cursor.AddMoveCallback((bool isRight) => OnCharaChanged(isRight));
             _cursor.AddSelectCallback(() => OnCharaSelected());
             _cursor.AddCancelCallback(() => OnCharaCanceled());
@@ -125,6 +148,7 @@ namespace App.Ui.CharaSelect
 
         Phase _phase = Phase.WaitingForEntry;
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
+        bool _isInputProxyResolved = false;
 
         bool _isReselect = false;
 
@@ -149,6 +173,8 @@ namespace App.Ui.CharaSelect
             }
 
             // ボタン入力待ち
+            ResolveInputProxy();
+
             // 他の台が担当する席は、この台では操作できない
             if (_inputProxy == null)
             {

@@ -54,15 +54,8 @@ namespace App.Network
         /// </summary>
         public override void FixedUpdateNetwork()
         {
-            if (Runner.Tick % 120 != 0)
-            {
-                return;
-            }
-
-            Debug.Log(
-                $"[同期調査] seatIdx={SeatIdx} networkId={Object.Id}"
-                + $" 権威={HasStateAuthority} 権威者={Object.StateAuthority}"
-                + $" pos={transform.position.x:F2},{transform.position.y:F2}");
+            // 席テーブルは後から届くため、自分の席になるまで試し続ける
+            TryTakeOwnSeatAuthority();
         }
         #endregion
 
@@ -77,6 +70,38 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// この席が自分の担当なら権威を取りに行く
+        ///
+        /// ランチャー側からまとめて要求する形だと、
+        /// シーン上の Player が非アクティブだったり Spawn が遅れたりしたときに取りこぼす。
+        /// 各 Player が自分で取りに行くことで、順序やアクティブ状態に依存しなくなる。
+        /// </summary>
+        void TryTakeOwnSeatAuthority()
+        {
+            if (_isAuthorityRequested || HasStateAuthority)
+            {
+                return;
+            }
+
+            var seatTable = NetworkSeatTable.Instance;
+            if (seatTable == null)
+            {
+                return;
+            }
+
+            var seat = seatTable.Seats[SeatIdx];
+            if (seat.IsEmpty || seat.Owner != Runner.LocalPlayer)
+            {
+                return;
+            }
+
+            _isAuthorityRequested = true;
+            Object.RequestStateAuthority();
+
+            Debug.Log($"[NetworkPlayerBinder] 自分の席なので権威を要求します: seatIdx={SeatIdx}");
+        }
+
         /// <summary>
         /// 権威の有無に応じて、自前のシミュレーションを止める / 動かす
         ///
@@ -171,6 +196,7 @@ namespace App.Network
         #endregion
 
         #region private フィールド
+        bool _isAuthorityRequested = false;
         bool[] _localInputEnabledCache = new bool[0];
         #endregion
     }

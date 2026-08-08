@@ -199,6 +199,7 @@ namespace TadaLib.Input
         /// </summary>
         public void SetLocalInputIdx(int localInputIdx)
         {
+            _localInputIdx = localInputIdx;
             _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx);
         }
         #endregion
@@ -208,8 +209,13 @@ namespace TadaLib.Input
         {
             var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
 
-            // オフラインでは席番号がそのままローカルのコントローラ番号になる
-            SetLocalInputIdx(playerIdx);
+            // ネットワーク側から既に割り当てられている場合は上書きしない
+            // (Spawned が Start より先に走ることがある)
+            if (_localInputIdx < 0)
+            {
+                // オフラインでは席番号がそのままローカルのコントローラ番号になる
+                SetLocalInputIdx(playerIdx);
+            }
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
@@ -303,6 +309,12 @@ namespace TadaLib.Input
 
         const float MaxBuffSec = 0.5f;
         TadaLib.Input.PlayerInputProxy _playerInputProxy = null;
+
+        /// <summary>
+        /// この Player を操作するローカルのコントローラ番号
+        /// 未設定なら -1
+        /// </summary>
+        int _localInputIdx = -1;
         Dictionary<ButtonCode, LinkedList<ButtonData>> _buttonDict = new Dictionary<ButtonCode, LinkedList<ButtonData>>();
         Dictionary<AxisCode, float> _axisDict = new Dictionary<AxisCode, float>();
 
