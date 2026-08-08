@@ -36,6 +36,14 @@ namespace App.Actor.Player
         #endregion
 
         #region メソッド
+        /// <summary>
+        /// 席番号を設定する
+        /// ネットワーク対戦では席が MasterClient から配られるため、生成後に設定する必要がある
+        /// </summary>
+        public void SetPlayerIdx(int playerIdx)
+        {
+            _playerIdx = playerIdx;
+        }
         #endregion
 
         public void OnUpdate()
