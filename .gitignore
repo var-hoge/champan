@@ -73,3 +73,7 @@ crashlytics-build.properties
 
 /Assets/ImportPackages/
 /Assets/ImportPackages.meta
+# Photon の App ID を含むため管理対象外にする (champan は public リポジトリ)
+# 設定手順は Docs/Network/setup.md を参照
+/Assets/Photon/Fusion/Resources/PhotonAppSettings.asset
+/Assets/Photon/Fusion/Resources/PhotonAppSettings.asset.meta
