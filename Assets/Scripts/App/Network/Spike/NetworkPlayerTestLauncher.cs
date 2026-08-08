@@ -128,7 +128,9 @@ namespace App.Network.Spike
                     _runner.LocalPlayer,
                     (runner, obj) =>
                     {
-                        obj.GetComponent<NetworkPlayerBinder>().SeatIdx = seatIdx;
+                        var binder = obj.GetComponent<NetworkPlayerBinder>();
+                        binder.SeatIdxOverride = seatIdx;
+                        binder.UseSeatOverride = true;
                     });
 
                 if (player == null)

@@ -20,7 +20,7 @@ namespace App.Actor.Gimmick.Crown
         public int ShieldValue { get; set; }
         public int ExShieldValue { get; set; }
         public bool IsShieldDestroyed => ShieldValue == 0 && ExShieldValue == 0;
-        public int InitShieldValue { private set; get; }
+        public int InitShieldValue { set; get; }
         public bool DoFakeFinishStaging
         {
             get
@@ -44,6 +44,21 @@ namespace App.Actor.Gimmick.Crown
         #endregion
 
         #region メソッド
+        /// <summary>
+        /// MasterClient が決めたシールド値を反映する
+        ///
+        /// シールド値は Awake で Random.Range によって決まるため、
+        /// ネットワーク対戦ではそのままだと台ごとに食い違う。
+        /// </summary>
+        public void ApplyNetworkShieldValues(int shieldValue, int exShieldValue, int initShieldValue)
+        {
+            ShieldValue = shieldValue;
+            ExShieldValue = exShieldValue;
+            InitShieldValue = initShieldValue;
+
+            Debug.Log($"[Crown.Manager] ネットワークから反映しました ShieldValue/Ex: {ShieldValue}/{ExShieldValue}");
+        }
+
         protected override void Awake()
         {
             base.Awake();

@@ -254,6 +254,12 @@ namespace App.Actor.Gimmick.Bubble
             bubble.SetupCrown(Crown.Manager.Instance.ShieldValue, withGameStart: Crown.Manager.Instance.IsFirstCrownSetup);
 
             Crown.Manager.Instance.IsFirstCrownSetup = false;
+
+            // どのバブルが王冠を持つかは全員で一致している必要がある
+            if (Network.NetworkCrownState.Instance != null)
+            {
+                Network.NetworkCrownState.Instance.SetCrownBubble(bubble);
+            }
         }
 
         private void RemoveCrown()

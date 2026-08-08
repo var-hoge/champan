@@ -6,76 +6,119 @@ namespace App.Network
     /// <summary>
     /// ネットワーク対戦時に Player をネットワークへ橋渡しするコンポーネント
     ///
-    /// やること
-    /// - 席番号 (playerIdx) を DataHolder に流し込む
-    /// - 権威を持たない側で、ローカルにシミュレートしてはいけないコンポーネントを止める
-    ///
-    /// 既存のローカル対戦・CPU 対戦に影響を与えないよう、
-    /// これらを持つのは Player プレハブのネットワーク用バリアントだけにしている。
+    /// Main シーンの Player はシーンに直接置かれているため、
+    /// 席が決まったピアが後から権威を取りに行く形になる。
+    /// そのため権威の有無は Spawned() の時点で確定せず、途中で変わる。
     /// </summary>
     public class NetworkPlayerBinder
         : NetworkBehaviour
+        , IStateAuthorityChanged
     {
         #region プロパティ
         /// <summary>
-        /// この Player が担当する席番号
-        /// Spawn 時に onBeforeSpawned で渡すこと (Spawned() より後に代入しても間に合わない)
+        /// 実行時生成の場合に渡される席番号
+        /// シーン配置の Player は DataHolder に設定済みの playerIdx を使うため、これを使わない
         /// </summary>
         [Networked]
-        public int SeatIdx { get; set; }
+        public int SeatIdxOverride { get; set; }
+
+        /// <summary>
+        /// SeatIdxOverride を使うかどうか
+        /// </summary>
+        [Networked]
+        public NetworkBool UseSeatOverride { get; set; }
+
+        /// <summary>
+        /// この Player が担当する席番号
+        /// </summary>
+        public int SeatIdx => UseSeatOverride
+            ? SeatIdxOverride
+            : GetComponent<Actor.Player.DataHolder>().PlayerIdx;
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
         public override void Spawned()
         {
-            // 既存コードはすべて playerIdx を見て動くので、まずこれを確定させる
-            GetComponent<Actor.Player.DataHolder>().SetPlayerIdx(SeatIdx);
-
-            if (HasStateAuthority)
+            if (UseSeatOverride)
             {
-                return;
+                // 既存コードはすべて playerIdx を見て動くので、まずこれを確定させる
+                GetComponent<Actor.Player.DataHolder>().SetPlayerIdx(SeatIdxOverride);
             }
 
-            DisableLocalSimulation();
+            CacheLocalInputEnabled();
+            ApplyAuthorityState();
+        }
+        #endregion
+
+        #region Fusion.IStateAuthorityChanged の実装
+        /// <summary>
+        /// 権威が移ったとき (席が決まったピアが権威を取りに来たときなど)
+        /// </summary>
+        public void StateAuthorityChanged()
+        {
+            ApplyAuthorityState();
         }
         #endregion
 
         #region private メソッド
         /// <summary>
-        /// 権威を持たない側で、ローカルのシミュレーションを止める
+        /// 権威の有無に応じて、自前のシミュレーションを止める / 動かす
         ///
-        /// 位置は NetworkTransform が同期するため、自前で座標を動かすものが残っていると衝突する。
+        /// 位置は NetworkTransform が同期するため、権威を持たない側で自前に座標を動かすと衝突する。
         /// 入力も、止めないと手元のコントローラでリモートのキャラが動いてしまう。
         /// </summary>
-        void DisableLocalSimulation()
+        void ApplyAuthorityState()
         {
-            // 自前で transform.position を書き換えるもの
+            var isLocal = HasStateAuthority;
+
             var moveCtrl = GetComponent<Actor.Player.MoveCtrl>();
             if (moveCtrl != null)
             {
-                moveCtrl.enabled = false;
+                moveCtrl.enabled = isLocal;
             }
 
             var rigidbody = GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
             if (rigidbody != null)
             {
-                rigidbody.enabled = false;
+                rigidbody.enabled = isLocal;
             }
 
             // InputUtil は「有効な IInput を最初に見つけた 1 つ」を返すため、
             // ローカル入力を無効にしておかないと NetworkInput が使われるとは限らない
-            foreach (var input in GetComponents<TadaLib.Input.IInput>())
+            var inputs = GetComponents<TadaLib.Input.IInput>();
+            for (int idx = 0; idx < inputs.Length; ++idx)
             {
-                if (input is NetworkInput)
+                if (inputs[idx] is NetworkInput)
                 {
                     continue;
                 }
 
-                input.ActionEnabled = false;
+                // 権威を取り戻したときは元の有効状態に戻す
+                // (CPU かどうかで元の値が変わるため、単純に true にはできない)
+                inputs[idx].ActionEnabled = isLocal && _localInputEnabledCache[idx];
             }
 
-            Debug.Log($"[NetworkPlayerBinder] リモートのため自前シミュレーションを停止しました: seatIdx={SeatIdx}");
+            Debug.Log($"[NetworkPlayerBinder] 権威を{(isLocal ? "取得" : "喪失")}しました: seatIdx={SeatIdx}");
         }
+
+        /// <summary>
+        /// ローカル入力の元々の有効状態を控えておく
+        /// CPU かどうかによって変わるため、復帰時に単純に true へ戻せない
+        /// </summary>
+        void CacheLocalInputEnabled()
+        {
+            var inputs = GetComponents<TadaLib.Input.IInput>();
+            _localInputEnabledCache = new bool[inputs.Length];
+
+            for (int idx = 0; idx < inputs.Length; ++idx)
+            {
+                _localInputEnabledCache[idx] = inputs[idx].ActionEnabled;
+            }
+        }
+        #endregion
+
+        #region private フィールド
+        bool[] _localInputEnabledCache = new bool[0];
         #endregion
     }
 }
