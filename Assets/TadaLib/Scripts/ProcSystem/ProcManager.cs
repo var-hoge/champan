@@ -28,6 +28,7 @@ namespace TadaLib.ProcSystem
         /// <param name="proc"></param>
         public void AddManagerUpdateInvoke(IProcManagerUpdate proc, ManagerProcSection section)
         {
+            EnsureSections();
             _procManagerList[section].Add(proc);
         }
         #endregion
@@ -35,14 +36,16 @@ namespace TadaLib.ProcSystem
         #region Monobehaviorの実装
         void Start()
         {
-            foreach(ManagerProcSection section in System.Enum.GetValues(typeof(ManagerProcSection)))
-            {
-                _procManagerList[section] = new List<IProcManagerUpdate>();
-            }
+            EnsureSections();
         }
 
         void Update()
         {
+            // シーンの再ロード中は Start より先に Update が走ることがあるため、
+            // 順序に依存しないようにする
+            // (ネットワーク対戦では Fusion がシーンを読み直す)
+            EnsureSections();
+
             // ====================================================
             // イベント関数の処理順はコードを読んでください
             // ※ 各イベント関数内の呼び出し順はUnity標準機能の「Script Execution Order」の順番通り
@@ -125,6 +128,23 @@ namespace TadaLib.ProcSystem
         }
         #endregion
 
+
+        #region private メソッド
+        /// <summary>
+        /// セクションごとのリストを用意する
+        /// 何度呼んでも既存のリストは壊さない
+        /// </summary>
+        void EnsureSections()
+        {
+            foreach (ManagerProcSection section in System.Enum.GetValues(typeof(ManagerProcSection)))
+            {
+                if (!_procManagerList.ContainsKey(section))
+                {
+                    _procManagerList[section] = new List<IProcManagerUpdate>();
+                }
+            }
+        }
+        #endregion
 
         #region private フィールド
         List<BaseProc> _procListForUpdate = new List<BaseProc>();

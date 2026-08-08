@@ -132,6 +132,15 @@ namespace App.Actor.Gimmick.Bubble
                 return;
             }
 
+            // 破裂の判定や搭乗の処理は権威側だけが行う。
+            // リモート側でも走らせると、Despawn が効かないまま DOScale(0) で
+            // 縮むだけの「見えないが存在するバブル」が残り、影だけが残る。
+            // 位置とスケールは NetworkTransform が配ってくる。
+            if (!Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             bool losingRider = currentRiders > _moveInfoCtrl.RideObjects.Count;
             currentRiders = _moveInfoCtrl.RideObjects.Count;
 

@@ -81,11 +81,27 @@ namespace App.Network
         #region MonoBehaviour の実装
         void Awake()
         {
+            // Fusion はシーンを読み直すため、既に動いているランチャーがある状態で
+            // シーン側の新しいランチャーが現れる。
+            // 二重にセッションを開始しないよう、後から現れた方を消す。
+            if (Instance != null && Instance != this)
+            {
+                Debug.Log("[NetworkGameLauncher] 既に動作中のため、このインスタンスを破棄します");
+                Destroy(gameObject);
+                return;
+            }
+
             Instance = this;
         }
 
         void Start()
         {
+            // Awake で破棄された側はここに来ない想定だが、念のため
+            if (Instance != this)
+            {
+                return;
+            }
+
             // 検証用の入口
             // 通常は Title からの流れで JoinAsync を呼ぶため、既定では何もしない
             if (_autoJoinOnStart)
@@ -106,6 +122,11 @@ namespace App.Network
         #region private メソッド
         async UniTask SetUpSeatsAsync(int localPlayerCount)
         {
+            // シーンのロードが終わる前に Spawn すると、
+            // "spawned and despawned in the same tick" となって消えてしまう
+            await UniTask.WaitUntil(() => !_runner.SceneManager.IsBusy)
+                .Timeout(_seatWaitTimeout);
+
             if (_runner.IsSharedModeMasterClient)
             {
                 _runner.Spawn(_seatTablePrefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);

@@ -36,11 +36,23 @@ namespace TadaLib.ActionStd
 
         public static GameObject TryGetPlayer(int number)
         {
+            // シーンの再ロード中は Instance が存在しない瞬間がある
+            // (ネットワーク対戦では Fusion がシーンを読み直すため)
+            if (Instance is null)
+            {
+                return null;
+            }
+
             if (Instance._players is null)
             {
                 Instance.InitPlayerList();
             }
-            Assert.IsTrue(number < Instance._players.Count);
+
+            if (number < 0 || number >= Instance._players.Count)
+            {
+                return null;
+            }
+
             return Instance._players[number];
         }
 
