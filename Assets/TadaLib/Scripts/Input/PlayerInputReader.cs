@@ -188,12 +188,28 @@ namespace TadaLib.Input
         }
         #endregion
 
+        #region メソッド
+        /// <summary>
+        /// この Player を操作するローカルのコントローラ番号を設定する
+        ///
+        /// 席番号 (playerIdx) とは別物。
+        /// ネットワーク対戦では「2 台目の席 2」を「その台のローカル 1 人目」が操作するため、
+        /// 席番号をそのままコントローラ番号として使うと、
+        /// どの台も同じコントローラを見てしまう。
+        /// </summary>
+        public void SetLocalInputIdx(int localInputIdx)
+        {
+            _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx);
+        }
+        #endregion
+
         #region MonoBehavior の実装
         void Start()
         {
             var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
 
-            _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx);
+            // オフラインでは席番号がそのままローカルのコントローラ番号になる
+            SetLocalInputIdx(playerIdx);
 
             // 初期化
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))

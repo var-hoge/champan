@@ -54,11 +54,6 @@ namespace App.Network
         /// </summary>
         public override void FixedUpdateNetwork()
         {
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                return;
-            }
-
             if (Runner.Tick % 120 != 0)
             {
                 return;
@@ -90,15 +85,12 @@ namespace App.Network
         /// </summary>
         void ApplyAuthorityState()
         {
-            // 対戦シーン以外 (キャラセレクトなど) では、権威に関係なく
-            // 従来通りローカルに動かす。ここで止めるとキャラが落下も操作もできなくなる。
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                DisableNetworkTransform();
-                return;
-            }
-
             var isLocal = HasStateAuthority;
+
+            if (isLocal)
+            {
+                ApplyLocalInputIdx();
+            }
 
             var moveCtrl = GetComponent<Actor.Player.MoveCtrl>();
             if (moveCtrl != null)
@@ -133,20 +125,33 @@ namespace App.Network
         }
 
         /// <summary>
-        /// 対戦シーン以外では NetworkTransform を止める
+        /// 自分が担当する席を、この台の何番目のコントローラで操作するかを設定する
         ///
-        /// 権威を持たない側では Fusion が毎フレーム座標を上書きするため、
-        /// MoveCtrl を動かしていてもキャラがその場に固定されてしまう。
-        /// キャラセレクトなどはローカルで完結させたいので、同期そのものを切る。
+        /// 席番号とローカルのコントローラ番号は一致しない。
+        /// 「2 台目の席 2」は、その台のローカル 1 人目が操作する。
         /// </summary>
-        void DisableNetworkTransform()
+        void ApplyLocalInputIdx()
         {
-            var networkTransform = GetComponent<Fusion.NetworkTransform>();
-            if (networkTransform != null && networkTransform.enabled)
+            if (NetworkSeatTable.Instance == null)
             {
-                networkTransform.enabled = false;
-                Debug.Log($"[NetworkPlayerBinder] 対戦シーン外のため座標同期を止めました: {gameObject.scene.name}");
+                return;
             }
+
+            var seat = NetworkSeatTable.Instance.Seats[SeatIdx];
+            if (seat.IsEmpty)
+            {
+                return;
+            }
+
+            var reader = GetComponent<TadaLib.Input.PlayerInputReader>();
+            if (reader == null)
+            {
+                return;
+            }
+
+            reader.SetLocalInputIdx(seat.LocalSlot);
+
+            Debug.Log($"[NetworkPlayerBinder] 操作の割り当て: seatIdx={SeatIdx} ローカル番号={seat.LocalSlot}");
         }
 
         /// <summary>

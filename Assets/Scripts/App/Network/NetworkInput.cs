@@ -47,11 +47,7 @@ namespace App.Network
         /// </summary>
         public bool ActionEnabled
         {
-            // 対戦シーン以外 (キャラセレクトなど) では、この入力を使わせない。
-            // 選ばれてしまうと手元の入力が届かず操作できなくなる。
-            get => _actionEnabled
-                && !HasStateAuthority
-                && NetworkSession.IsInMatchScene(gameObject);
+            get => _actionEnabled && !HasStateAuthority;
             set => _actionEnabled = value;
         }
 
@@ -100,11 +96,6 @@ namespace App.Network
         #region Fusion.NetworkBehaviour の実装
         public override void FixedUpdateNetwork()
         {
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                return;
-            }
-
             if (HasStateAuthority)
             {
                 Current = CaptureLocalInput();

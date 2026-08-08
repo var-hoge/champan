@@ -24,12 +24,39 @@ namespace App.Ui.CharaSelect
         #endregion
 
         #region メソッド
+        /// <summary>
+        /// この席を操作するローカルのコントローラ番号を取得する
+        ///
+        /// オフラインでは席番号がそのままコントローラ番号になる。
+        /// 他の台が担当する席は、この台では操作できない (-1 を返す)。
+        /// </summary>
+        int GetLocalInputIdx()
+        {
+            if (!Network.NetworkSession.IsOnline || Network.NetworkSeatTable.Instance == null)
+            {
+                return _playerIdx;
+            }
+
+            var seat = Network.NetworkSeatTable.Instance.Seats[_playerIdx];
+
+            if (seat.IsEmpty || !Network.NetworkSeatTable.Instance.IsLocalSeat(_playerIdx))
+            {
+                return -1;
+            }
+
+            return seat.LocalSlot;
+        }
         #endregion
 
         #region MonoBehavior の実装
         void Start()
         {
-            _inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
+            // 席番号とローカルのコントローラ番号は一致しない。
+            // ネットワーク対戦では「2 台目の席 2」を、その台のローカル 1 人目が操作する。
+            var localInputIdx = GetLocalInputIdx();
+            _inputProxy = localInputIdx >= 0
+                ? TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx)
+                : null;
             _cursor.AddMoveCallback((bool isRight) => OnCharaChanged(isRight));
             _cursor.AddSelectCallback(() => OnCharaSelected());
             _cursor.AddCancelCallback(() => OnCharaCanceled());
@@ -122,6 +149,12 @@ namespace App.Ui.CharaSelect
             }
 
             // ボタン入力待ち
+            // 他の台が担当する席は、この台では操作できない
+            if (_inputProxy == null)
+            {
+                return;
+            }
+
             if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {
                 SEManager.Instance.Play(SEPath.PLAYER_JOIN);

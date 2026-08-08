@@ -145,18 +145,14 @@ namespace App.Network
         #region private メソッド
         void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, LoadSceneMode mode)
         {
-            if (scene.name != NetworkSession.MatchSceneName)
-            {
-                return;
-            }
-
             if (_runner == null)
             {
                 return;
             }
 
-            // 対戦シーンに入った時点で、席と CPU を確定させる
-            SetUpMatchAsync().Forget();
+            // キャラセレクトにも Player が置かれており、そこでも相手の動きを見せたい。
+            // Player がいるシーンなら対戦シーンと同じように席と権威を設定する。
+            SetUpSceneAsync().Forget();
         }
 
         async UniTask SetUpSeatsAsync()
@@ -198,15 +194,20 @@ namespace App.Network
         }
 
         /// <summary>
-        /// 対戦シーンでの準備
+        /// Player が置かれているシーンでの準備
         /// </summary>
-        async UniTask SetUpMatchAsync()
+        async UniTask SetUpSceneAsync()
         {
             IsMatchReady = false;
 
             try
             {
                 await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
+                    .Timeout(_waitTimeout);
+
+                // シーン上の Player が Spawn されるまで待つ
+                await UniTask.WaitUntil(
+                        () => FindObjectsByType<NetworkPlayerBinder>(FindObjectsSortMode.None).Length > 0)
                     .Timeout(_waitTimeout);
 
                 // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存するため、
