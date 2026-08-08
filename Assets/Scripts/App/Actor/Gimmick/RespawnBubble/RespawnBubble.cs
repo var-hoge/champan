@@ -52,7 +52,7 @@ namespace App.Actor.Gimmick.RespawnBubble
             _burstTimer -= Time.deltaTime;
 
             var force = Time.deltaTime * 10f;
-            // ƒ}ƒ‹ƒ`ƒvƒŒƒCƒ„[‘Î‰
+            // ï¿½}ï¿½ï¿½ï¿½`ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Î‰ï¿½
             var axisX = InputUtil.GetAxis(_player.gameObject, AxisCode.Horizontal);
             _rb.AddForce(new(axisX * force, 0.0f));
 
@@ -76,7 +76,7 @@ namespace App.Actor.Gimmick.RespawnBubble
             SEManager.Instance.Play(path, 20f);
             _player.position = transform.position;
             _player.GetComponent<Player.MoveCtrl>().SetVelocityForce(Vector3.zero);
-            Destroy(gameObject);
+            Network.NetworkSession.Despawn(gameObject);
             Instantiate(_bubPopEff, transform.position, Quaternion.identity);
         }
 

@@ -17,6 +17,13 @@ namespace App.Actor.Gimmick.Bubble
 
         void Start()
         {
+            // バブルの配置は全員で一致している必要があるため、権威を持つ側だけが生成する
+            // (オフラインでは常に権威を持つので、従来通りここで生成される)
+            if (!Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             List<Bubble> bubbles = new();
             for (var n = 0; n < _numOfBubble; ++n)
             {
@@ -37,14 +44,14 @@ namespace App.Actor.Gimmick.Bubble
 
             Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
 
-            // �����͒x������
+            // �����͒x������
             TeleportImpl().Forget();
         }
 
         private Bubble Generate(bool isCrown = false)
         {
             var position = new Vector3(Random.Range(-10f, 10f), Random.Range(-4.0f, isCrown ? 2.5f : 4.0f), 1f);
-            var bubble = Instantiate(_bubblePrafab, position, Quaternion.identity);
+            var bubble = Network.NetworkSession.Spawn(_bubblePrafab, position, Quaternion.identity);
             bubble.transform.SetParent(_bubbleRoot);
             bubble.GetComponent<BubbleAnimator>().AnimationEnabled = true;
             return bubble.GetComponent<Bubble>();
@@ -57,7 +64,7 @@ namespace App.Actor.Gimmick.Bubble
 
             if (Manager.Instance.DoFakeFinishStaging)
             {
-                // �N���E���������鉉�o���o��܂ő҂�
+                // �N���E���������鉉�o���o��܂ő҂�
                 await UniTask.WaitForSeconds(0.8f);
             }
 

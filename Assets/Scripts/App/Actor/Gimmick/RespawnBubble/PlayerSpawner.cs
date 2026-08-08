@@ -31,7 +31,7 @@ namespace App.Actor.Gimmick.RespawnBubble
         {
             _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
 
-            // ƒXƒ|[ƒ“”ÍˆÍ‚ÌƒLƒƒƒbƒVƒ…
+            // ï¿½Xï¿½|ï¿½[ï¿½ï¿½ï¿½ÍˆÍ‚ÌƒLï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½
             {
                 var camera = Camera.main;
                 var topRight = camera.ScreenToWorldPoint(new(Screen.width, Screen.height, camera.nearClipPlane));
@@ -51,33 +51,39 @@ namespace App.Actor.Gimmick.RespawnBubble
                 {
                     var dataHolder = player.GetComponent<Player.DataHolder>();
                     dataHolder.IsDead = true;
-                    // SE‚ÌÄ¶
+                    // SEï¿½ÌÄï¿½
                     var path = SEPath[Random.Range(0, SEPath.Count)];
                     SEManager.Instance.Play(path, 20f);
                     var playerIdx = player.GetComponent<Player.DataHolder>().PlayerIdx;
                     if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                     {
-                        // ƒRƒ“ƒgƒ[ƒ‰‚ğU“®
+                        // ï¿½Rï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½
                         TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Dead);
                     }
-                    // ƒIƒmƒ}ƒgƒy‚ğ¶¬
+                    // ï¿½Iï¿½mï¿½}ï¿½gï¿½yï¿½ğ¶ï¿½
                     Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
-                    // ƒŠƒXƒ|[ƒ“ƒoƒuƒ‹‚Ì¶¬
+                    // ï¿½ï¿½ï¿½Xï¿½|ï¿½[ï¿½ï¿½ï¿½oï¿½uï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
                     var spawnPointX = Mathf.Clamp(player.transform.position.x, spawnRangeX.Min, spawnRangeX.Max);
-                    var respawnBubble = Instantiate(_respawnBubble, new(spawnPointX, spawnRangeY.Max, 0), Quaternion.identity);
-                    respawnBubble.Init(player);
-                    // ƒvƒŒƒCƒ„[‚ğ‰æ–ÊŠO‚ÉˆÚ“®
+                    // ç”Ÿæˆã¯æ¨©å¨ã‚’æŒã¤å´ã ã‘ãŒè¡Œã† (ã‚ªãƒ•ãƒ©ã‚¤ãƒ³ã§ã¯å¸¸ã«æ¨©å¨ã‚’æŒã¤)
+                    var respawnBubble = Network.NetworkSession.HasAuthority
+                        ? Network.NetworkSession.Spawn(_respawnBubble, new(spawnPointX, spawnRangeY.Max, 0), Quaternion.identity)
+                        : null;
+                    if (respawnBubble != null)
+                    {
+                        respawnBubble.Init(player);
+                    }
+                    // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ÊŠOï¿½ÉˆÚ“ï¿½
                     player.transform.position = OutOfScreenPoint;
-                    // ’Ç‰Á‚Ìƒoƒuƒ‹‚ğ¶¬
+                    // ï¿½Ç‰ï¿½ï¿½Ìƒoï¿½uï¿½ï¿½ï¿½ğ¶ï¿½
                     CreateBubble(spawnPointX);
                 }
                 else
                 {
                     var dataHolder = player.GetComponent<Player.DataHolder>();
-                    // ƒIƒmƒ}ƒgƒy‚ğ¶¬
+                    // ï¿½Iï¿½mï¿½}ï¿½gï¿½yï¿½ğ¶ï¿½
                     Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
                     player.GetComponent<Player.DataHolder>().IsDead = true;
-                    // ƒvƒŒƒCƒ„[‚ğ‰æ–ÊŠO‚ÉˆÚ“®
+                    // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ÊŠOï¿½ÉˆÚ“ï¿½
                     player.transform.position = OutOfScreenPoint;
                 }
             }
@@ -85,12 +91,18 @@ namespace App.Actor.Gimmick.RespawnBubble
 
         private void CreateBubble(float spawnPointX)
         {
+            // è¿½åŠ ãƒãƒ–ãƒ«ã®æ•°ã¨é…ç½®ã¯å…¨å“¡ã§ä¸€è‡´ã—ã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚‹ãŸã‚ã€æ¨©å¨ã‚’æŒã¤å´ã ã‘ãŒç”Ÿæˆã™ã‚‹
+            if (!Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             var xPosition = spawnPointX - 2f;
             var xForce = -15f;
             int count = Random.Range(bubbleCountMin, bubbleCountMax);
             for (var n = 0; n < count; ++n)
             {
-                var bubble = Instantiate(_bubble, new(xPosition, spawnRangeY.Min, 0), Quaternion.identity);
+                var bubble = Network.NetworkSession.Spawn(_bubble, new(xPosition, spawnRangeY.Min, 0), Quaternion.identity);
                 bubble.Init(xForce);
                 xPosition += 2f;
                 xForce += 15f;

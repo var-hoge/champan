@@ -169,7 +169,7 @@ namespace App.Actor.Gimmick.Bubble
                     BurstImpl();
                 }
 
-                // •¡”‚ÌƒvƒŒƒCƒ„[‚ªæ‚Á‚Ä‚¢‚éê‡Aæ‚Á‚Ä‚¢‚é‘S‚Ä‚ÌƒvƒŒƒCƒ„[‚ð”ò‚Î‚·
+                // ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒvï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Sï¿½Ä‚Ìƒvï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Î‚ï¿½
                 var players = _moveInfoCtrl.RideObjects;
                 var count = HasCrown ? 0 : 1;
                 if (players.Count > count)
@@ -190,7 +190,7 @@ namespace App.Actor.Gimmick.Bubble
             }
 
 
-            // ƒvƒŒƒCƒ„[‚Ì’…’n‹““®‚ªˆÀ’è‚µ‚½‚Ì‚ÅA‰º‹L‚ÍƒRƒƒ“ƒgƒAƒEƒg
+            // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ì’ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚µï¿½ï¿½ï¿½Ì‚ÅAï¿½ï¿½ï¿½Lï¿½ÍƒRï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Aï¿½Eï¿½g
 
             //_burstGracePeriod = ((!isRiding && _hasRidden) || losingRider)
             //                    ? _burstGracePeriod - Time.deltaTime
@@ -215,7 +215,7 @@ namespace App.Actor.Gimmick.Bubble
                 }
             }
 
-            // ƒNƒ‰ƒEƒ“ƒoƒuƒ‹‚Ìê‡AƒV[ƒ‹ƒh‚ð‰ñ“]
+            // ï¿½Nï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½oï¿½uï¿½ï¿½ï¿½Ìê‡ï¿½Aï¿½Vï¿½[ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½]
             if (HasCrown)
             {
                 _shieldCountRoot.Rotate(Vector3.forward, Time.deltaTime * 15f);
@@ -314,7 +314,7 @@ namespace App.Actor.Gimmick.Bubble
 
             _crownEffect.SetRemainHitCount(shieldValue);
             _crownAnim.SetRemainHitCount(shieldValue, transform.lossyScale.x);
-            // ƒGƒtƒFƒNƒg‚ÌÄ¶
+            // ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½ÌÄï¿½
             crownGlitter.Play(false);
         }
 
@@ -353,10 +353,10 @@ namespace App.Actor.Gimmick.Bubble
                     Crown.Manager.Instance.ShieldValue--;
                 }
 
-                // ÅŒã‚Ì‰‰o
+                // ï¿½ÅŒï¿½Ì‰ï¿½ï¿½o
                 if (Manager.Instance.IsShieldDestroyed)
                 {
-                    // U“®
+                    // ï¿½Uï¿½ï¿½
                     {
                         var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
                         if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
@@ -374,13 +374,13 @@ namespace App.Actor.Gimmick.Bubble
                     {
                         var scale = transform.lossyScale.x;
                         FinishCrown.Create(transform.position, scale);
-                        Destroy(gameObject);
+                        Network.NetworkSession.Despawn(gameObject);
                     });
                     return;
                 }
                 else
                 {
-                    // U“®
+                    // ï¿½Uï¿½ï¿½
                     {
                         var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
                         if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
@@ -402,7 +402,7 @@ namespace App.Actor.Gimmick.Bubble
                         }
                     }
 
-                    // ƒtƒFƒCƒN‰‰o
+                    // ï¿½tï¿½Fï¿½Cï¿½Nï¿½ï¿½ï¿½o
                     if (Manager.Instance.DoFakeFinishStaging)
                     {
                         var scale = transform.lossyScale.x;
@@ -420,7 +420,7 @@ namespace App.Actor.Gimmick.Bubble
                             RunAwayCrown.Create(transform.position, scale);
                             crownSpriteParent.gameObject.SetActive(false);
                         }
-                        Destroy(gameObject);
+                        Network.NetworkSession.Despawn(gameObject);
                     });
                 }
             }
@@ -429,7 +429,7 @@ namespace App.Actor.Gimmick.Bubble
                 transform.DOScale(transform.localScale * 1.15f, 0.1f).OnComplete(() =>
                 {
                     Instantiate(_bubPopEff, transform.position, Quaternion.identity);
-                    Destroy(gameObject);
+                    Network.NetworkSession.Despawn(gameObject);
                 });
             }
         }

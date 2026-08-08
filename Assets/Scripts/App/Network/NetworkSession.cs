@@ -109,6 +109,24 @@ namespace App.Network
         }
 
         /// <summary>
+        /// ギミックを生成する (GameObject 版)
+        /// </summary>
+        public static GameObject Spawn(
+            GameObject prefab,
+            Vector3 position,
+            Quaternion rotation,
+            System.Action<GameObject> onBeforeSpawned = null)
+        {
+            var spawned = Spawn(
+                prefab.transform,
+                position,
+                rotation,
+                onBeforeSpawned == null ? null : trans => onBeforeSpawned(trans.gameObject));
+
+            return spawned != null ? spawned.gameObject : null;
+        }
+
+        /// <summary>
         /// ギミックを破棄する
         /// </summary>
         public static void Despawn(GameObject target)
