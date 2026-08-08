@@ -79,6 +79,11 @@ namespace App.Network
         /// </summary>
         void TryTakeOwnSeatAuthority()
         {
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             if (_isAuthorityRequested || HasStateAuthority)
             {
                 return;
@@ -110,6 +115,15 @@ namespace App.Network
         /// </summary>
         void ApplyAuthorityState()
         {
+            // 対戦シーン以外 (キャラセレクトなど) の Player はネットワーク制御しない。
+            // キャラセレクトは状態同期 (NetworkCharaSelectState) で表現しており、
+            // ここで制御するとキャラが落下も操作もできなくなる。
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                DisableNetworkTransform();
+                return;
+            }
+
             var isLocal = HasStateAuthority;
 
             if (isLocal)
@@ -147,6 +161,21 @@ namespace App.Network
             Debug.Log(
                 $"[NetworkPlayerBinder] 権威を{(isLocal ? "取得" : "喪失")}しました:"
                 + $" seatIdx={SeatIdx} networkId={Object.Id} 権威者={Object.StateAuthority}");
+        }
+
+        /// <summary>
+        /// 対戦シーン以外では NetworkTransform を止める
+        ///
+        /// 権威を持たない側では Fusion が毎フレーム座標を上書きするため、
+        /// MoveCtrl が動いていてもキャラがその場に固定されてしまう。
+        /// </summary>
+        void DisableNetworkTransform()
+        {
+            var networkTransform = GetComponent<Fusion.NetworkTransform>();
+            if (networkTransform != null && networkTransform.enabled)
+            {
+                networkTransform.enabled = false;
+            }
         }
 
         /// <summary>

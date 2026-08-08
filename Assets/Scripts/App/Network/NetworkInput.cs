@@ -47,7 +47,11 @@ namespace App.Network
         /// </summary>
         public bool ActionEnabled
         {
-            get => _actionEnabled && !HasStateAuthority;
+            // 対戦シーン以外 (キャラセレクトなど) では、この入力を使わせない。
+            // 選ばれてしまうと手元の入力が届かず操作できなくなる。
+            get => _actionEnabled
+                && !HasStateAuthority
+                && NetworkSession.IsInMatchScene(gameObject);
             set => _actionEnabled = value;
         }
 

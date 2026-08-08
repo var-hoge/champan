@@ -230,8 +230,15 @@ namespace App.Network
                         FindObjectsSortMode.None).Length > 0)
                     .Timeout(_waitTimeout);
 
-                // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存する
-                ApplyCpuSeats();
+                // CPU 席の確定は対戦シーンに入ってから行う。
+                // キャラセレクトで確定させると「席が埋まっている = 人間」と判定され、
+                // ボタンを押す前に自動でエントリーされてしまう
+                // (ローカル対戦ではボタンを押して参加する)。
+                if (SceneManager.GetActiveScene().name == NetworkSession.MatchSceneName)
+                {
+                    // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存する
+                    ApplyCpuSeats();
+                }
 
                 // 権威の要求は各 Player が自分で行う (NetworkPlayerBinder)
                 IsMatchReady = true;

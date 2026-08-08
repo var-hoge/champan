@@ -205,8 +205,22 @@ namespace App.Ui.CharaSelect
             if (remotePhase == Network.NetworkCharaSelectState.Phase.Selected
                 && _phase != Phase.CharacterSelected)
             {
+                // キャラの使用中フラグと CPU 判定はここで確定する
+                // (ローカルの決定と同じ経路を通す)
+                _cursor.Manager.NotifySelect(_playerIdx, remoteSelectIdx);
+
                 _phase = Phase.CharacterSelected;
                 OnCharaSelected();
+            }
+
+            // 決定の取り消し
+            if (remotePhase == Network.NetworkCharaSelectState.Phase.InSelection
+                && _phase == Phase.CharacterSelected)
+            {
+                _cursor.Manager.NotifyCancelSelect(_playerIdx);
+
+                _phase = Phase.InCharacterSelection;
+                OnCharaCanceled();
             }
         }
 
