@@ -74,6 +74,22 @@ Shared Mode では NetworkObject ごとに StateAuthority を持つピアが決�
 | 中間リザルト | 勝ち点を同期して MasterClient が次ラウンドを開始 |
 | Result | 勝者を同期。「CharaSelect へ / Title へ」は MasterClient が決定 |
 
+## 大前提: シーンはローカルとネットワークで共通
+
+**Main シーンをローカル対戦とネットワーク対戦で共通のものとして使う。** ネットワーク専用のシーンを別に作らない。
+
+これは以下を意味する。
+
+- シーン上のオブジェクト構成はモードによって変えない
+- 「ネットワーク対戦かどうか」は実行時に分岐して吸収する
+- Player などのプレハブも、可能な限り 1 つに保つ
+
+### この方針から導かれる、見直すべき判断
+
+Phase 3 で `Player.prefab` のバリアントとして `PlayerNetwork.prefab` を作ったが、これはこの方針と相性が悪い。プレハブが 2 つに分かれると Main シーンがモードごとに別物になりかねない。
+
+**本来は `Player.prefab` 本体に `NetworkObject` を持たせ、オフライン時は Runner を通さずに使っても無害である状態を目指すべき。** バリアントは Phase 3 時点での暫定措置として扱い、Main シーンへの統合時に解消する。
+
 ## 実装フェーズ
 
 | # | 内容 | 既存コードへの影響 |
@@ -133,6 +149,49 @@ Fusion のエディタ拡張 ([Fusion.Unity.Editor.cs:5024](../../Assets/Photon/
 **5. fire-and-forget な async は例外を握り潰す**
 
 `_ = JoinAsync()` の形だと例外が Unity の Console に一切出ず、無言で失敗する。async な接続処理では必ず try/catch でログを出す。
+
+## 現在地 (2026-08-08 時点)
+
+### 完了
+
+- Phase 0: SDK 導入・規約整備
+- Phase 1: Shared Mode の成立性を検証 (`Assets/Scenes/NetworkSpike.unity`)
+- Phase 2: 席テーブル (`NetworkSeatTable`) — **2 ピアで動作確認済み**
+- Phase 3: `NetworkInput` / `NetworkPlayerBinder` / `PlayerNetwork.prefab` — **実装のみ。未検証**
+
+### 未検証で残っていること
+
+`Assets/Scenes/NetworkPlayerTest.unity` で実際の Player を動かそうとしたが、
+素のシーンでは Main シーン固有のマネージャが無く NullReference が多発して検証に至らなかった。
+
+| 発生元 | 不足しているもの |
+|---|---|
+| `CpuInput.OnPostMove` (CpuInput.cs:163) | `CpuViewDataManager` |
+| `Shadow.Requestor.OnEnable` (Requestor.cs:32) | `Shadow.Manager` |
+| `Hit.HitCollider.Start` (HitCollider.cs:116) | 未特定 |
+
+Player は Main シーンの環境とセットで成立する作りのため、**素のシーンを継ぎ足す方向は取らない**。
+Phase 4 以降を進めて Main シーンで通しで確認できる状態にしてから、まとめて検証する。
+
+そのため以下は**まだ誰も確認していない**。実装が正しい保証はない。
+
+- `MoveCtrl` / `TadaRigidbody2D` を止めたとき、`StateMachine` や `MoveScaleAnimCtrl` がリモートで正しく動くか
+- `NetworkTransform` の補間と `TotalScaleCtrl` / `RotateCtrl` の見た目が破綻しないか
+- `CharaCtrl.Start()` が `DataHolder.PlayerIdx` を読むタイミングと、`NetworkPlayerBinder.Spawned()` で席番号を設定するタイミングの前後関係
+  （間に合わないと全員が同じキャラで表示される）
+
+### 次の一手 (Phase 4)
+
+Bubble 系のネットワークスポーン化。対象は以下。
+
+- `Assets/Scripts/App/Actor/Gimmick/Bubble/Bubble.cs` / `BubbleGenerator.cs`
+- `Assets/Scripts/App/Actor/Gimmick/RespawnBubble/RespawnBubble.cs` / `PlayerSpawner.cs`
+- `Assets/Scripts/App/Actor/Gimmick/Crown/` (勝敗判定の根拠)
+
+いずれも現在は素の `Instantiate` を呼んでいる。MasterClient 権威で `Runner.Spawn` に置き換え、
+オフライン時は従来通り `Instantiate` する分岐を入れる (シーンを共通にするため)。
+
+エフェクト (`_bubPopEff` など) はローカルのままでよい。
 
 ## 既知の要注意ポイント
 
