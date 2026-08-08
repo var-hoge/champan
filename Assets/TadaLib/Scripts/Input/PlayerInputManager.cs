@@ -53,10 +53,18 @@ namespace TadaLib.Input
             manager.onPlayerJoined += OnPlayerJoined;
             manager.onPlayerLeft += OnPlayerLeft;
 
+            // キーボードがまだ認識されていない環境がある
+            // (Multiplayer Play Mode の仮想プレイヤーなど)
+            var keyboard = Keyboard.current;
+
             for (int idx = 0; idx < MaxPlayerCount; ++idx)
             {
                 string schemeMapping = _inputActionAsset.controlSchemes[idx].name;
-                var input = PlayerInput.Instantiate(_keyboardPlayerInputPrefab.gameObject, idx, schemeMapping, pairWithDevices: Keyboard.current);
+
+                var input = keyboard != null
+                    ? PlayerInput.Instantiate(_keyboardPlayerInputPrefab.gameObject, idx, schemeMapping, pairWithDevices: keyboard)
+                    : PlayerInput.Instantiate(_keyboardPlayerInputPrefab.gameObject, idx, schemeMapping);
+
                 input.transform.SetParent(transform);
             }
 
@@ -70,7 +78,14 @@ namespace TadaLib.Input
             TadaLib.Dbg.DebugTextManager.Display(this);
 #endif
             // @memo: なぜか 1P の Action だけ無効になってしまったので、ここで有効化
-            _playerInputs[0].actions["Action"].Enable();
+            if (_playerInputs.Count > 0)
+            {
+                _playerInputs[0].actions["Action"].Enable();
+            }
+            else
+            {
+                Debug.LogWarning("PlayerInputManager: 入力デバイスが 1 つも認識されていません");
+            }
         }
 
         public void OnUpdate()
