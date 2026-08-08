@@ -36,13 +36,17 @@ namespace App.Actor.Gimmick.Bubble
 
         private void TeleportCrown()
         {
-            if (Crown.Manager.Instance.IsShieldDestroyed)
+            // 王冠バブルが破棄された直後に呼ばれるため、参照が既に外れていることがある
+            var crownBubble = Crown.Manager.Instance.CrownBubble;
+            if (crownBubble != null)
             {
-                Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
-                return;
+                crownBubble.OnDestroyEvent -= TeleportCrown;
             }
 
-            Crown.Manager.Instance.CrownBubble.OnDestroyEvent -= TeleportCrown;
+            if (Crown.Manager.Instance.IsShieldDestroyed)
+            {
+                return;
+            }
 
             // �����͒x������
             TeleportImpl().Forget();

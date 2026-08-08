@@ -55,6 +55,14 @@ namespace TadaLib.ProcSystem
 
             foreach (var proc in _procListForUpdate)
             {
+                // フレーム途中で破棄されている場合がある
+                // (ネットワーク対戦では Runner.Despawn が即座に破棄するため。
+                //  Unity の Destroy はフレーム末まで遅延するのでオフラインでは起きない)
+                if (proc == null)
+                {
+                    continue;
+                }
+
                 (proc as IProcUpdate)?.OnUpdate();
             }
 
@@ -65,6 +73,11 @@ namespace TadaLib.ProcSystem
 
             foreach (var proc in _procListForUpdate)
             {
+                if (proc == null)
+                {
+                    continue;
+                }
+
                 (proc as IProcMove)?.OnMove();
             }
 
@@ -75,6 +88,11 @@ namespace TadaLib.ProcSystem
 
             foreach (var proc in _procListForUpdate)
             {
+                if (proc == null)
+                {
+                    continue;
+                }
+
                 (proc as IProcPhysicsMove)?.OnPhysicsMove();
             }
 
@@ -85,6 +103,11 @@ namespace TadaLib.ProcSystem
 
             foreach (var proc in _procListForUpdate)
             {
+                if (proc == null)
+                {
+                    continue;
+                }
+
                 (proc as IProcPostMove)?.OnPostMove();
             }
 
