@@ -85,6 +85,13 @@ namespace App.Network
         /// </summary>
         void ApplyAuthorityState()
         {
+            // 対戦シーン以外 (キャラセレクトなど) では、権威に関係なく
+            // 従来通りローカルに動かす。ここで止めるとキャラが落下も操作もできなくなる。
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             var isLocal = HasStateAuthority;
 
             var moveCtrl = GetComponent<Actor.Player.MoveCtrl>();

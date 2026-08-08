@@ -145,7 +145,7 @@ namespace App.Network
         #region private メソッド
         void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, LoadSceneMode mode)
         {
-            if (scene.name != MainSceneName)
+            if (scene.name != NetworkSession.MatchSceneName)
             {
                 return;
             }
@@ -285,8 +285,6 @@ namespace App.Network
         /// ランチャーは実行時に生成されるため、参照は Resources から取る
         /// </summary>
         const string SeatTableResourcePath = "Network/NetworkSeatTable";
-
-        const string MainSceneName = "Main";
 
         static readonly System.TimeSpan _waitTimeout = System.TimeSpan.FromSeconds(15.0);
 

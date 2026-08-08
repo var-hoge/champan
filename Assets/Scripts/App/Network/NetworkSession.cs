@@ -59,6 +59,18 @@ namespace App.Network
 
         #region メソッド
         /// <summary>
+        /// 対戦シーンに属するオブジェクトかどうか
+        ///
+        /// Player プレハブはキャラセレクトなど対戦以外の画面にも置かれている。
+        /// そこではネットワークの権威に関係なくローカルに動く必要があるため、
+        /// 権威による制御は対戦シーンに限る。
+        /// </summary>
+        public static bool IsInMatchScene(GameObject obj)
+        {
+            return obj.scene.name == MatchSceneName;
+        }
+
+        /// <summary>
         /// ギミックを生成する
         ///
         /// オンラインなら Runner.Spawn で全員に複製され、オフラインなら通常の Instantiate になる。
@@ -155,6 +167,11 @@ namespace App.Network
         #endregion
 
         #region private フィールド
+        /// <summary>
+        /// 対戦シーンの名前
+        /// </summary>
+        public const string MatchSceneName = "Main";
+
         static NetworkRunner _cachedRunner = null;
         #endregion
     }
