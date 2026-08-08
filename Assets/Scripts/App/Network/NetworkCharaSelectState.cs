@@ -53,6 +53,11 @@ namespace App.Network
             /// カーソルと同じく状態として配る。
             /// </summary>
             public Vector2 CharaPos;
+
+            /// <summary>
+            /// キャラが左を向いているか
+            /// </summary>
+            public NetworkBool IsFacingLeft;
         }
         #endregion
 
@@ -80,17 +85,22 @@ namespace App.Network
             return Seats[seatIdx].CharaPos;
         }
 
+        public bool IsFacingLeft(int seatIdx)
+        {
+            return Seats[seatIdx].IsFacingLeft;
+        }
+
         /// <summary>
         /// 自分の席の状態を全員に知らせる
         /// </summary>
-        public void Publish(int seatIdx, Phase phase, int selectIdx, Vector2 charaPos)
+        public void Publish(int seatIdx, Phase phase, int selectIdx, Vector2 charaPos, bool isFacingLeft)
         {
             if (!SeatInput.IsLocalSeat(seatIdx))
             {
                 return;
             }
 
-            RPC_SetSeatState(seatIdx, (byte)phase, selectIdx, charaPos);
+            RPC_SetSeatState(seatIdx, (byte)phase, selectIdx, charaPos, isFacingLeft);
         }
 
         /// <summary>
@@ -131,7 +141,13 @@ namespace App.Network
         /// 他人の席を勝手に書き換えないよう、送り主が担当している席かを確認する
         /// </summary>
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        void RPC_SetSeatState(int seatIdx, byte phaseValue, int selectIdx, Vector2 charaPos, RpcInfo info = default)
+        void RPC_SetSeatState(
+            int seatIdx,
+            byte phaseValue,
+            int selectIdx,
+            Vector2 charaPos,
+            NetworkBool isFacingLeft,
+            RpcInfo info = default)
         {
             if (NetworkSeatTable.Instance == null)
             {
@@ -155,6 +171,7 @@ namespace App.Network
                 PhaseValue = phaseValue,
                 SelectIdx = selectIdx,
                 CharaPos = charaPos,
+                IsFacingLeft = isFacingLeft,
             });
         }
         #endregion

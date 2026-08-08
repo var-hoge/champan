@@ -17,9 +17,27 @@ namespace App.Actor.Player
         , IProcPostMove
     {
         #region プロパティ
+        /// <summary>
+        /// 左を向いているか
+        /// </summary>
+        public bool IsFacingLeft => Mathf.Abs(Mathf.DeltaAngle(_mesh.transform.localEulerAngles.y, 180.0f)) < 90.0f;
         #endregion
 
         #region メソッド
+        /// <summary>
+        /// 向きを設定する
+        ///
+        /// 自分で向きを決められない場合 (ネットワーク越しの相手など) に使う。
+        /// 速度から向きを決める処理は、速度が小さいときは現在の向きを保つため、
+        /// ここで設定した向きは維持される。
+        /// </summary>
+        public void SetFacingLeft(bool isFacingLeft)
+        {
+            var rotVec3 = _mesh.transform.localEulerAngles;
+            rotVec3.y = isFacingLeft ? 180.0f : 0.0f;
+
+            _mesh.transform.localEulerAngles = rotVec3;
+        }
         #endregion
 
         #region Monobehavior の実装

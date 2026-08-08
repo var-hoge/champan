@@ -160,8 +160,31 @@ namespace App.Ui.CharaSelect
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
         bool _isInputProxyResolved = false;
 
-        const float PosPublishIntervalSec = 0.05f;
+        /// <summary>
+        /// 位置を配る間隔
+        /// Fusion のティックレート (既定 60) より速く送っても状態は更新されない
+        /// </summary>
+        const float PosPublishIntervalSec = 1.0f / 60.0f;
+
+        /// <summary>
+        /// この距離以下しか動いていなければ送らない
+        /// </summary>
+        const float PosPublishThresholdSqr = 0.0001f;
+
+        /// <summary>
+        /// 受け取った位置への追従の速さ
+        /// 大きいほど遅れが減り、小さいほど滑らかになる
+        /// </summary>
+        const float PosFollowSpeed = 25.0f;
+
+        /// <summary>
+        /// これ以上離れていたら補間せずに合わせる
+        /// </summary>
+        const float PosSnapDistanceSqr = 25.0f;
+
         float _posPublishTimer = 0.0f;
+        Vector2 _lastPublishedPos = Vector2.zero;
+        bool _lastPublishedFacingLeft = false;
 
         bool _isReselect = false;
 
@@ -276,7 +299,23 @@ namespace App.Ui.CharaSelect
                 ? (Vector2)_player.transform.position
                 : Vector2.zero;
 
-            Network.NetworkCharaSelectState.Instance.Publish(_playerIdx, phase, _cursor.SelectIdx, charaPos);
+            Network.NetworkCharaSelectState.Instance.Publish(
+                _playerIdx, phase, _cursor.SelectIdx, charaPos, IsPlayerFacingLeft());
+        }
+
+        /// <summary>
+        /// キャラが左を向いているか
+        /// </summary>
+        bool IsPlayerFacingLeft()
+        {
+            if (_player == null)
+            {
+                return false;
+            }
+
+            var rotateCtrl = _player.GetComponent<Actor.Player.RotateCtrl>();
+
+            return rotateCtrl != null && rotateCtrl.IsFacingLeft;
         }
 
         /// <summary>
@@ -295,7 +334,8 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
-            // 毎フレーム送ると通信量が増えるので間引く
+            // ネットワークの状態が更新されるのはティックごとなので、
+            // それより速く送っても意味がない
             _posPublishTimer -= Time.deltaTime;
             if (_posPublishTimer > 0.0f)
             {
@@ -303,11 +343,27 @@ namespace App.Ui.CharaSelect
             }
             _posPublishTimer = PosPublishIntervalSec;
 
+            // 動いておらず向きも変わっていないなら送らない
+            var currentPos = (Vector2)_player.transform.position;
+            var isFacingLeft = IsPlayerFacingLeft();
+
+            var isPosChanged = (currentPos - _lastPublishedPos).sqrMagnitude >= PosPublishThresholdSqr;
+            var isFacingChanged = isFacingLeft != _lastPublishedFacingLeft;
+
+            if (!isPosChanged && !isFacingChanged)
+            {
+                return;
+            }
+
+            _lastPublishedPos = currentPos;
+            _lastPublishedFacingLeft = isFacingLeft;
+
             Network.NetworkCharaSelectState.Instance.Publish(
                 _playerIdx,
                 Network.NetworkCharaSelectState.Phase.Selected,
                 _cursor.SelectIdx,
-                _player.transform.position);
+                _player.transform.position,
+                isFacingLeft);
         }
 
         /// <summary>
@@ -333,6 +389,13 @@ namespace App.Ui.CharaSelect
                 rigidbody.enabled = false;
             }
 
+            // 向きは自前で決められないので、受け取った値をそのまま反映する
+            var rotateCtrl = _player.GetComponent<Actor.Player.RotateCtrl>();
+            if (rotateCtrl != null)
+            {
+                rotateCtrl.SetFacingLeft(Network.NetworkCharaSelectState.Instance.IsFacingLeft(_playerIdx));
+            }
+
             var targetPos = Network.NetworkCharaSelectState.Instance.GetCharaPos(_playerIdx);
             if (targetPos == Vector2.zero)
             {
@@ -340,7 +403,17 @@ namespace App.Ui.CharaSelect
             }
 
             var current = _player.transform.position;
-            var next = Vector2.Lerp(current, targetPos, 0.35f);
+
+            // 固定値の Lerp はフレームレートで速さが変わってしまうため、
+            // 経過時間から補間率を出す
+            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * Time.deltaTime);
+            var next = Vector2.Lerp(current, targetPos, rate);
+
+            // 離れすぎたら補間せずに合わせる (復帰やワープ時)
+            if (((Vector2)current - targetPos).sqrMagnitude > PosSnapDistanceSqr)
+            {
+                next = targetPos;
+            }
 
             _player.transform.position = new Vector3(next.x, next.y, current.z);
         }
