@@ -97,6 +97,13 @@ namespace App.Ui.CharaSelect
         #region IProcUpdate の実装
         public void OnUpdate()
         {
+            // 他の台が担当する席は、受け取った状態を表示するだけ
+            if (Network.NetworkSession.IsOnline && !Network.SeatInput.IsLocalSeat(_playerIdx))
+            {
+                ApplyRemoteState();
+                return;
+            }
+
             switch (_phase)
             {
                 case Phase.WaitingForEntry:
@@ -158,6 +165,71 @@ namespace App.Ui.CharaSelect
         #endregion
 
         #region privateメソッド
+        /// <summary>
+        /// 他の台が担当する席の状態を反映する
+        /// </summary>
+        void ApplyRemoteState()
+        {
+            var state = Network.NetworkCharaSelectState.Instance;
+            if (state == null)
+            {
+                return;
+            }
+
+            var remotePhase = state.GetPhase(_playerIdx);
+
+            // エントリー
+            if (remotePhase != Network.NetworkCharaSelectState.Phase.WaitingForEntry
+                && _phase == Phase.WaitingForEntry)
+            {
+                _phase = Phase.InCharacterSelection;
+                _cursor.Show();
+                ShowChara();
+            }
+
+            if (_phase == Phase.WaitingForEntry)
+            {
+                return;
+            }
+
+            // カーソル位置 (= 選んでいるキャラ)
+            var remoteSelectIdx = state.GetSelectIdx(_playerIdx);
+            if (remoteSelectIdx != _cursor.SelectIdx)
+            {
+                _cursor.Setup(_cursor.Manager, remoteSelectIdx);
+                _cursor.Manager.NotifyCursorOver(_playerIdx, remoteSelectIdx);
+                OnCharaChanged(true);
+            }
+
+            // 決定
+            if (remotePhase == Network.NetworkCharaSelectState.Phase.Selected
+                && _phase != Phase.CharacterSelected)
+            {
+                _phase = Phase.CharacterSelected;
+                OnCharaSelected();
+            }
+        }
+
+        /// <summary>
+        /// 自分の席の状態を全員に知らせる
+        /// </summary>
+        void PublishState()
+        {
+            if (!Network.NetworkSession.IsOnline || Network.NetworkCharaSelectState.Instance == null)
+            {
+                return;
+            }
+
+            var phase = _phase switch
+            {
+                Phase.InCharacterSelection => Network.NetworkCharaSelectState.Phase.InSelection,
+                Phase.CharacterSelected => Network.NetworkCharaSelectState.Phase.Selected,
+                _ => Network.NetworkCharaSelectState.Phase.WaitingForEntry,
+            };
+
+            Network.NetworkCharaSelectState.Instance.Publish(_playerIdx, phase, _cursor.SelectIdx);
+        }
+
         void WaitingForEntry()
         {
             // 最初から CPU じゃなければ自動エントリーする
@@ -169,6 +241,7 @@ namespace App.Ui.CharaSelect
 
                 _cursor.Show();
                 ShowChara();
+                PublishState();
                 return;
             }
 
@@ -188,6 +261,7 @@ namespace App.Ui.CharaSelect
 
                 _cursor.Show();
                 ShowChara();
+                PublishState();
             }
         }
 
@@ -221,6 +295,8 @@ namespace App.Ui.CharaSelect
 
         void OnCharaChanged(bool isRight)
         {
+            PublishState();
+
             SEManager.Instance.Play(SEPath.MOVING_CURSOR);
             var charaIdx = CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx);
             var charaImage = CharacterManager.Instance.GetCharaImage(charaIdx);
@@ -239,6 +315,9 @@ namespace App.Ui.CharaSelect
 
         void OnCharaSelected()
         {
+            _phase = Phase.CharacterSelected;
+            PublishState();
+
             var path = _breadCrunchPaths[Random.Range(0, _breadCrunchPaths.Length)];
             SEManager.Instance.Play(path, 0.3f);
 
@@ -261,6 +340,9 @@ namespace App.Ui.CharaSelect
 
         void OnCharaCanceled()
         {
+            _phase = Phase.InCharacterSelection;
+            PublishState();
+
             SEManager.Instance.Play(SEPath.CANCEL_SELECTION);
 
             // キャラ削除

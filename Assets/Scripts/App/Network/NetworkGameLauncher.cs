@@ -174,10 +174,20 @@ namespace App.Network
                 var seatTable = _runner.Spawn(prefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
 
                 // 実行時に Spawn したオブジェクトはシーン切り替えで破棄される。
-                // 席テーブルはタイトルからキャラセレクト、対戦まで持ち越す必要がある。
-                if (_runner.SceneManager is NetworkSceneManagerDefault sceneManager)
+                // タイトルからキャラセレクト、対戦まで持ち越す必要がある。
+                KeepAcrossScenes(seatTable.gameObject);
+
+                var charaSelectPrefab = Resources.Load<NetworkCharaSelectState>(CharaSelectStateResourcePath);
+                if (charaSelectPrefab != null)
                 {
-                    sceneManager.MakeDontDestroyOnLoad(seatTable.gameObject);
+                    var charaSelectState = _runner.Spawn(
+                        charaSelectPrefab, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+
+                    KeepAcrossScenes(charaSelectState.gameObject);
+                }
+                else
+                {
+                    Debug.LogError($"[NetworkGameLauncher] プレハブが見つかりません: Resources/{CharaSelectStateResourcePath}");
                 }
             }
 
@@ -233,6 +243,17 @@ namespace App.Network
         }
 
         /// <summary>
+        /// シーンが切り替わっても破棄されないようにする
+        /// </summary>
+        void KeepAcrossScenes(GameObject obj)
+        {
+            if (_runner.SceneManager is NetworkSceneManagerDefault sceneManager)
+            {
+                sceneManager.MakeDontDestroyOnLoad(obj);
+            }
+        }
+
+        /// <summary>
         /// 人間が着いていない席を CPU 席として CpuManager に反映する
         ///
         /// 席テーブルは全員に複製されているため、どのピアでも同じ結果になる。
@@ -265,6 +286,7 @@ namespace App.Network
         /// ランチャーは実行時に生成されるため、参照は Resources から取る
         /// </summary>
         const string SeatTableResourcePath = "Network/NetworkSeatTable";
+        const string CharaSelectStateResourcePath = "Network/NetworkCharaSelectState";
 
         static readonly System.TimeSpan _waitTimeout = System.TimeSpan.FromSeconds(15.0);
 

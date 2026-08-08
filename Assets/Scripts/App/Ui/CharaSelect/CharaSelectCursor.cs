@@ -89,6 +89,12 @@ namespace App.Ui.CharaSelect
 
         int _selectIdx = 0;
 
+        /// <summary>
+        /// 購読中の入力 (他の台が担当する席なら null)
+        /// </summary>
+        TadaLib.Input.PlayerInputProxy _subscribedProxy = null;
+        bool _isInputResolved = false;
+
         float _moveInputValuePrev = 0.0f;
         bool _isReady = false;
         Vector3 _initScale;
@@ -172,10 +178,8 @@ namespace App.Ui.CharaSelect
         {
             _selectIdx = _manager.CharaIdxToSelectIdx(CharaSelectUiManager.PlayerUseCharaIdList(_playerIdx));
 
-            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
-            inputProxy.OnAction += OnAction;
-            inputProxy.OnMove += OnMove;
-            inputProxy.OnCancel += OnCancel;
+            // 入力の購読は席が決まってから行う (TrySubscribeInput)
+            // ネットワーク対戦では席テーブルが届くまで、どの入力を使うか決まらない
 
             // 最初は非表示
             var image = GetComponent<UnityEngine.UI.Image>();
@@ -184,16 +188,53 @@ namespace App.Ui.CharaSelect
             _initScale = GetComponent<RectTransform>().localScale;
         }
 
+        private void Update()
+        {
+            TrySubscribeInput();
+        }
+
         private void OnDestroy()
         {
-            if (TadaLib.Input.PlayerInputManager.Instance == null)
+            if (_subscribedProxy == null)
             {
                 return;
             }
 
-            var inputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(_playerIdx);
-            inputProxy.OnAction -= OnAction;
-            inputProxy.OnMove -= OnMove;
+            _subscribedProxy.OnAction -= OnAction;
+            _subscribedProxy.OnMove -= OnMove;
+            _subscribedProxy.OnCancel -= OnCancel;
+            _subscribedProxy = null;
+        }
+
+        /// <summary>
+        /// この席を担当する入力を購読する
+        ///
+        /// 他の台が担当する席では購読しない (受信した状態で表示するだけ)。
+        /// 席テーブルはセッション参加後に届くため、決まるまで毎フレーム試す。
+        /// </summary>
+        void TrySubscribeInput()
+        {
+            if (_isInputResolved)
+            {
+                return;
+            }
+
+            if (Network.NetworkSession.IsOnline && Network.NetworkSeatTable.Instance == null)
+            {
+                return;
+            }
+
+            _isInputResolved = true;
+
+            _subscribedProxy = Network.SeatInput.GetProxyOrNull(_playerIdx);
+            if (_subscribedProxy == null)
+            {
+                return;
+            }
+
+            _subscribedProxy.OnAction += OnAction;
+            _subscribedProxy.OnMove += OnMove;
+            _subscribedProxy.OnCancel += OnCancel;
         }
 
         void MoveImpl(bool isRight)
