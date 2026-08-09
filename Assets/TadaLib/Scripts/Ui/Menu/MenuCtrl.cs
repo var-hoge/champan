@@ -52,6 +52,42 @@ namespace TadaLib.Ui.Menu
         /// カーソルの登録
         /// </summary>
         /// <param name="cursor"></param>
+        /// <summary>
+        /// 現在選ばれている項目
+        /// </summary>
+        public int ActivePageItemIndex => GetActivePageItemIndex();
+
+        /// <summary>
+        /// 外から選択項目を合わせる
+        ///
+        /// ネットワーク対戦でホストの操作に追従するために使う。
+        /// ローカルで操作したときと同じ経路を通るので、
+        /// カーソルの移動アニメと通知も同じように行われる。
+        /// </summary>
+        public void SetActivePageItemIndex(int idx)
+        {
+            if (_activePageCache is null || idx < 0 || idx >= _activePageCache.Count)
+            {
+                return;
+            }
+
+            if (idx == GetActivePageItemIndex())
+            {
+                return;
+            }
+
+            var currentItem = GetActivePageItem();
+
+            ChangeActivePageItemIndex(idx);
+
+            currentItem.OnUnselected();
+            GetActivePageItem().OnSelected();
+
+            _cursor?.OnActiveItemChanged(GetActivePageItemIndex());
+
+            ActivePageItemChanged?.Invoke();
+        }
+
         public void SetCursor(ICursor cursor)
         {
             _cursor = cursor;
@@ -65,15 +101,17 @@ namespace TadaLib.Ui.Menu
             // OnStart のタイミングで登録されている必要がある
             Debug.Assert(GetActivePage() is not null);
 
-            if (IsEnabled is false)
-            {
-                return;
-            }
-
+            // カーソルの配置は入力の有効無効に関わらず必要
+            // (ネットワーク対戦のゲストは操作できないが、表示は追従させる)
             if (_isCursorDirty)
             {
                 _isCursorDirty = false;
                 _cursor?.SetupCursor(GetActivePageItemIndex());
+            }
+
+            if (IsEnabled is false)
+            {
+                return;
             }
 
             var inputResult = HandleInput();

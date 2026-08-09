@@ -50,6 +50,12 @@ namespace App.Network
         /// </summary>
         [Networked]
         public int RuleWinCountOptionIdx { get; set; }
+
+        /// <summary>
+        /// ルール選択: メニューで選んでいる項目
+        /// </summary>
+        [Networked]
+        public int RuleMenuItemIdx { get; set; }
         #endregion
 
         #region メソッド
@@ -101,6 +107,16 @@ namespace App.Network
             }
 
             RuleWinCountOptionIdx = idx;
+        }
+
+        public void SetRuleMenuItemIdx(int idx)
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            RuleMenuItemIdx = idx;
         }
 
         /// <summary>

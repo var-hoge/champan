@@ -103,15 +103,29 @@ namespace App.Ui.GameModeSelect
                 return;
             }
 
+            var flowState = Network.NetworkFlowState.Instance;
+
             if (Network.NetworkSession.HasAuthority)
             {
                 _rootPage.PublishRuleToGuests();
+
+                // 選んでいる項目もゲストに伝える
+                if (flowState != null && flowState.RuleMenuItemIdx != _menuCtrl.ActivePageItemIndex)
+                {
+                    flowState.SetRuleMenuItemIdx(_menuCtrl.ActivePageItemIndex);
+                }
+
                 return;
             }
 
-            // ゲストは操作を受け付けず、受け取った設定を反映するだけ
+            // ゲストは操作を受け付けず、受け取った状態を反映するだけ
             _menuCtrl.IsEnabled = false;
             _rootPage.ApplyRuleFromHost();
+
+            if (flowState != null)
+            {
+                _menuCtrl.SetActivePageItemIndex(flowState.RuleMenuItemIdx);
+            }
         }
 
         void UpdateBack()
