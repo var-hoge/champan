@@ -68,6 +68,39 @@ namespace App.Network
         /// バブル自身に載せて伝えることはできない。
         /// 伝えた直後にバブルは破棄されるため、届く前に対象が消えてしまう。
         /// </summary>
+        /// <summary>
+        /// 落下したことを他の台に伝える
+        ///
+        /// 落下を検知できるのは、そのキャラを動かしている台だけ。
+        /// 他の台では物理を止めているため、いつ落ちたか分からず、
+        /// オノマトペや音が出ないままになる。
+        /// </summary>
+        public void NotifyFall(int seatIdx, Vector3 position, Vector3 velocity)
+        {
+            if (Object == null || !Object.IsValid)
+            {
+                return;
+            }
+
+            RPC_NotifyFall(seatIdx, position.x, position.y, velocity.x, velocity.y);
+        }
+
+        /// <summary>
+        /// 踏まれたことを、そのキャラを動かしている台に伝える
+        ///
+        /// 踏まれた動きは、そのキャラを動かしている台が行う。
+        /// 他の台で動かしても、持ち主が配る座標で上書きされてしまう。
+        /// </summary>
+        public void NotifyStepedOn(int seatIdx)
+        {
+            if (Object == null || !Object.IsValid)
+            {
+                return;
+            }
+
+            RPC_NotifyStepedOn(seatIdx);
+        }
+
         public void NotifyRespawn(int seatIdx, Vector3 position)
         {
             if (Object == null || !Object.IsValid)
@@ -171,6 +204,50 @@ namespace App.Network
         ///
         /// 送った台では既に済んでいるため、そこでは呼ばない。
         /// </summary>
+        /// <summary>
+        /// 落下したという知らせを受けて、この台でも見た目と音を出す
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyFall(int seatIdx, float posX, float posY, float velX, float velY)
+        {
+            Actor.Gimmick.RespawnBubble.PlayerSpawner.PlayFallVisual(
+                seatIdx,
+                new Vector3(posX, posY, 0f),
+                new Vector3(velX, velY, 0f));
+        }
+
+        /// <summary>
+        /// 踏まれたという知らせを受けて、自分の担当なら踏まれた動きをする
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyStepedOn(int seatIdx)
+        {
+            var hitColliders = FindObjectsByType<Actor.Player.Hit.HitCollider>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+
+            foreach (var hitCollider in hitColliders)
+            {
+                if (hitCollider.PlayerIdx != seatIdx)
+                {
+                    continue;
+                }
+
+                // 表情は配っていないため、見ている台それぞれで出す
+                hitCollider.PlayStepedOnEmotion();
+
+                // 拡縮と動きは、そのキャラを動かしている台だけ。
+                // 拡縮の結果は他の台へ配られる。
+                if (SeatInput.IsLocalSeat(seatIdx))
+                {
+                    hitCollider.PlayStepedOnSquash();
+                    hitCollider.PlayStepedOnMove();
+                }
+
+                return;
+            }
+        }
+
         [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
         void RPC_NotifyRespawn(int seatIdx, float posX, float posY)
         {

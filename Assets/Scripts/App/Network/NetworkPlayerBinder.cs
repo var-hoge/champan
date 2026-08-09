@@ -53,8 +53,9 @@ namespace App.Network
         /// 向きは速度から決まるが、権威を持たない側では MoveCtrl を止めているため
         /// 速度が変化せず、向きも変わらない。そのため別途配る。
         /// </summary>
+        /// 反映は NetworkPlayerPositionApplier が IProcPostMove で行う。
+        /// 自分のキャラの向きを決める RotateCtrl と同じ位相にそろえるため。
         [Networked]
-        [OnChangedRender(nameof(OnFacingChanged))]
         public NetworkBool IsFacingLeft { get; set; }
 
         /// <summary>
@@ -78,6 +79,41 @@ namespace App.Network
         /// </summary>
         [Networked]
         public NetworkObject RidingObject { get; set; }
+
+        /// <summary>
+        /// 権威を持つ側の速度
+        ///
+        /// 拡縮アニメや表情、オノマトペは、どれも速度と接地から毎フレーム決まる。
+        /// 演出を一つずつ配るより、元になるこの値を配って
+        /// 各台に同じ計算をさせるほうが、ずれようがなく数も増えない。
+        /// </summary>
+        [Networked]
+        public Vector2 SyncVelocity { get; set; }
+
+        /// <summary>
+        /// 権威を持つ側の接地状態
+        /// </summary>
+        [Networked]
+        public NetworkBool IsGrounded { get; set; }
+
+        /// <summary>
+        /// 権威を持つ側の大きさ
+        ///
+        /// 着地・ジャンプ・高速落下・踏まれたときの拡縮は、どれも出どころが違うが
+        /// 最後は必ず TotalScaleCtrl を通って反映される。
+        /// そこで、個々の演出ではなく通り道の結果を配る。
+        /// 演出が増えても配るものは増えない。
+        ///
+        /// z は常に 1 のため運ばない。
+        /// </summary>
+        [Networked]
+        public Vector2 SyncScale { get; set; }
+
+        /// <summary>
+        /// 権威を持つ側の見た目の大きさ
+        /// </summary>
+        [Networked]
+        public Vector2 SyncViewScale { get; set; }
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
@@ -104,6 +140,10 @@ namespace App.Network
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            // 拡縮はキャラセレクトでも起きるため、シーンを問わず配る。
+            // (座標だけは、キャラセレクトでは NetworkCharaSelectState が配る)
+            PublishScale();
+
             // キャラセレクトの座標は NetworkCharaSelectState が配る。
             // ここで扱うと二重になる。
             if (!NetworkSession.IsInMatchScene(gameObject))
@@ -123,6 +163,16 @@ namespace App.Network
                 ? ridingMover.GetComponentInParent<NetworkObject>()
                 : null;
 
+            // 見た目の計算に使う元の値を配る
+            IsGrounded = rigidbody != null && rigidbody.IsGround;
+
+            var moveCtrl = GetComponent<Actor.Player.MoveCtrl>();
+            if (moveCtrl != null)
+            {
+                SyncVelocity = moveCtrl.Velocity;
+            }
+
+
             var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
             if (rotateCtrl == null)
             {
@@ -138,30 +188,7 @@ namespace App.Network
         // @memo: 配られた座標の反映は NetworkPlayerPositionApplier が行う。
         //        当たり判定と噛み合わせるために、反映する位相が重要になる。
 
-        /// <summary>
-        /// 配られた向きを反映する
-        /// </summary>
-        void OnFacingChanged()
-        {
-            // キャラセレクトの向きは NetworkCharaSelectState が配る
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                return;
-            }
-
-            if (HasStateAuthority)
-            {
-                return;
-            }
-
-            var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
-            if (rotateCtrl == null)
-            {
-                return;
-            }
-
-            rotateCtrl.SetFacingLeft(IsFacingLeft);
-        }
+        // @memo: 配られた向きの反映も NetworkPlayerPositionApplier が行う。
 
         // @memo: 権威の要求は NetworkGameLauncher が行う。
         //        権威を持たないオブジェクトでは FixedUpdateNetwork が呼ばれないため、
@@ -179,6 +206,24 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// 大きさを配る
+        ///
+        /// 着地・ジャンプ・高速落下・踏まれたときの拡縮は出どころが違うが、
+        /// 最後は必ず TotalScaleCtrl を通って反映される。
+        /// 個々の演出ではなく、その通り道の結果を配る。
+        /// </summary>
+        void PublishScale()
+        {
+            var totalScaleCtrl = GetComponentInChildren<TadaLib.ActionStd.TotalScaleCtrl>(true);
+            if (totalScaleCtrl == null)
+            {
+                return;
+            }
+
+            SyncScale = totalScaleCtrl.CurrentScale;
+            SyncViewScale = totalScaleCtrl.CurrentViewScale;
+        }
 
         /// <summary>
         /// 権威の有無に応じて、自前のシミュレーションを止める / 動かす

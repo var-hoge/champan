@@ -28,6 +28,18 @@ namespace TadaLib.ActionStd
         /// 接地している
         /// </summary>
         public bool IsGround { get; private set; } = true;
+
+        /// <summary>
+        /// 接地状態を外から設定する
+        ///
+        /// この処理を止めている状況で、接地から生まれる見た目
+        /// (着地の拡縮など) だけを再現したいときに使う。
+        /// </summary>
+        public void SetIsGroundForcibly(bool isGround)
+        {
+            IsGround = isGround;
+        }
+
         /// <summary>
         /// 天井にぶつかっている
         /// </summary>

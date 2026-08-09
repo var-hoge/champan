@@ -76,10 +76,66 @@ namespace App.Actor.Player.Hit
             if (result.IsTopHit)
             {
                 // 踏まれた
-                GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);
+                //
+                // 自分の台のキャラなら、そのまま踏まれた動きをする。
+                // 相手の台のキャラなら、動かす権利がないので相手に任せ、
+                // 踏まれたことだけを伝える。
+                // (相手の台では、そのキャラを踏んだ判定が出ないことがある)
+                // 表情はどの台でも出す
+                PlayStepedOnEmotion();
 
-                GetComponent<EmotionCtrl>().NotifyStepedOn();
+                // 拡縮と動きは、そのキャラを動かしている台だけが行う。
+                // 他の台では、そこで再生された拡縮がそのまま配られてくる。
+                // 各台で別々に再生すると、配られた値と食い違ってちらつく。
+                if (!Network.NetworkSession.IsOnline
+                    || Network.SeatInput.IsLocalSeat(PlayerIdx))
+                {
+                    PlayStepedOnSquash();
+                    PlayStepedOnMove();
+                }
 
+                // 相手の台では、そのキャラが踏まれた判定が出ないことがある
+                Network.NetworkMatchState.Instance?.NotifyStepedOn(PlayerIdx);
+            }
+        }
+
+        /// <summary>
+        /// 踏まれたときの動き
+        ///
+        /// 踏んだ側の跳ね返りは、踏んだ側の台が自分で行う。
+        /// </summary>
+        public void PlayStepedOnMove()
+        {
+            // 自分で判定した直後に知らせが届くと、二重に効いてしまう
+            if (Time.time - _latestStepedOnMoveTime < StepedOnMoveIntervalSec)
+            {
+                return;
+            }
+
+            _latestStepedOnMoveTime = Time.time;
+
+            GetComponent<MoveCtrl>().SetVelocityForceY(GetComponent<MoveCtrl>().Velocity.y - 10.0f);
+        }
+
+        /// <summary>
+        /// 踏まれたときの表情
+        ///
+        /// 表情は配っていないため、見ている台それぞれで出す。
+        /// </summary>
+        public void PlayStepedOnEmotion()
+        {
+            GetComponent<EmotionCtrl>().NotifyStepedOn();
+        }
+
+        /// <summary>
+        /// 踏まれたときの拡縮
+        ///
+        /// 再生するのは、そのキャラを動かしている台だけ。
+        /// 結果は TotalScaleCtrl を通って他の台に配られる。
+        /// </summary>
+        public void PlayStepedOnSquash()
+        {
+            {
                 if (_seq != null && _seq.IsActive() && !_seq.IsComplete())
                 {
                     _seq.Kill();
@@ -101,6 +157,15 @@ namespace App.Actor.Player.Hit
                     );
             }
         }
+        #endregion
+
+        #region privateフィールド
+        /// <summary>
+        /// 踏まれた動きを二重に効かせない間隔
+        /// </summary>
+        const float StepedOnMoveIntervalSec = 0.2f;
+
+        float _latestStepedOnMoveTime = -10.0f;
         #endregion
 
         #region MonoBehavior の実装

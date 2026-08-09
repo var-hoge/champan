@@ -58,6 +58,19 @@ namespace App.Network
             /// キャラが左を向いているか
             /// </summary>
             public NetworkBool IsFacingLeft;
+
+            /// <summary>
+            /// キャラの大きさ
+            ///
+            /// 座標と同じ理由で、権威ではなく状態として配る。
+            /// z は常に 1 のため運ばない。
+            /// </summary>
+            public Vector2 Scale;
+
+            /// <summary>
+            /// キャラの見た目の大きさ
+            /// </summary>
+            public Vector2 ViewScale;
         }
         #endregion
 
@@ -88,6 +101,33 @@ namespace App.Network
         public bool IsFacingLeft(int seatIdx)
         {
             return Seats[seatIdx].IsFacingLeft;
+        }
+
+        public Vector2 GetScale(int seatIdx)
+        {
+            return Seats[seatIdx].Scale;
+        }
+
+        public Vector2 GetViewScale(int seatIdx)
+        {
+            return Seats[seatIdx].ViewScale;
+        }
+
+        /// <summary>
+        /// 自分の席のキャラの大きさを全員に知らせる
+        ///
+        /// キャラセレクトのキャラはシーンに置かれているため、権威はホストが持つ。
+        /// ゲスト側では FixedUpdateNetwork が動かず、そちらの経路では配れない。
+        /// 座標や向きと同じく、席の状態として配る。
+        /// </summary>
+        public void PublishScale(int seatIdx, Vector2 scale, Vector2 viewScale)
+        {
+            if (!SeatInput.IsLocalSeat(seatIdx))
+            {
+                return;
+            }
+
+            RPC_SetSeatScale(seatIdx, scale, viewScale);
         }
 
         /// <summary>
@@ -166,13 +206,47 @@ namespace App.Network
                 return;
             }
 
+            // 大きさは別に配られるため、ここで消さないように引き継ぐ
+            var current = Seats[seatIdx];
+
             Seats.Set(seatIdx, new SeatState
             {
                 PhaseValue = phaseValue,
                 SelectIdx = selectIdx,
                 CharaPos = charaPos,
                 IsFacingLeft = isFacingLeft,
+                Scale = current.Scale,
+                ViewScale = current.ViewScale,
             });
+        }
+
+        /// <summary>
+        /// 大きさの書き込み (ホスト上でのみ実行される)
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        void RPC_SetSeatScale(
+            int seatIdx,
+            Vector2 scale,
+            Vector2 viewScale,
+            RpcInfo info = default)
+        {
+            if (NetworkSeatTable.Instance == null)
+            {
+                return;
+            }
+
+            var source = info.Source.IsRealPlayer ? info.Source : Runner.LocalPlayer;
+
+            var owner = NetworkSeatTable.Instance.Seats[seatIdx].Owner;
+            if (owner != source)
+            {
+                return;
+            }
+
+            var current = Seats[seatIdx];
+            current.Scale = scale;
+            current.ViewScale = viewScale;
+            Seats.Set(seatIdx, current);
         }
         #endregion
     }

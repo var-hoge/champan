@@ -14,9 +14,154 @@ namespace App.Network
     /// </summary>
     public class NetworkPlayerPositionApplier
         : TadaLib.ProcSystem.BaseProc
+        , TadaLib.ProcSystem.IProcUpdate
         , TadaLib.ProcSystem.IProcMove
         , TadaLib.ProcSystem.IProcPhysicsMove
+        , TadaLib.ProcSystem.IProcPostMove
     {
+        #region TadaLib.ProcSystem.IProcUpdate の実装
+        /// <summary>
+        /// 見た目の計算に使う元の値を、配られたもので埋める
+        ///
+        /// 権威を持たない側では MoveCtrl と TadaRigidbody2D を止めているため、
+        /// 速度も接地状態も変化しない。
+        /// そのままでは、そこから決まる拡縮アニメや表情、オノマトペが何も出ない。
+        ///
+        /// 演出を一つずつ配るのではなく元の値を配ることで、
+        /// 各台が同じ計算をして同じ見た目になる。
+        /// </summary>
+        public void OnUpdate()
+        {
+            if (!NetworkSession.IsOnline)
+            {
+                return;
+            }
+
+            var binder = GetComponent<NetworkPlayerBinder>();
+            if (binder == null || binder.Object == null || !binder.Object.IsValid)
+            {
+                return;
+            }
+
+            // キャラセレクトのキャラはシーンに置かれていて、権威はホストが持つ。
+            // 権威の有無では「誰が動かしているか」を判断できないため、席で見る。
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                ApplyCharaSelectScale(binder.SeatIdx);
+                return;
+            }
+
+            if (binder.Object.HasStateAuthority)
+            {
+                // 権威を持つ側は自分で計算している
+                return;
+            }
+
+            var moveCtrl = GetComponent<Actor.Player.MoveCtrl>();
+            if (moveCtrl != null)
+            {
+                moveCtrl.SetVelocityForce(binder.SyncVelocity);
+            }
+
+            var rigidbody = GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
+            if (rigidbody != null)
+            {
+                rigidbody.SetIsGroundForcibly(binder.IsGrounded);
+            }
+
+            // 拡縮は元の値からは再現しきれない。
+            // 踏まれたときの拡縮のように、時間で動く演出が混ざっているため、
+            // 通り道の結果をそのまま映す。
+            var totalScaleCtrl = GetComponentInChildren<TadaLib.ActionStd.TotalScaleCtrl>(true);
+            if (totalScaleCtrl != null && binder.SyncScale != Vector2.zero)
+            {
+                totalScaleCtrl.SetScaleForcibly(
+                    new Vector3(binder.SyncScale.x, binder.SyncScale.y, 1.0f),
+                    new Vector3(binder.SyncViewScale.x, binder.SyncViewScale.y, 1.0f));
+            }
+        }
+        #endregion
+
+        #region TadaLib.ProcSystem.IProcPostMove の実装
+        /// <summary>
+        /// 配られた向きを反映する
+        ///
+        /// 自分のキャラの向きは RotateCtrl が IProcPostMove で決めている。
+        /// 同じ位相で反映して、自分と相手で処理の流れをそろえる。
+        /// </summary>
+        public void OnPostMove()
+        {
+            if (!NetworkSession.IsOnline || !NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
+            var binder = GetComponent<NetworkPlayerBinder>();
+            if (binder == null || binder.Object == null || !binder.Object.IsValid)
+            {
+                return;
+            }
+
+            if (binder.Object.HasStateAuthority)
+            {
+                // 権威を持つ側は RotateCtrl が決める
+                return;
+            }
+
+            var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
+            if (rotateCtrl == null)
+            {
+                return;
+            }
+
+            rotateCtrl.SetFacingLeft(binder.IsFacingLeft);
+        }
+        #endregion
+
+        #region private メソッド
+        /// <summary>
+        /// キャラセレクトの大きさをやりとりする
+        ///
+        /// 自分の席なら配り、他人の席なら配られたものを映す。
+        /// </summary>
+        void ApplyCharaSelectScale(int seatIdx)
+        {
+            var charaSelectState = NetworkCharaSelectState.Instance;
+            if (charaSelectState == null)
+            {
+                return;
+            }
+
+            var totalScaleCtrl = GetComponentInChildren<TadaLib.ActionStd.TotalScaleCtrl>(true);
+            if (totalScaleCtrl == null)
+            {
+                return;
+            }
+
+            if (SeatInput.IsLocalSeat(seatIdx))
+            {
+                charaSelectState.PublishScale(
+                    seatIdx,
+                    totalScaleCtrl.CurrentScale,
+                    totalScaleCtrl.CurrentViewScale);
+
+                return;
+            }
+
+            var scale = charaSelectState.GetScale(seatIdx);
+            if (scale == Vector2.zero)
+            {
+                // まだ配られていない
+                return;
+            }
+
+            var viewScale = charaSelectState.GetViewScale(seatIdx);
+            totalScaleCtrl.SetScaleForcibly(
+                new Vector3(scale.x, scale.y, 1.0f),
+                new Vector3(viewScale.x, viewScale.y, 1.0f));
+        }
+        #endregion
+
         #region TadaLib.ProcSystem.IProcMove の実装
         public void OnMove()
         {

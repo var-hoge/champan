@@ -239,17 +239,6 @@ namespace App.Actor.Player
             var vel3 = new Vector3(Velocity.x * SpeedRateX, Velocity.y * SpeedRateY * rateY, 0.0f);
             transform.position += vel3 * deltaTime;
 
-            // @memo: 調査用。原因が判明したら削除する
-            if (App.Network.NetworkSession.IsOnline && Time.frameCount % 30 == 0)
-            {
-                var playerIdx = GetComponent<DataHolder>().PlayerIdx;
-                Debug.Log(
-                    $"[移動調査] seatIdx={playerIdx}"
-                    + $" 速度=({Velocity.x:F1},{Velocity.y:F1})"
-                    + $" deltaTime={deltaTime * 1000.0f:F1}ms"
-                    + $" 接地={rigidbody.IsGround}");
-            }
-
             var pos = transform.position;
             if (pos.x < _moveLimitPos.x)
             {

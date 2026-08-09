@@ -47,10 +47,35 @@ namespace App.Actor.Gimmick.RespawnBubble
         {
             foreach (var player in _moveInfoCtrl.RideObjects)
             {
+                var holder = player.GetComponent<Player.DataHolder>();
+
+                // 落下を検知できるのは、そのキャラを動かしている台だけ。
+                // 他の台では物理を止めているため、ここには来ない。
+                // 検知した台が知らせるので、二重に処理しないようにする。
+                if (Network.NetworkSession.IsOnline
+                    && !Network.SeatInput.IsLocalSeat(holder.PlayerIdx))
+                {
+                    continue;
+                }
+
+                // 既に落ちた扱いのキャラは、画面外へ移すまでの間ここに残り続ける。
+                // 知らせを毎フレーム送ると、オノマトペが出続けてしまう。
+                if (holder.IsDead)
+                {
+                    continue;
+                }
+
                 if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.Battle)
                 {
                     var dataHolder = player.GetComponent<Player.DataHolder>();
                     dataHolder.IsDead = true;
+
+                    // 落下は勝敗に関わらないため、検知した台がそのまま知らせる
+                    if (Network.NetworkSession.IsOnline)
+                    {
+                        Network.NetworkMatchState.Instance?.NotifyFall(
+                            dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
+                    }
                     // SE�̍Đ�
                     var path = SEPath[Random.Range(0, SEPath.Count)];
                     SEManager.Instance.Play(path, 20f);
@@ -111,6 +136,26 @@ namespace App.Actor.Gimmick.RespawnBubble
                     player.transform.position = OutOfScreenPoint;
                 }
             }
+        }
+
+        /// <summary>
+        /// 落下したという知らせを受けて、この台の見た目と音を出す
+        ///
+        /// キャラを画面外へ動かす処理は行わない。
+        /// 座標は落ちた本人の台から配られるため、放っておいても揃う。
+        /// </summary>
+        public static void PlayFallVisual(int seatIdx, Vector3 position, Vector3 velocity)
+        {
+            var spawner = FindAnyObjectByType<PlayerSpawner>();
+            if (spawner == null)
+            {
+                return;
+            }
+
+            var path = spawner.SEPath[Random.Range(0, spawner.SEPath.Count)];
+            SEManager.Instance.Play(path, 20f);
+
+            Ui.Main.OtomatopoeiaManager.Instance.Spawn(seatIdx, position, velocity);
         }
 
         /// <summary>
