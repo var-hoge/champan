@@ -300,6 +300,30 @@ namespace App.Network
         }
 
         /// <summary>
+        /// CPU が担当する席かどうか
+        ///
+        /// 誰も座っていない席に加えて、
+        /// 席は埋まっているがキャラセレクトで参加しなかった枠も CPU にする。
+        /// (部屋に居るだけで操作していない人の枠が、動かないキャラになるのを防ぐ)
+        /// </summary>
+        bool IsCpuSeat(int seatIdx)
+        {
+            if (NetworkSeatTable.Instance.IsCpuSeat(seatIdx))
+            {
+                return true;
+            }
+
+            var charaSelectState = NetworkCharaSelectState.Instance;
+            if (charaSelectState == null)
+            {
+                // キャラセレクトを経ていない場合は席の有無だけで判断する
+                return false;
+            }
+
+            return charaSelectState.GetPhase(seatIdx) != NetworkCharaSelectState.Phase.Selected;
+        }
+
+        /// <summary>
         /// 各 Player の入力の有効・無効を、確定した CPU 判定で付け直す
         ///
         /// PlayerInputReader と CpuInput は Start の時点の CPU 判定を一度だけ読む。
@@ -561,7 +585,7 @@ namespace App.Network
 
             for (int seatIdx = 0; seatIdx < NetworkSeatTable.SeatCountMax; ++seatIdx)
             {
-                var isCpuSeat = isExistCpu && NetworkSeatTable.Instance.IsCpuSeat(seatIdx);
+                var isCpuSeat = isExistCpu && IsCpuSeat(seatIdx);
                 cpuManager.SetIsCpu(seatIdx, isCpuSeat);
             }
 

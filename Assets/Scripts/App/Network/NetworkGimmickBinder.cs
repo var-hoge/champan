@@ -90,8 +90,25 @@ namespace App.Network
                 return;
             }
 
-            // 権威を持たない側では物理を止め、配られた座標に従う
-            rigidbody.simulated = HasStateAuthority;
+            if (!_hasOriginalBodyType)
+            {
+                _originalBodyType = rigidbody.bodyType;
+                _hasOriginalBodyType = true;
+            }
+
+            if (HasStateAuthority)
+            {
+                rigidbody.bodyType = _originalBodyType;
+                return;
+            }
+
+            // 権威を持たない側では物理で動かさず、配られた座標に従う。
+            //
+            // ここで simulated = false にしてはいけない。
+            // コライダーごと物理世界から外れてしまい、
+            // その台ではバブルに当たり判定が無くなって、
+            // 自分のキャラが乗れず落下し続ける。
+            rigidbody.bodyType = RigidbodyType2D.Kinematic;
         }
         #endregion
 
@@ -105,6 +122,9 @@ namespace App.Network
         /// これ以上離れていたら補間せずに合わせる
         /// </summary>
         const float PosSnapDistanceSqr = 25.0f;
+
+        RigidbodyType2D _originalBodyType = RigidbodyType2D.Dynamic;
+        bool _hasOriginalBodyType = false;
         #endregion
     }
 }

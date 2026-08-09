@@ -97,13 +97,23 @@ namespace App.Ui.CharaSelect
         #region IProcUpdate の実装
         public void OnUpdate()
         {
+            // 席が配られる前は、どの席が自分の担当か分からない。
+            // その状態で「他の台の席」として扱うと、自分のキャラの移動を止めてしまう。
+            var isSeatKnown = !Network.NetworkSession.IsOnline
+                || Network.NetworkSeatTable.Instance != null;
+
             // 他の台が担当する席は、受け取った状態を表示するだけ
-            if (Network.NetworkSession.IsOnline && !Network.SeatInput.IsLocalSeat(_playerIdx))
+            if (isSeatKnown
+                && Network.NetworkSession.IsOnline
+                && !Network.SeatInput.IsLocalSeat(_playerIdx))
             {
                 ApplyRemoteState();
                 ApplyRemoteCharaPos();
                 return;
             }
+
+            // 自分の担当なら、自分で動かせる状態に戻す
+            RestoreLocalCharaPhysics();
 
             PublishCharaPos();
 
@@ -185,6 +195,11 @@ namespace App.Ui.CharaSelect
         float _posPublishTimer = 0.0f;
         Vector2 _lastPublishedPos = Vector2.zero;
         bool _lastPublishedFacingLeft = false;
+
+        /// <summary>
+        /// 他の台の席として扱い、キャラの移動を止めているか
+        /// </summary>
+        bool _isCharaPhysicsDisabled = false;
 
         bool _isReselect = false;
 
@@ -367,6 +382,34 @@ namespace App.Ui.CharaSelect
         }
 
         /// <summary>
+        /// 自分が担当する席のキャラを、自分で動かせる状態に戻す
+        ///
+        /// 席が配られる前に「他の台の席」として扱ってしまうと移動を止めるため、
+        /// 判明した時点で戻す必要がある。
+        /// </summary>
+        void RestoreLocalCharaPhysics()
+        {
+            if (_player == null || !_isCharaPhysicsDisabled)
+            {
+                return;
+            }
+
+            var moveCtrl = _player.GetComponent<Actor.Player.MoveCtrl>();
+            if (moveCtrl != null)
+            {
+                moveCtrl.enabled = true;
+            }
+
+            var rigidbody = _player.GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
+            if (rigidbody != null)
+            {
+                rigidbody.enabled = true;
+            }
+
+            _isCharaPhysicsDisabled = false;
+        }
+
+        /// <summary>
         /// 他の台が担当する席のキャラは、受け取った位置へ動かす
         /// 自前で動かすと二重に動いてしまうため、ローカルの移動は止める
         /// </summary>
@@ -388,6 +431,8 @@ namespace App.Ui.CharaSelect
             {
                 rigidbody.enabled = false;
             }
+
+            _isCharaPhysicsDisabled = true;
 
             // 向きは自前で決められないので、受け取った値をそのまま反映する
             var rotateCtrl = _player.GetComponent<Actor.Player.RotateCtrl>();

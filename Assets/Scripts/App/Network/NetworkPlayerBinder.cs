@@ -93,6 +93,13 @@ namespace App.Network
         /// </summary>
         public override void FixedUpdateNetwork()
         {
+            // キャラセレクトの座標は NetworkCharaSelectState が配る。
+            // ここで扱うと二重になる。
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             SyncPosition = transform.position;
 
             var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
@@ -114,6 +121,14 @@ namespace App.Network
         /// </summary>
         public override void Render()
         {
+            // キャラセレクトでは権威がホストのままなので、
+            // ここで座標を反映すると自分のキャラまで引き戻してしまう。
+            // (自分で動かした分が毎フレーム打ち消され「動きにくい」症状になる)
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             if (HasStateAuthority)
             {
                 return;
@@ -145,6 +160,12 @@ namespace App.Network
         /// </summary>
         void OnFacingChanged()
         {
+            // キャラセレクトの向きは NetworkCharaSelectState が配る
+            if (!NetworkSession.IsInMatchScene(gameObject))
+            {
+                return;
+            }
+
             if (HasStateAuthority)
             {
                 return;
