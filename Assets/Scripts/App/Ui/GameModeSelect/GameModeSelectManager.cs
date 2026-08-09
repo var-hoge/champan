@@ -56,6 +56,14 @@ namespace App.Ui.GameModeSelect
                 return;
             }
 
+            UpdateNetworkRule();
+
+            // ネットワーク対戦では、戻る操作もホストだけが行う
+            if (Network.NetworkSession.IsOnline && !Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             UpdateBack();
         }
         #endregion
@@ -63,6 +71,9 @@ namespace App.Ui.GameModeSelect
         #region private フィールド
         [SerializeField]
         TadaLib.Ui.Menu.MenuCtrl _menuCtrl;
+
+        [SerializeField]
+        MenuPages.Root _rootPage;
 
         [SerializeField]
         Material _backUiMaterial;
@@ -79,6 +90,30 @@ namespace App.Ui.GameModeSelect
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// ルール設定をホストからゲストへ流す
+        ///
+        /// ゲストはメニューを操作できない。
+        /// 台ごとに設定が食い違うと勝敗条件がずれるため、決定権はホストに集める。
+        /// </summary>
+        void UpdateNetworkRule()
+        {
+            if (!Network.NetworkSession.IsOnline)
+            {
+                return;
+            }
+
+            if (Network.NetworkSession.HasAuthority)
+            {
+                _rootPage.PublishRuleToGuests();
+                return;
+            }
+
+            // ゲストは操作を受け付けず、受け取った設定を反映するだけ
+            _menuCtrl.IsEnabled = false;
+            _rootPage.ApplyRuleFromHost();
+        }
+
         void UpdateBack()
         {
 

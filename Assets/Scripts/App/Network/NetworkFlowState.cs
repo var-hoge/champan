@@ -38,6 +38,18 @@ namespace App.Network
         /// </summary>
         [Networked]
         public NetworkBool IsTitleDecided { get; set; }
+
+        /// <summary>
+        /// ルール選択: CPU の有無 (選択肢の番号)
+        /// </summary>
+        [Networked]
+        public int RuleCpuOptionIdx { get; set; }
+
+        /// <summary>
+        /// ルール選択: 勝利に必要な勝ち点 (選択肢の番号)
+        /// </summary>
+        [Networked]
+        public int RuleWinCountOptionIdx { get; set; }
         #endregion
 
         #region メソッド
@@ -69,6 +81,26 @@ namespace App.Network
             }
 
             IsTitleDecided = true;
+        }
+
+        public void SetRuleCpuOptionIdx(int idx)
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            RuleCpuOptionIdx = idx;
+        }
+
+        public void SetRuleWinCountOptionIdx(int idx)
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            RuleWinCountOptionIdx = idx;
         }
 
         /// <summary>

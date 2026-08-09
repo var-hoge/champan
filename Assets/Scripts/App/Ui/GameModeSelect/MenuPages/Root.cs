@@ -20,6 +20,48 @@ namespace App.Ui.GameModeSelect.MenuPages
         #endregion
 
         #region メソッド
+        /// <summary>
+        /// ホストの設定をゲストに配る
+        ///
+        /// 変化した瞬間に送るだけだと、その前に合流したゲストへ何も伝わらないため、
+        /// 現在値を反映し続ける。
+        /// </summary>
+        public void PublishRuleToGuests()
+        {
+            var flowState = Network.NetworkFlowState.Instance;
+            if (flowState == null)
+            {
+                return;
+            }
+
+            if (_cpuPicker != null && flowState.RuleCpuOptionIdx != _cpuPicker.ActiveOptionIdx)
+            {
+                flowState.SetRuleCpuOptionIdx(_cpuPicker.ActiveOptionIdx);
+            }
+
+            if (_winCountPicker != null && flowState.RuleWinCountOptionIdx != _winCountPicker.ActiveOptionIdx)
+            {
+                flowState.SetRuleWinCountOptionIdx(_winCountPicker.ActiveOptionIdx);
+            }
+        }
+
+        /// <summary>
+        /// ホストの設定を反映する
+        ///
+        /// ValuePicker.Move を通すことで、見た目と設定値の両方が
+        /// ホストで操作したときと同じ経路で更新される。
+        /// </summary>
+        public void ApplyRuleFromHost()
+        {
+            var flowState = Network.NetworkFlowState.Instance;
+            if (flowState == null)
+            {
+                return;
+            }
+
+            ApplyPicker(_cpuPicker, flowState.RuleCpuOptionIdx);
+            ApplyPicker(_winCountPicker, flowState.RuleWinCountOptionIdx);
+        }
         #endregion
 
         #region MonoBehavior の実装
@@ -49,7 +91,8 @@ namespace App.Ui.GameModeSelect.MenuPages
                 };
                 recipe.IsEnabledFunc = () => Cpu.CpuManager.Instance.CpuCount() != 0; // CPUが0なら選択不可
 
-                items.Add(new TadaLib.Ui.Menu.PageItem.ValuePicker(recipe));
+                _cpuPicker = new TadaLib.Ui.Menu.PageItem.ValuePicker(recipe);
+                items.Add(_cpuPicker);
             }
 
             {
@@ -67,7 +110,8 @@ namespace App.Ui.GameModeSelect.MenuPages
                 };
                 recipe.IsEnabledFunc = () => true;
 
-                items.Add(new TadaLib.Ui.Menu.PageItem.ValuePicker(recipe));
+                _winCountPicker = new TadaLib.Ui.Menu.PageItem.ValuePicker(recipe);
+                items.Add(_winCountPicker);
             }
 
             {
@@ -101,9 +145,26 @@ namespace App.Ui.GameModeSelect.MenuPages
 
         [SerializeField]
         RectTransform _start;
+
+        /// <summary>
+        /// ネットワーク対戦でホストの設定を反映するために保持する
+        /// </summary>
+        TadaLib.Ui.Menu.PageItem.ValuePicker _cpuPicker;
+        TadaLib.Ui.Menu.PageItem.ValuePicker _winCountPicker;
         #endregion
 
         #region privateメソッド
+        static void ApplyPicker(TadaLib.Ui.Menu.PageItem.ValuePicker picker, int optionIdx)
+        {
+            if (picker == null || picker.ActiveOptionIdx == optionIdx)
+            {
+                return;
+            }
+
+            var isPositive = optionIdx > picker.ActiveOptionIdx;
+
+            picker.Move(optionIdx, isPositive);
+        }
         #endregion
     }
 }
