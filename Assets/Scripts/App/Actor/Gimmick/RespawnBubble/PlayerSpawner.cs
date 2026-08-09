@@ -25,6 +25,15 @@ namespace App.Actor.Gimmick.RespawnBubble
 
         private static readonly Vector3 OutOfScreenPoint = new(0, -30, 0);
 
+        /// <summary>
+        /// 落下を続けて処理しない時間
+        ///
+        /// 画面外へ移すまでの数フレーム、落下地点に残り続けるため
+        /// </summary>
+        private const float FallCooldownSec = 1.0f;
+
+        private readonly Dictionary<int, float> _latestFallTimes = new();
+
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -58,12 +67,17 @@ namespace App.Actor.Gimmick.RespawnBubble
                     continue;
                 }
 
-                // 既に落ちた扱いのキャラは、画面外へ移すまでの間ここに残り続ける。
-                // 知らせを毎フレーム送ると、オノマトペが出続けてしまう。
-                if (holder.IsDead)
+                // 落ちたキャラは、画面外へ移すまでの間ここに残り続ける。
+                // 毎フレーム処理すると、オノマトペが出続けてしまう。
+                //
+                // IsDead は戻される場所がないため、ここでは使えない。
+                // 使うと、一度落ちたキャラが二度と落ちられなくなる。
+                if (IsInFallCooldown(holder.PlayerIdx))
                 {
                     continue;
                 }
+
+                RegisterFall(holder.PlayerIdx);
 
                 if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.Battle)
                 {
@@ -136,6 +150,24 @@ namespace App.Actor.Gimmick.RespawnBubble
                     player.transform.position = OutOfScreenPoint;
                 }
             }
+        }
+
+        /// <summary>
+        /// 直前に落下を処理したばかりか
+        /// </summary>
+        bool IsInFallCooldown(int seatIdx)
+        {
+            if (!_latestFallTimes.TryGetValue(seatIdx, out var latestTime))
+            {
+                return false;
+            }
+
+            return Time.time - latestTime < FallCooldownSec;
+        }
+
+        void RegisterFall(int seatIdx)
+        {
+            _latestFallTimes[seatIdx] = Time.time;
         }
 
         /// <summary>
