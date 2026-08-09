@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 5494613019607211277}
   - component: {fileID: 8208198930462694628}
   - component: {fileID: 9023508136276926088}
+  - component: {fileID: 8279174458064049665}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -612,3 +613,18 @@ MonoBehaviour:
   _SeatIdxOverride: 0
   _UseSeatOverride:
     RawValue: 0
+  _IsFacingLeft:
+    RawValue: 0
+  _SyncPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &8279174458064049665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139938000420098449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93cadefbd5a7032418a51a3b0eadd7ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

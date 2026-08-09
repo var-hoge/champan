@@ -41,37 +41,8 @@ namespace App.Network
             SyncPosition = transform.position;
         }
 
-        /// <summary>
-        /// 権威を持たない側は、配られた座標へ追従する
-        /// Render は権威の有無に関わらず呼ばれる
-        /// </summary>
-        public override void Render()
-        {
-            if (HasStateAuthority)
-            {
-                return;
-            }
-
-            if (SyncPosition == Vector3.zero)
-            {
-                // まだ配られていない
-                return;
-            }
-
-            var current = transform.position;
-
-            // フレームレートに依存しない追従
-            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * Time.deltaTime);
-            var next = Vector3.Lerp(current, SyncPosition, rate);
-
-            // 離れすぎたら補間せずに合わせる
-            if ((current - SyncPosition).sqrMagnitude > PosSnapDistanceSqr)
-            {
-                next = SyncPosition;
-            }
-
-            transform.position = next;
-        }
+        // @memo: 配られた座標の反映は NetworkGimmickPositionApplier が行う。
+        //        乗り物の移動差分を正しく出すために、反映する位相が重要になる。
         #endregion
 
         #region Fusion.IStateAuthorityChanged の実装
@@ -113,16 +84,6 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        /// <summary>
-        /// 配られた座標への追従の速さ
-        /// </summary>
-        const float PosFollowSpeed = 25.0f;
-
-        /// <summary>
-        /// これ以上離れていたら補間せずに合わせる
-        /// </summary>
-        const float PosSnapDistanceSqr = 25.0f;
-
         RigidbodyType2D _originalBodyType = RigidbodyType2D.Dynamic;
         bool _hasOriginalBodyType = false;
         #endregion

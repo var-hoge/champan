@@ -114,46 +114,8 @@ namespace App.Network
             }
         }
 
-        /// <summary>
-        /// 権威を持たない側は、配られた座標へ追従する
-        ///
-        /// Render は権威の有無に関わらず呼ばれる。
-        /// </summary>
-        public override void Render()
-        {
-            // キャラセレクトでは権威がホストのままなので、
-            // ここで座標を反映すると自分のキャラまで引き戻してしまう。
-            // (自分で動かした分が毎フレーム打ち消され「動きにくい」症状になる)
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                return;
-            }
-
-            if (HasStateAuthority)
-            {
-                return;
-            }
-
-            if (SyncPosition == Vector3.zero)
-            {
-                // まだ配られていない
-                return;
-            }
-
-            var current = transform.position;
-
-            // フレームレートに依存しない追従
-            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * Time.deltaTime);
-            var next = Vector3.Lerp(current, SyncPosition, rate);
-
-            // 離れすぎたら補間せずに合わせる (リスポーンなど)
-            if ((current - SyncPosition).sqrMagnitude > PosSnapDistanceSqr)
-            {
-                next = SyncPosition;
-            }
-
-            transform.position = next;
-        }
+        // @memo: 配られた座標の反映は NetworkPlayerPositionApplier が行う。
+        //        当たり判定と噛み合わせるために、反映する位相が重要になる。
 
         /// <summary>
         /// 配られた向きを反映する
@@ -319,16 +281,6 @@ namespace App.Network
 
         #region private フィールド
         bool[] _localInputEnabledCache = new bool[0];
-
-        /// <summary>
-        /// 配られた座標への追従の速さ
-        /// </summary>
-        const float PosFollowSpeed = 25.0f;
-
-        /// <summary>
-        /// これ以上離れていたら補間せずに合わせる
-        /// </summary>
-        const float PosSnapDistanceSqr = 25.0f;
         #endregion
     }
 }
