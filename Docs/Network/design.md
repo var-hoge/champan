@@ -1,5 +1,8 @@
 # ネットワーク対戦 設計メモ（Photon Fusion 2 / Shared Mode）
 
+> 実装方針と原則は [strategy.md](strategy.md) にまとめている。
+> この文書は初期の検討と経緯の記録。
+
 ## 決定事項
 
 | 項目 | 決定 |
