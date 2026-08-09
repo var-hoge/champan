@@ -21,11 +21,42 @@ namespace App.Network
         /// </summary>
         [Networked]
         public Vector3 SyncPosition { get; set; }
+
+        /// <summary>
+        /// 見た目の種類
+        ///
+        /// バブルの色は各台が乱数で選ぶため、そのままでは食い違う。
+        /// 権威側が決めた値を配る。
+        /// </summary>
+        [Networked]
+        public int VisualIdx { get; set; }
+
+        /// <summary>
+        /// 見た目の種類が決まっているか
+        /// </summary>
+        public bool HasVisualIdx => Object != null && Object.IsValid && VisualIdx > 0;
+
+        /// <summary>
+        /// 基準となる大きさ
+        ///
+        /// バブルは Start で乱数から大きさを決めるため、そのままでは台ごとに違う。
+        ///
+        /// 拡縮アニメの途中の値は配らない。
+        /// 毎フレーム上書きすると、各台で再生している演出が打ち消されてしまう。
+        /// </summary>
+        [Networked]
+        public Vector3 BaseScale { get; set; }
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
         public override void Spawned()
         {
+            if (HasStateAuthority && VisualIdx == 0)
+            {
+                // 0 は「未設定」を表すため 1 以上にする
+                VisualIdx = Random.Range(1, 1000);
+            }
+
             // 座標は自前で配るため、NetworkTransform は使わない
             var networkTransform = GetComponent<NetworkTransform>();
             if (networkTransform != null && networkTransform.enabled)
@@ -45,6 +76,42 @@ namespace App.Network
         //        乗り物の移動差分を正しく出すために、反映する位相が重要になる。
         #endregion
 
+        #region メソッド
+        /// <summary>
+        /// 破裂をホストに要求する
+        ///
+        /// 破裂の見た目は要求した台がその場で出し、
+        /// 実際の破棄やシールドの増減はホストが行う。
+        /// ホストの返答を待ってから見た目を出すと、手応えが遅れて感じられるため。
+        /// </summary>
+        /// <summary>
+        /// 基準となる大きさを配る (権威を持つ側のみ)
+        ///
+        /// 大きさは Start で乱数から決まるため、
+        /// それより前に配ると既定値を配ってしまう。
+        /// 決まった時点で呼ぶこと。
+        /// </summary>
+        public void PublishBaseScale(Vector3 scale)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority)
+            {
+                return;
+            }
+
+            BaseScale = scale;
+        }
+
+        public void RequestBurst(int playerIdx)
+        {
+            if (Object == null || !Object.IsValid)
+            {
+                return;
+            }
+
+            RPC_RequestBurst(playerIdx);
+        }
+        #endregion
+
         #region Fusion.IStateAuthorityChanged の実装
         public void StateAuthorityChanged()
         {
@@ -53,6 +120,22 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// 破裂の要求を受けて、実際の処理を行う (ホスト上でのみ実行される)
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        void RPC_RequestBurst(int playerIdx)
+        {
+            var bubble = GetComponent<Actor.Gimmick.Bubble.Bubble>();
+            if (bubble == null)
+            {
+                return;
+            }
+
+            // 二重に要求されても Bubble 側で無視される
+            bubble.DoBurst(playerIdx);
+        }
+
         void ApplyAuthorityState()
         {
             var rigidbody = GetComponent<Rigidbody2D>();

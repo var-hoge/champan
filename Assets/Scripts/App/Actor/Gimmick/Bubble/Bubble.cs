@@ -105,6 +105,16 @@ namespace App.Actor.Gimmick.Bubble
 
             transform.localScale = Vector3.one * UnityEngine.Random.Range(minSize, maxSize);
 
+            // 大きさは各台が乱数で決めるため、権威側の値を配って揃える
+            if (Network.NetworkSession.IsOnline)
+            {
+                var binder = GetComponent<Network.NetworkGimmickBinder>();
+                if (binder != null)
+                {
+                    binder.PublishBaseScale(transform.localScale);
+                }
+            }
+
             if (TopRight.Equals(Vector3.positiveInfinity))
             {
                 var camera = Camera.main;
@@ -135,9 +145,12 @@ namespace App.Actor.Gimmick.Bubble
             // 破裂の判定や搭乗の処理は権威側だけが行う。
             // リモート側でも走らせると、Despawn が効かないまま DOScale(0) で
             // 縮むだけの「見えないが存在するバブル」が残り、影だけが残る。
-            // 位置とスケールは NetworkTransform が配ってくる。
+            // 権威を持たない側でも、踏まれたときの演出はその場で再生する。
+            // ホストの結果を待ってから再生すると、踏んだ手応えが遅れて感じられる。
+            // 破裂やシールドの増減といった結果はホストだけが決める。
             if (!Network.NetworkSession.HasAuthority)
             {
+                UpdateRideVisualOnly();
                 return;
             }
 
@@ -231,6 +244,85 @@ namespace App.Actor.Gimmick.Bubble
             }
         }
 
+        /// <summary>
+        /// 踏まれたときの演出だけを再生する (権威を持たない側)
+        ///
+        /// 乗車の情報は各台に届いているため、演出はその場で出せる。
+        /// ホストの結果を待つと手応えが遅れるため、判定と演出を分けている。
+        /// </summary>
+        private void UpdateRideVisualOnly()
+        {
+            var losingRider = currentRiders > _moveInfoCtrl.RideObjects.Count;
+            currentRiders = _moveInfoCtrl.RideObjects.Count;
+
+            if (IsRidden)
+            {
+                if (!_isRidenPrev)
+                {
+                    _isRidenPrev = true;
+
+                    GetComponent<BubbleAnimator>().OnRide();
+                    GetComponent<BubbleAnimator>().AnimationEnabled = true;
+                    PlaySE();
+                }
+
+                _burstTimer -= Time.deltaTime;
+                _hasRidden = true;
+
+                if (_burstTimer < 0)
+                {
+                    RequestBurst();
+                }
+            }
+            else
+            {
+                _isRidenPrev = false;
+            }
+
+            if ((!IsRidden && _hasRidden) || losingRider)
+            {
+                RequestBurst();
+            }
+        }
+
+        /// <summary>
+        /// 破裂を要求する (権威を持たない側)
+        ///
+        /// 見た目はその場で出し、実際の破棄とシールドの増減はホストに任せる。
+        /// ホストの返答を待つと破裂が遅れて感じられるため。
+        /// </summary>
+        private void RequestBurst()
+        {
+            if (_isBursting)
+            {
+                return;
+            }
+
+            _isBursting = true;
+
+            var playerIdx = _moveInfoCtrl.RideObjects.Count > 0
+                ? _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx
+                : -1;
+
+            // 見た目だけ先に出す
+            PlaySE();
+            transform.DOScale(Vector3.zero, 0.15f);
+            Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+
+            // 王冠バブルなら、シールドが減った見た目も先に出す。
+            // 正しい値はホストから配られてくるので、そこで上書きされる。
+            if (HasCrown && Crown.Manager.Instance.ShieldValue > 0)
+            {
+                SetupCrown(Crown.Manager.Instance.ShieldValue - 1, withGameStart: false);
+            }
+
+            var binder = GetComponent<Network.NetworkGimmickBinder>();
+            if (binder != null)
+            {
+                binder.RequestBurst(playerIdx);
+            }
+        }
+
         private void PlaySE()
         {
             var path = SEPath[UnityEngine.Random.Range(0, SEPath.Count)];
@@ -256,6 +348,22 @@ namespace App.Actor.Gimmick.Bubble
         //        return;
         //    }
         //}
+
+        /// <summary>
+        /// 王冠バブルのシールド表示を更新する
+        ///
+        /// シールドの値はホストが決めて配るため、
+        /// 受け取った側も見た目を更新する必要がある。
+        /// </summary>
+        public void RefreshCrownVisual()
+        {
+            if (!HasCrown)
+            {
+                return;
+            }
+
+            SetupCrown(Crown.Manager.Instance.ShieldValue, withGameStart: false);
+        }
 
         public static void SetupCrown(Bubble bubble)
         {

@@ -61,6 +61,16 @@ namespace App.Network
             }
 
             transform.position = next;
+
+            // 基準の大きさは、配られた値が変わったときだけ合わせる。
+            // 毎フレーム上書きすると、この台で再生している拡縮アニメが打ち消される。
+            // (大きさは Start で決まるため、配られるのが遅れることがある)
+            var baseScale = binder.BaseScale;
+            if (baseScale != Vector3.zero && baseScale != _appliedBaseScale)
+            {
+                _appliedBaseScale = baseScale;
+                transform.localScale = baseScale;
+            }
         }
         #endregion
 
@@ -74,6 +84,8 @@ namespace App.Network
         /// これ以上離れていたら補間せずに合わせる
         /// </summary>
         const float PosSnapDistanceSqr = 25.0f;
+
+        Vector3 _appliedBaseScale = Vector3.zero;
         #endregion
     }
 }

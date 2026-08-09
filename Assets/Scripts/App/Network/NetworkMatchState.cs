@@ -49,6 +49,38 @@ namespace App.Network
 
         #region メソッド
         /// <summary>
+        /// 復帰用バブルの生成をホストに要求する
+        ///
+        /// 落下の検知は、そのキャラを動かしている台でしか行えない。
+        /// (ホスト側では他の台のキャラの物理を止めているため検知できない)
+        /// </summary>
+        public void RequestRespawnBubble(int seatIdx, float spawnPointX, float spawnPointY)
+        {
+            RPC_RequestRespawnBubble(seatIdx, spawnPointX, spawnPointY);
+        }
+
+        /// <summary>
+        /// 復帰したことを他の台に伝える
+        ///
+        /// 割れる判断と復帰位置は、そのキャラを動かしている台が決める。
+        /// ホストの許可を待たないため、落ちた本人の手応えが遅れない。
+        ///
+        /// バブル自身に載せて伝えることはできない。
+        /// 伝えた直後にバブルは破棄されるため、届く前に対象が消えてしまう。
+        /// </summary>
+        public void NotifyRespawn(int seatIdx, Vector3 position)
+        {
+            if (Object == null || !Object.IsValid)
+            {
+                return;
+            }
+
+            RPC_NotifyRespawn(seatIdx, position.x, position.y);
+        }
+        #endregion
+
+        #region メソッド
+        /// <summary>
         /// ラウンドの結果を全員に知らせる (権威側のみ)
         /// </summary>
         public void PublishRoundEnd(int winnerSeatIdx)
@@ -118,6 +150,33 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// 復帰用バブルの生成 (ホスト上でのみ実行される)
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        void RPC_RequestRespawnBubble(int seatIdx, float spawnPointX, float spawnPointY)
+        {
+            var spawner = FindAnyObjectByType<Actor.Gimmick.RespawnBubble.PlayerSpawner>();
+            if (spawner == null)
+            {
+                Debug.LogError("[NetworkMatchState] PlayerSpawner が見つかりません");
+                return;
+            }
+
+            spawner.SpawnRespawnBubbleForSeat(seatIdx, spawnPointX, spawnPointY);
+        }
+
+        /// <summary>
+        /// 復帰したという知らせを受ける
+        ///
+        /// 送った台では既に済んでいるため、そこでは呼ばない。
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyRespawn(int seatIdx, float posX, float posY)
+        {
+            NetworkRespawnBubbleBinder.ApplyRespawn(seatIdx, new Vector3(posX, posY, 0f));
+        }
+
         void PublishWinCounts()
         {
             var gameMatchManager = GameMatchManager.Instance;

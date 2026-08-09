@@ -103,6 +103,12 @@ namespace App.Network
             }
 
             manager.ApplyNetworkShieldValues(ShieldValue, ExShieldValue, InitShieldValue);
+
+            // 値だけでなく見た目も更新する
+            if (manager.CrownBubble != null)
+            {
+                manager.CrownBubble.RefreshCrownVisual();
+            }
         }
 
         void OnCrownBubbleChanged()

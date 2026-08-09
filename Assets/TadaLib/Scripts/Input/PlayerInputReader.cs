@@ -24,15 +24,24 @@ namespace TadaLib.Input
         // 入力状態をリセットする
         public void ResetInput()
         {
+            // Start より先に呼ばれることがあり、その時点では中身が無い
             foreach (ButtonCode code in System.Enum.GetValues(typeof(ButtonCode)))
             {
-                _buttonDict[code].Clear();
-                _buttonDict[code].AddFirst(new ButtonData(false, Time.unscaledTime));
+                if (!_buttonDict.TryGetValue(code, out var buff))
+                {
+                    continue;
+                }
+
+                buff.Clear();
+                buff.AddFirst(new ButtonData(false, Time.unscaledTime));
             }
 
             foreach (AxisCode code in System.Enum.GetValues(typeof(AxisCode)))
             {
-                _axisDict[code] = 0.0f;
+                if (_axisDict.ContainsKey(code))
+                {
+                    _axisDict[code] = 0.0f;
+                }
             }
         }
 

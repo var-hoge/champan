@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 505707714611184825}
   - component: {fileID: 4256206828618661818}
   - component: {fileID: 3198983806738060718}
+  - component: {fileID: 6910743052951403008}
   m_Layer: 9
   m_Name: RespawnBubble
   m_TagString: Untagged
@@ -326,6 +327,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 505707714611184825}
   - {fileID: 4256206828618661818}
+  - {fileID: 6910743052951403008}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &505707714611184825
 MonoBehaviour:
@@ -380,6 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _SyncPosition: {x: 0, y: 0, z: 0}
+  _VisualIdx: 0
 --- !u!114 &3198983806738060718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,6 +395,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37af3ef0080ceee4c8472fec4bf89ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6910743052951403008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7550832157192918740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e098062f762a2e644b14f4e820efa384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _SeatIdx: 0
 --- !u!1 &7733689424362595272
 GameObject:
   m_ObjectHideFlags: 0

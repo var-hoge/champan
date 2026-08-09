@@ -64,9 +64,33 @@ namespace App.Actor.Gimmick.RespawnBubble
                     Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);
                     // ���X�|�[���o�u���̐���
                     var spawnPointX = Mathf.Clamp(player.transform.position.x, spawnRangeX.Min, spawnRangeX.Max);
-                    // 生成は権威を持つ側だけが行う (オフラインでは常に権威を持つ)
+                    // 落下を検知できるのは、そのキャラを動かしている台だけ。
+                    // 権威を持たない側は、ホストに生成を要求する。
+                    if (!Network.NetworkSession.HasAuthority)
+                    {
+                        Network.NetworkMatchState.Instance?.RequestRespawnBubble(
+                            dataHolder.PlayerIdx, spawnPointX, spawnRangeY.Max);
+
+                        // プレイヤーを画面外へ移動
+                        player.transform.position = OutOfScreenPoint;
+                        continue;
+                    }
+
                     var respawnBubble = Network.NetworkSession.HasAuthority
-                        ? Network.NetworkSession.Spawn(_respawnBubble, new(spawnPointX, spawnRangeY.Max, 0), Quaternion.identity)
+                        ? Network.NetworkSession.Spawn(
+                            _respawnBubble,
+                            new(spawnPointX, spawnRangeY.Max, 0),
+                            Quaternion.identity,
+                            // どの席のバブルかを Spawned より前に渡す
+                            // (各台が自分の Player を結び付けるために使う)
+                            spawned =>
+                            {
+                                var binder = spawned.GetComponent<Network.NetworkRespawnBubbleBinder>();
+                                if (binder != null)
+                                {
+                                    binder.SetSeatIdx(dataHolder.PlayerIdx);
+                                }
+                            })
                         : null;
                     if (respawnBubble != null)
                     {
@@ -87,6 +111,45 @@ namespace App.Actor.Gimmick.RespawnBubble
                     player.transform.position = OutOfScreenPoint;
                 }
             }
+        }
+
+        /// <summary>
+        /// 指定した席の復帰用バブルを生成する (ホストのみ)
+        ///
+        /// 落下を検知した台からの要求で呼ばれる。
+        /// </summary>
+        public void SpawnRespawnBubbleForSeat(int seatIdx, float spawnPointX, float spawnPointY)
+        {
+            if (!Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
+            var respawnBubble = Network.NetworkSession.Spawn(
+                _respawnBubble,
+                new(spawnPointX, spawnPointY, 0),
+                Quaternion.identity,
+                spawned =>
+                {
+                    var binder = spawned.GetComponent<Network.NetworkRespawnBubbleBinder>();
+                    if (binder != null)
+                    {
+                        binder.SetSeatIdx(seatIdx);
+                    }
+                });
+
+            if (respawnBubble == null)
+            {
+                return;
+            }
+
+            // 生成した時点では対象の Player がまだ結び付いていないため、
+            // Player に依らない部分だけを設定する。
+            // これを忘れると下向きの初速が付かず、バブルが上に留まったままになる。
+            respawnBubble.InitForSeat(seatIdx, spawnPointX);
+
+            // 対象の Player は各台が自分で結び付ける (NetworkRespawnBubbleBinder)
+            CreateBubble(spawnPointX);
         }
 
         private void CreateBubble(float spawnPointX)

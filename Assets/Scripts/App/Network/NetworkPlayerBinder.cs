@@ -67,6 +67,17 @@ namespace App.Network
         /// </summary>
         [Networked]
         public Vector3 SyncPosition { get; set; }
+
+        /// <summary>
+        /// 今乗っている足場
+        ///
+        /// 乗車の登録は TadaRigidbody2D が行うが、
+        /// 権威を持たない側ではその処理を止めているため登録されない。
+        /// そのままではホストから見て「誰も乗っていない」ことになり、
+        /// バブルがはじけず、王冠の獲得者も分からない。
+        /// </summary>
+        [Networked]
+        public NetworkObject RidingObject { get; set; }
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
@@ -101,6 +112,16 @@ namespace App.Network
             }
 
             SyncPosition = transform.position;
+
+            // 乗っている足場を配る
+            var rigidbody = GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
+            var ridingMover = rigidbody != null ? rigidbody.RidingMover : null;
+
+            // MoveInfoCtrl はバブルの子オブジェクトに付いているため、
+            // NetworkObject は親をたどって探す
+            RidingObject = ridingMover != null
+                ? ridingMover.GetComponentInParent<NetworkObject>()
+                : null;
 
             var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
             if (rotateCtrl == null)
