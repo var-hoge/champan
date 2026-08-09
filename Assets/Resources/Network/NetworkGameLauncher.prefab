@@ -48,3 +48,4 @@ MonoBehaviour:
   _charaSelectStatePrefab: {fileID: 6366433178411655778, guid: a995ceaffe590ec4aa24ae36dcc475ef, type: 3}
   _flowStatePrefab: {fileID: 3655025117547104457, guid: 862a711d386a53c479c4b44e5ddec889, type: 3}
   _matchStatePrefab: {fileID: 3723847455065947649, guid: e57cae368c278bb489a7d8ed3b3c7a84, type: 3}
+  _crownStatePrefab: {fileID: 6525602208270667857, guid: 310d497d5507cd449800563e73310e1c, type: 3}

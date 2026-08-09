@@ -107,6 +107,9 @@ namespace App.Network
 
         void OnCrownBubbleChanged()
         {
+            // @memo: 調査用。原因が判明したら削除する
+            Debug.Log($"[王冠調査] 王冠バブルの通知を受けました 権威={HasStateAuthority} 対象={(CrownBubble != null ? "あり" : "無し")}");
+
             if (HasStateAuthority)
             {
                 return;
@@ -115,12 +118,23 @@ namespace App.Network
             var manager = Actor.Gimmick.Crown.Manager.Instance;
             if (manager == null)
             {
+                Debug.LogWarning("[王冠調査] Crown.Manager が見つかりません");
                 return;
             }
 
-            manager.CrownBubble = CrownBubble != null
+            var bubble = CrownBubble != null
                 ? CrownBubble.GetComponent<Actor.Gimmick.Bubble.Bubble>()
                 : null;
+
+            if (bubble == null)
+            {
+                manager.CrownBubble = null;
+                return;
+            }
+
+            // 管理情報だけでなく見た目も更新する必要がある。
+            // ホストと同じ経路を通すことで、王冠とシールドの表示が揃う。
+            Actor.Gimmick.Bubble.Bubble.SetupCrown(bubble);
         }
         #endregion
     }

@@ -156,6 +156,39 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// @memo: 調査用。フレーム時間を測る
+        /// 動きの不自然さがフレームレート由来かを切り分ける
+        /// </summary>
+        void Update()
+        {
+            if (_runner == null)
+            {
+                return;
+            }
+
+            _frameCount += 1;
+            _frameTimeSum += Time.unscaledDeltaTime;
+            _frameTimeMax = Mathf.Max(_frameTimeMax, Time.unscaledDeltaTime);
+
+            if (_frameTimeSum < 2.0f)
+            {
+                return;
+            }
+
+            var averageMs = _frameTimeSum / _frameCount * 1000.0f;
+
+            Debug.Log(
+                $"[フレーム調査] 平均={averageMs:F1}ms ({_frameCount / _frameTimeSum:F0}fps)"
+                + $" 最悪={_frameTimeMax * 1000.0f:F1}ms"
+                + $" timeScale={Time.timeScale:F2}"
+                + $" 目標fps={Application.targetFrameRate}");
+
+            _frameCount = 0;
+            _frameTimeSum = 0.0f;
+            _frameTimeMax = 0.0f;
+        }
+
         void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, LoadSceneMode mode)
         {
             if (_runner == null)
@@ -168,9 +201,10 @@ namespace App.Network
             // (バブルの生成が例外になり、バブルも王冠も出なくなっていた)
             PreloadNetworkPrefabs();
 
-            // キャラセレクトにも Player が置かれており、そこでも相手の動きを見せたい。
-            // Player がいるシーンなら対戦シーンと同じように席と権威を設定する。
-            SetUpSceneAsync().Forget();
+            // 読み込まれたシーンをそのまま渡す。
+            // Fusion は加算ロードして後からアクティブにするため、
+            // ここで GetActiveScene() を見るとまだ切り替わっておらず判定を誤る。
+            SetUpSceneAsync(scene.name).Forget();
         }
 
         async UniTask SetUpSeatsAsync()
@@ -188,6 +222,7 @@ namespace App.Network
                 SpawnSharedState(_charaSelectStatePrefab);
                 SpawnSharedState(_flowStatePrefab);
                 SpawnSharedState(_matchStatePrefab);
+                SpawnSharedState(_crownStatePrefab);
             }
 
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
@@ -212,8 +247,10 @@ namespace App.Network
         /// <summary>
         /// Player が置かれているシーンでの準備
         /// </summary>
-        async UniTask SetUpSceneAsync()
+        async UniTask SetUpSceneAsync(string loadedSceneName)
         {
+            var isMatchScene = loadedSceneName == NetworkSession.MatchSceneName;
+
             IsMatchReady = false;
 
             try
@@ -239,18 +276,190 @@ namespace App.Network
                 // キャラセレクトで確定させると「席が埋まっている = 人間」と判定され、
                 // ボタンを押す前に自動でエントリーされてしまう
                 // (ローカル対戦ではボタンを押して参加する)。
-                if (SceneManager.GetActiveScene().name == NetworkSession.MatchSceneName)
+                if (isMatchScene)
                 {
                     // Player の生成可否 (PlayerRegistorator) が CPU 判定に依存する
                     ApplyCpuSeats();
+
+                    // CPU 判定が決まる前に各 Player が入力の有効・無効を決めてしまっているため、
+                    // 確定後に付け直す
+                    RefreshPlayerInputEnabled();
+
+                    await TakeAuthorityOfLocalSeatsAsync();
                 }
 
-                // 権威の要求は各 Player が自分で行う (NetworkPlayerBinder)
                 IsMatchReady = true;
+
+                // @memo: 調査用。原因が判明したら削除する
+                DumpPlayerStates();
             }
             catch (System.Exception e)
             {
                 Debug.LogException(e);
+            }
+        }
+
+        /// <summary>
+        /// 各 Player の入力の有効・無効を、確定した CPU 判定で付け直す
+        ///
+        /// PlayerInputReader と CpuInput は Start の時点の CPU 判定を一度だけ読む。
+        /// ネットワーク対戦では席と CPU が決まるのがそれより後になるため、
+        /// キャラセレクト時の古い判定 (そこでは全席が CPU 扱い) が残ってしまう。
+        /// </summary>
+        void RefreshPlayerInputEnabled()
+        {
+            // 呼び出し側 (SetUpSceneAsync) が対戦シーンのときだけ呼ぶ
+            var binders = FindObjectsByType<NetworkPlayerBinder>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+
+            foreach (var binder in binders)
+            {
+                var isCpu = Cpu.CpuManager.Instance.IsCpu(binder.SeatIdx);
+
+                var reader = binder.GetComponent<TadaLib.Input.PlayerInputReader>();
+                if (reader != null)
+                {
+                    reader.ActionEnabled = !isCpu;
+
+                    // 席が確定する前に操作元を決めていた場合に備えて決め直す
+                    reader.ResetInputResolve();
+                }
+
+                var cpuInput = binder.GetComponent<Cpu.CpuInput>();
+                if (cpuInput != null)
+                {
+                    cpuInput.ActionEnabled = isCpu;
+                }
+            }
+
+            Debug.Log("[NetworkGameLauncher] 入力の有効・無効を付け直しました");
+        }
+
+        /// <summary>
+        /// @memo: 調査用。各 Player が動ける状態かを出す
+        /// </summary>
+        void DumpPlayerStates()
+        {
+            var binders = FindObjectsByType<NetworkPlayerBinder>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+
+            foreach (var binder in binders)
+            {
+                var moveCtrl = binder.GetComponent<Actor.Player.MoveCtrl>();
+                var rigidbody = binder.GetComponent<TadaLib.ActionStd.TadaRigidbody2D>();
+                var reader = binder.GetComponent<TadaLib.Input.PlayerInputReader>();
+                var cpuInput = binder.GetComponent<Cpu.CpuInput>();
+
+                if (binder.Object == null || !binder.Object.IsValid)
+                {
+                    Debug.Log($"[状態調査] seatIdx={binder.SeatIdx} まだ Spawn されていません");
+                    continue;
+                }
+
+                Debug.Log(
+                    $"[状態調査] seatIdx={binder.SeatIdx}"
+                    + $" 権威={binder.Object.HasStateAuthority}"
+                    + $" 操作元={(reader != null && reader.HasInputProxy ? $"ローカル{reader.LocalInputIdx}" : "無し")}"
+                    + $" 有効={binder.gameObject.activeSelf}"
+                    + $" MoveCtrl={(moveCtrl != null ? moveCtrl.enabled.ToString() : "無し")}"
+                    + $" 物理={(rigidbody != null ? rigidbody.enabled.ToString() : "無し")}"
+                    + $" 人間入力={(reader != null ? reader.ActionEnabled.ToString() : "無し")}"
+                    + $" CPU入力={(cpuInput != null ? cpuInput.ActionEnabled.ToString() : "無し")}"
+                    + $" CPU判定={Cpu.CpuManager.Instance.IsCpu(binder.SeatIdx)}");
+            }
+        }
+
+        /// <summary>
+        /// 自分の席に対応する Player の権威を取りに行く
+        ///
+        /// 権威を持たないオブジェクトでは FixedUpdateNetwork が呼ばれないため、
+        /// Player 自身に取りに行かせることはできない (堂々巡りになる)。
+        /// 権威に依存しないここから要求する。
+        ///
+        /// 権威の移動は非同期に完了するため、移るまで要求を繰り返す。
+        /// </summary>
+        async UniTask TakeAuthorityOfLocalSeatsAsync()
+        {
+            // 呼び出し側 (SetUpSceneAsync) が対戦シーンのときだけ呼ぶ。
+            // シーン上の Player は非アクティブで置かれていることがある
+            var binders = FindObjectsByType<NetworkPlayerBinder>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+
+            for (int slot = 0; slot < LocalPlayerCount; ++slot)
+            {
+                if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out var seatIdx))
+                {
+                    Debug.LogError($"[NetworkGameLauncher] 席が割り当てられていません: localSlot={slot}");
+                    continue;
+                }
+
+                var target = System.Array.Find(binders, binder => binder.SeatIdx == seatIdx);
+
+                // Spawn は遅れて完了することがあるので待つ
+                if (target != null)
+                {
+                    var isSpawnTimeout = await UniTask
+                        .WaitUntil(() => target == null || (target.Object != null && target.Object.IsValid))
+                        .TimeoutWithoutException(System.TimeSpan.FromSeconds(10.0));
+
+                    if (isSpawnTimeout)
+                    {
+                        Debug.LogError($"[NetworkGameLauncher] Player の Spawn を待てませんでした: seatIdx={seatIdx}");
+                    }
+                }
+                if (target == null)
+                {
+                    // キャラセレクトなど Player がいない画面ではここに来る
+                    continue;
+                }
+
+                if (target.Object == null || !target.Object.IsValid)
+                {
+                    Debug.LogError($"[NetworkGameLauncher] Player が Spawn されていません: seatIdx={seatIdx}");
+                    continue;
+                }
+
+                if (target.Object.HasStateAuthority)
+                {
+                    continue;
+                }
+
+                var isTaken = false;
+
+                for (int retry = 0; retry < AuthorityRequestRetryCount; ++retry)
+                {
+                    if (target == null || target.Object == null || !target.Object.IsValid)
+                    {
+                        break;
+                    }
+
+                    target.Object.RequestStateAuthority();
+
+                    await UniTask.Delay(System.TimeSpan.FromSeconds(AuthorityRequestIntervalSec));
+
+                    if (target == null || target.Object == null)
+                    {
+                        break;
+                    }
+
+                    if (target.Object.HasStateAuthority)
+                    {
+                        isTaken = true;
+                        break;
+                    }
+                }
+
+                if (isTaken)
+                {
+                    Debug.Log($"[NetworkGameLauncher] 権威を取得しました: seatIdx={seatIdx}");
+                }
+                else
+                {
+                    Debug.LogError($"[NetworkGameLauncher] 権威を取得できませんでした: seatIdx={seatIdx}");
+                }
             }
         }
 
@@ -374,6 +583,9 @@ namespace App.Network
         [SerializeField]
         NetworkMatchState _matchStatePrefab;
 
+        [SerializeField]
+        NetworkCrownState _crownStatePrefab;
+
         /// <summary>
         /// ランチャー自身は実行時に生成するため、これだけ Resources から取る
         /// </summary>
@@ -381,7 +593,18 @@ namespace App.Network
 
         static readonly System.TimeSpan _waitTimeout = System.TimeSpan.FromSeconds(15.0);
 
+        /// <summary>
+        /// 権威が移るまで要求を繰り返す回数と間隔
+        /// </summary>
+        const int AuthorityRequestRetryCount = 20;
+        const float AuthorityRequestIntervalSec = 0.15f;
+
         NetworkRunner _runner = null;
+
+        // @memo: 調査用
+        int _frameCount = 0;
+        float _frameTimeSum = 0.0f;
+        float _frameTimeMax = 0.0f;
         #endregion
     }
 }

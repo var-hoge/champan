@@ -31,6 +31,25 @@ namespace App.Network
         }
 
         /// <summary>
+        /// 席に対応するこの台のコントローラ番号を取得する
+        /// 他の台が担当する席なら -1
+        /// </summary>
+        public static int GetLocalInputIdx(int seatIdx)
+        {
+            if (!NetworkSession.IsOnline)
+            {
+                return seatIdx;
+            }
+
+            if (!IsLocalSeat(seatIdx))
+            {
+                return -1;
+            }
+
+            return NetworkSeatTable.Instance.Seats[seatIdx].LocalSlot;
+        }
+
+        /// <summary>
         /// 席に対応するこの台の入力を取得する
         /// 他の台が担当する席なら null
         /// </summary>

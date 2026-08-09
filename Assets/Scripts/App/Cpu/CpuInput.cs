@@ -123,6 +123,14 @@ namespace App.Cpu
         #region IProcPostMove の実装
         public void OnPostMove()
         {
+            // CPU かどうかは席の確定後に決まるため、一度だけ読むと取り違える。
+            // ネットワーク対戦では毎フレーム見て追従する。
+            if (Network.NetworkSession.IsOnline)
+            {
+                var playerIdx = GetComponent<Actor.Player.DataHolder>().PlayerIdx;
+                ActionEnabled = CpuManager.Instance.IsCpu(playerIdx);
+            }
+
             _nextInputPrev = _nextInput;
             _nextInput = CalcNextInput();
         }
@@ -161,6 +169,28 @@ namespace App.Cpu
         {
             var playerIdx = GetComponent<Actor.Player.DataHolder>().PlayerIdx;
             var cpuViewData = CpuViewDataManager.Instance.GetCpuViewData(playerIdx);
+
+            // プレイヤーの登録が済むまでは視界情報が用意されていない
+            // (ネットワーク対戦では席の確定を待ってから登録するため、その間ここに来る)
+            if (cpuViewData.bubblePositions == null)
+            {
+                // @memo: 調査用。原因が判明したら削除する
+                if (Time.frameCount % 120 == 0)
+                {
+                    Debug.LogWarning($"[CPU調査] 視界情報がありません: seatIdx={playerIdx}");
+                }
+
+                return new InputData();
+            }
+
+            // @memo: 調査用。原因が判明したら削除する
+            if (Time.frameCount % 120 == 0)
+            {
+                Debug.Log(
+                    $"[CPU調査] seatIdx={playerIdx}"
+                    + $" 入力有効={ActionEnabled}"
+                    + $" バブル数={cpuViewData.bubblePositions.Count}");
+            }
 
             if (_hasTargetBubble)
             {

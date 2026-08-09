@@ -95,6 +95,15 @@ namespace App.Network
                 return;
             }
 
+            // @memo: 調査用。原因が判明したら削除する
+            if (Runner.Tick % 120 == 0)
+            {
+                Debug.Log(
+                    $"[同期調査] 権威={HasStateAuthority}"
+                    + $" 配られているフェーズ={(GameSequenceManager.Phase)PhaseValue}"
+                    + $" この台のフェーズ={sequenceManager.PhaseKind}");
+            }
+
             if (HasStateAuthority)
             {
                 PhaseValue = (byte)sequenceManager.PhaseKind;

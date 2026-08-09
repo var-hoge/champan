@@ -94,6 +94,9 @@ namespace App.Ui.Main
             _ = _canvas.GetComponent<CanvasGroup>().DOFade(0.0f, 0.3f);
 
             GameSequenceManager.Instance.PhaseKind = GameSequenceManager.Phase.Battle;
+
+            // @memo: 調査用。原因が判明したら削除する
+            Debug.Log("[GameBeginUi] カウントダウンが終わり、試合を開始しました");
         }
         #endregion
 

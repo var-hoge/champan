@@ -31,9 +31,42 @@ namespace App.Network
         /// <summary>
         /// この Player が担当する席番号
         /// </summary>
-        public int SeatIdx => UseSeatOverride
-            ? SeatIdxOverride
-            : GetComponent<Actor.Player.DataHolder>().PlayerIdx;
+        public int SeatIdx
+        {
+            get
+            {
+                var seatIdxFromData = GetComponent<Actor.Player.DataHolder>().PlayerIdx;
+
+                // Spawn される前は Networked なプロパティを読めない
+                if (Object == null || !Object.IsValid)
+                {
+                    return seatIdxFromData;
+                }
+
+                return UseSeatOverride ? SeatIdxOverride : seatIdxFromData;
+            }
+        }
+
+        /// <summary>
+        /// 左を向いているか
+        ///
+        /// 向きは速度から決まるが、権威を持たない側では MoveCtrl を止めているため
+        /// 速度が変化せず、向きも変わらない。そのため別途配る。
+        /// </summary>
+        [Networked]
+        [OnChangedRender(nameof(OnFacingChanged))]
+        public NetworkBool IsFacingLeft { get; set; }
+
+        /// <summary>
+        /// 権威を持つ側の座標
+        ///
+        /// NetworkTransform は自身が座標を管理する前提で、描画時に自分の持つ値で上書きする。
+        /// champan の MoveCtrl は Update で transform を直接動かすため、
+        /// その移動が毎フレーム打ち消されてしまう。
+        /// そのため NetworkTransform は使わず、キャラセレクトと同じく座標を配る。
+        /// </summary>
+        [Networked]
+        public Vector3 SyncPosition { get; set; }
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
@@ -52,11 +85,83 @@ namespace App.Network
         /// <summary>
         /// @memo: 同期状況の調査用。原因が判明したら削除する
         /// </summary>
+        /// <summary>
+        /// 権威を持つ側が自分の向きを配る
+        ///
+        /// 権威を持たないオブジェクトでは呼ばれないため、受け取り側の反映は
+        /// OnFacingChanged で行う。
+        /// </summary>
         public override void FixedUpdateNetwork()
         {
-            // 席テーブルは後から届くため、自分の席になるまで試し続ける
-            TryTakeOwnSeatAuthority();
+            SyncPosition = transform.position;
+
+            var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
+            if (rotateCtrl == null)
+            {
+                return;
+            }
+
+            if (IsFacingLeft != rotateCtrl.IsFacingLeft)
+            {
+                IsFacingLeft = rotateCtrl.IsFacingLeft;
+            }
         }
+
+        /// <summary>
+        /// 権威を持たない側は、配られた座標へ追従する
+        ///
+        /// Render は権威の有無に関わらず呼ばれる。
+        /// </summary>
+        public override void Render()
+        {
+            if (HasStateAuthority)
+            {
+                return;
+            }
+
+            if (SyncPosition == Vector3.zero)
+            {
+                // まだ配られていない
+                return;
+            }
+
+            var current = transform.position;
+
+            // フレームレートに依存しない追従
+            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * Time.deltaTime);
+            var next = Vector3.Lerp(current, SyncPosition, rate);
+
+            // 離れすぎたら補間せずに合わせる (リスポーンなど)
+            if ((current - SyncPosition).sqrMagnitude > PosSnapDistanceSqr)
+            {
+                next = SyncPosition;
+            }
+
+            transform.position = next;
+        }
+
+        /// <summary>
+        /// 配られた向きを反映する
+        /// </summary>
+        void OnFacingChanged()
+        {
+            if (HasStateAuthority)
+            {
+                return;
+            }
+
+            var rotateCtrl = GetComponent<Actor.Player.RotateCtrl>();
+            if (rotateCtrl == null)
+            {
+                return;
+            }
+
+            rotateCtrl.SetFacingLeft(IsFacingLeft);
+        }
+
+        // @memo: 権威の要求は NetworkGameLauncher が行う。
+        //        権威を持たないオブジェクトでは FixedUpdateNetwork が呼ばれないため、
+        //        ここで取りに行くことはできない。
         #endregion
 
         #region Fusion.IStateAuthorityChanged の実装
@@ -70,42 +175,6 @@ namespace App.Network
         #endregion
 
         #region private メソッド
-        /// <summary>
-        /// この席が自分の担当なら権威を取りに行く
-        ///
-        /// ランチャー側からまとめて要求する形だと、
-        /// シーン上の Player が非アクティブだったり Spawn が遅れたりしたときに取りこぼす。
-        /// 各 Player が自分で取りに行くことで、順序やアクティブ状態に依存しなくなる。
-        /// </summary>
-        void TryTakeOwnSeatAuthority()
-        {
-            if (!NetworkSession.IsInMatchScene(gameObject))
-            {
-                return;
-            }
-
-            if (_isAuthorityRequested || HasStateAuthority)
-            {
-                return;
-            }
-
-            var seatTable = NetworkSeatTable.Instance;
-            if (seatTable == null)
-            {
-                return;
-            }
-
-            var seat = seatTable.Seats[SeatIdx];
-            if (seat.IsEmpty || seat.Owner != Runner.LocalPlayer)
-            {
-                return;
-            }
-
-            _isAuthorityRequested = true;
-            Object.RequestStateAuthority();
-
-            Debug.Log($"[NetworkPlayerBinder] 自分の席なので権威を要求します: seatIdx={SeatIdx}");
-        }
 
         /// <summary>
         /// 権威の有無に応じて、自前のシミュレーションを止める / 動かす
@@ -115,13 +184,15 @@ namespace App.Network
         /// </summary>
         void ApplyAuthorityState()
         {
+            // NetworkTransform は描画時に自分の持つ座標で上書きするため、
+            // Update で transform を動かす MoveCtrl と噛み合わない。
+            // 座標は SyncPosition で自前に配るので、常に無効にする。
+            DisableNetworkTransform();
+
             // 対戦シーン以外 (キャラセレクトなど) の Player はネットワーク制御しない。
-            // シーン上のオブジェクトが決定時に有効化される作りのため権威の受け渡しが安定せず、
-            // 何度もキャラが固まる原因になった。
             // キャラセレクトの位置は NetworkCharaSelectState で配る。
             if (!NetworkSession.IsInMatchScene(gameObject))
             {
-                DisableNetworkTransform();
                 return;
             }
 
@@ -226,8 +297,17 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        bool _isAuthorityRequested = false;
         bool[] _localInputEnabledCache = new bool[0];
+
+        /// <summary>
+        /// 配られた座標への追従の速さ
+        /// </summary>
+        const float PosFollowSpeed = 25.0f;
+
+        /// <summary>
+        /// これ以上離れていたら補間せずに合わせる
+        /// </summary>
+        const float PosSnapDistanceSqr = 25.0f;
         #endregion
     }
 }

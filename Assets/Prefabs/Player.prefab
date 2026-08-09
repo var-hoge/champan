@@ -538,7 +538,7 @@ MonoBehaviour:
   SortKey: 1951571254
   SendPriority: 1
   EnableInterpolation: 1
-  Flags: 262402
+  Flags: 786690
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5494613019607211277}
@@ -609,4 +609,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c969e82c893994c40ae49d7fbb2c70b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _SeatIdx: 0
+  _SeatIdxOverride: 0
+  _UseSeatOverride:
+    RawValue: 0

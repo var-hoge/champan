@@ -197,11 +197,32 @@ namespace TadaLib.Input
         /// 席番号をそのままコントローラ番号として使うと、
         /// どの台も同じコントローラを見てしまう。
         /// </summary>
+        /// <summary>
+        /// 操作元が決まっているか (調査用)
+        /// </summary>
+        public bool HasInputProxy => _playerInputProxy != null;
+
+        /// <summary>
+        /// 割り当てられたローカルのコントローラ番号 (調査用)
+        /// </summary>
+        public int LocalInputIdx => _localInputIdx;
+
         public void SetLocalInputIdx(int localInputIdx)
         {
             _localInputIdx = localInputIdx;
             _isInputResolved = true;
             _playerInputProxy = TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx);
+        }
+
+        /// <summary>
+        /// 操作元を決め直す
+        /// 席が確定した後に呼ぶ
+        /// </summary>
+        public void ResetInputResolve()
+        {
+            _isInputResolved = false;
+            _localInputIdx = -1;
+            _playerInputProxy = null;
         }
 
         /// <summary>
@@ -228,6 +249,12 @@ namespace TadaLib.Input
 
             _isInputResolved = true;
             _playerInputProxy = App.Network.SeatInput.GetProxyOrNull(playerIdx);
+            _localInputIdx = App.Network.SeatInput.GetLocalInputIdx(playerIdx);
+
+            Debug.Log(
+                $"[入力調査] seatIdx={playerIdx}"
+                + $" 操作元={(_playerInputProxy != null ? "あり" : "無し")}"
+                + $" ローカル番号={_localInputIdx}");
         }
         #endregion
 
@@ -263,6 +290,14 @@ namespace TadaLib.Input
         public void OnUpdate()
         {
             ResolveInputProxy();
+
+            // CPU かどうかは席の確定後に決まるため、一度だけ読むと取り違える。
+            // ネットワーク対戦では毎フレーム見て追従する。
+            if (App.Network.NetworkSession.IsOnline)
+            {
+                var playerIdx = GetComponent<App.Actor.Player.DataHolder>().PlayerIdx;
+                ActionEnabled = !CpuManager.Instance.IsCpu(playerIdx);
+            }
 
             if (!ActionEnabled || _playerInputProxy == null)
             {
