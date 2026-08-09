@@ -18,7 +18,10 @@ namespace App.Actor.Gimmick.Bubble
                 var playerIdx = obj.GetComponent<Player.DataHolder>().PlayerIdx;
                 if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                 {
-                    TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
+                    // 席番号とこの台のコントローラ番号は一致しない。
+                    // 他の台が担当する席なら null が返る。
+                    Network.SeatInput.GetProxyOrNull(playerIdx)
+                        ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
                 }
             }
 

@@ -97,7 +97,10 @@ namespace App.Actor.Gimmick.RespawnBubble
                     if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                     {
                         // �R���g���[����U��
-                        TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Dead);
+                        // 席番号とこの台のコントローラ番号は一致しない。
+                        // 他の台が担当する席なら null が返る。
+                        Network.SeatInput.GetProxyOrNull(playerIdx)
+                            ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Dead);
                     }
                     // �I�m�}�g�y�𐶐�
                     Ui.Main.OtomatopoeiaManager.Instance.Spawn(dataHolder.PlayerIdx, player.transform.position, dataHolder.Velocity);

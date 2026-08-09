@@ -93,6 +93,14 @@ namespace App.Actor.Gimmick.Bubble
                 return;
             }
 
+            // 次にどのバブルが王冠を持つかはホストが決める。
+            // 各台で選ぶと、乱数も候補の並びも食い違って別のバブルになる。
+            // 決まった結果は NetworkCrownState が配る。
+            if (!Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             // �����͒x������
             TeleportImpl().Forget();
         }

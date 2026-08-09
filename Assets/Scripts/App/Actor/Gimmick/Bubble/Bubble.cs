@@ -191,20 +191,7 @@ namespace App.Actor.Gimmick.Bubble
                     BurstImpl();
                 }
 
-                // �����̃v���C���[������Ă���ꍇ�A����Ă���S�Ẵv���C���[���΂�
-                var players = _moveInfoCtrl.RideObjects;
-                var count = HasCrown ? 0 : 1;
-                if (players.Count > count)
-                {
-                    foreach (var player in players)
-                    {
-                        BubbleUtil.Blow(player, transform.position, blowPower, doVibrate: !HasCrown);
-                        if (HasCrown)
-                        {
-                            player.GetComponent<EmotionCtrl>().NotifyHitCrown();
-                        }
-                    }
-                }
+                BlowRiders();
             }
             else
             {
@@ -273,6 +260,10 @@ namespace App.Actor.Gimmick.Bubble
                 {
                     RequestBurst();
                 }
+
+                // 王冠入りのバブルは触れた時点で弾け飛ぶ。
+                // 権威の有無に関わらず、見ている台それぞれで起こす。
+                BlowRiders();
             }
             else
             {
@@ -283,6 +274,76 @@ namespace App.Actor.Gimmick.Bubble
             {
                 RequestBurst();
             }
+        }
+
+        /// <summary>
+        /// 乗っているプレイヤーを吹き飛ばす
+        ///
+        /// 王冠入りのバブルは一人でも触れた時点で吹き飛ばす。
+        /// それ以外は、二人以上が乗り合ったときだけ押し出す。
+        ///
+        /// 吹き飛ばすのはキャラを動かす行為なので、動かしている台だけが行う。
+        /// 他の台で動かしても、持ち主が配る座標で上書きされてしまう。
+        /// 各台が自分の担当を吹き飛ばすことで、全員が同じ結果になる。
+        /// </summary>
+        private void BlowRiders()
+        {
+            var players = _moveInfoCtrl.RideObjects;
+            var requiredCount = HasCrown ? 0 : 1;
+            if (players.Count <= requiredCount)
+            {
+                return;
+            }
+
+            foreach (var player in players)
+            {
+                if (HasCrown)
+                {
+                    // 表情は配っていないため、見ている台それぞれで出す
+                    player.GetComponent<EmotionCtrl>().NotifyHitCrown();
+                }
+
+                var playerIdx = player.GetComponent<Player.DataHolder>().PlayerIdx;
+                if (Network.NetworkSession.IsOnline
+                    && !Network.SeatInput.IsLocalSeat(playerIdx))
+                {
+                    continue;
+                }
+
+                BubbleUtil.Blow(player, transform.position, blowPower, doVibrate: !HasCrown);
+
+                if (HasCrown)
+                {
+                    VibrateCrownHit(playerIdx);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 王冠バブルに触れたときの振動
+        ///
+        /// 手元のコントローラを鳴らせるのは、その席を操作している台だけ。
+        /// シールドの増減はホストが行うため、そこで鳴らすとゲストは鳴らない。
+        /// </summary>
+        private void VibrateCrownHit(int playerIdx)
+        {
+            if (Cpu.CpuManager.Instance.IsCpu(playerIdx))
+            {
+                return;
+            }
+
+            // 残りが少ないほど長く鳴らす
+            var durationSec = Crown.Manager.Instance.ShieldValue switch
+            {
+                var value when value >= 9 => 0.12f,
+                var value when value >= 1 => 0.12f + (10 - value) * 0.02f,
+                _ => 0.12f,
+            };
+
+            // 席番号とこの台のコントローラ番号は一致しない。
+            // 「2 台目の席 2」は、その台のローカル 1 人目が持っている。
+            Network.SeatInput.GetProxyOrNull(playerIdx)
+                ?.VibrateAdvanced(0.2f, 0.5f, durationSec);
         }
 
         /// <summary>
@@ -482,9 +543,13 @@ namespace App.Actor.Gimmick.Bubble
                     // �U��
                     {
                         var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
+
+                        // 手元のコントローラを鳴らせるのは、その席を操作している台だけ。
+                        // 席番号とこの台のコントローラ番号も一致しない。
                         if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
                         {
-                            TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
+                            Network.SeatInput.GetProxyOrNull(playerIdx)
+                                ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
                         }
                     }
 
@@ -503,27 +568,8 @@ namespace App.Actor.Gimmick.Bubble
                 }
                 else
                 {
-                    // �U��
-                    {
-                        var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
-                        if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
-                        {
-                            var durationSec = Manager.Instance.ShieldValue switch
-                            {
-                                var value when value == 9 => 0.12f,
-                                var value when value == 8 => 0.14f,
-                                var value when value == 7 => 0.16f,
-                                var value when value == 6 => 0.18f,
-                                var value when value == 5 => 0.20f,
-                                var value when value == 4 => 0.22f,
-                                var value when value == 3 => 0.24f,
-                                var value when value == 2 => 0.26f,
-                                var value when value == 1 => 0.28f,
-                                _ => 0.12f,
-                            };
-                            TadaLib.Input.PlayerInputManager.Instance.InputProxy(playerIdx).VibrateAdvanced(0.2f, 0.5f, durationSec);
-                        }
-                    }
+                    // @memo: 振動は BlowRiders が各台で鳴らす。
+                    //        ここはホストでしか動かないため、ゲストで鳴らない。
 
                     // �t�F�C�N���o
                     if (Manager.Instance.DoFakeFinishStaging)
