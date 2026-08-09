@@ -47,3 +47,4 @@ MonoBehaviour:
   _seatTablePrefab: {fileID: 9135396544825123981, guid: 31629101de6ce6043b24cde9110a3b5c, type: 3}
   _charaSelectStatePrefab: {fileID: 6366433178411655778, guid: a995ceaffe590ec4aa24ae36dcc475ef, type: 3}
   _flowStatePrefab: {fileID: 3655025117547104457, guid: 862a711d386a53c479c4b44e5ddec889, type: 3}
+  _matchStatePrefab: {fileID: 3723847455065947649, guid: e57cae368c278bb489a7d8ed3b3c7a84, type: 3}

@@ -100,6 +100,8 @@ namespace App.Network
 
                 Debug.Log($"[NetworkGameLauncher] 参加しました PlayerRef={_runner.LocalPlayer.PlayerId}");
 
+                PreloadNetworkPrefabs();
+
                 await SetUpSeatsAsync();
 
                 IsSessionReady = true;
@@ -161,6 +163,11 @@ namespace App.Network
                 return;
             }
 
+            // シーンを切り替えると未使用アセットが破棄され、
+            // プレハブのロード状態が失われて同期生成に失敗する。
+            // (バブルの生成が例外になり、バブルも王冠も出なくなっていた)
+            PreloadNetworkPrefabs();
+
             // キャラセレクトにも Player が置かれており、そこでも相手の動きを見せたい。
             // Player がいるシーンなら対戦シーンと同じように席と権威を設定する。
             SetUpSceneAsync().Forget();
@@ -180,6 +187,7 @@ namespace App.Network
                 SpawnSharedState(_seatTablePrefab);
                 SpawnSharedState(_charaSelectStatePrefab);
                 SpawnSharedState(_flowStatePrefab);
+                SpawnSharedState(_matchStatePrefab);
             }
 
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
@@ -210,6 +218,12 @@ namespace App.Network
 
             try
             {
+                // シーンのロードが完全に終わるまでは Spawn できない。
+                // 準備完了の判定にこれを含めないと、
+                // これを待って生成しようとしている側が失敗する。
+                await UniTask.WaitUntil(() => !_runner.SceneManager.IsBusy)
+                    .Timeout(_waitTimeout);
+
                 await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                     .Timeout(_waitTimeout);
 
@@ -241,6 +255,43 @@ namespace App.Network
         }
 
         /// <summary>
+        /// ネットワーク用プレハブを事前に読み込む
+        ///
+        /// Fusion は未ロードのプレハブを同期生成しようとすると例外を投げる
+        /// (NetworkObjectSpawnException: Failed to load prefab synchronously)。
+        /// バブルなど対戦中に生成するものがこれで失敗していた。
+        ///
+        /// 生成を非同期にする設定もあるが、その場合は生成直後の戻り値が null になり、
+        /// 生成したオブジェクトをその場で使っている既存コードが壊れるため採らない。
+        /// </summary>
+        void PreloadNetworkPrefabs()
+        {
+            var table = _runner.Prefabs;
+            var loadedCount = 0;
+            var failedCount = 0;
+
+            foreach (var (prefabId, _) in table.GetEntries())
+            {
+                if (table.Load(prefabId, isSynchronous: true) != null)
+                {
+                    ++loadedCount;
+                }
+                else
+                {
+                    ++failedCount;
+                }
+            }
+
+            if (failedCount > 0)
+            {
+                Debug.LogError($"[NetworkGameLauncher] プレハブの読み込みに失敗しました: {failedCount} 件");
+                return;
+            }
+
+            Debug.Log($"[NetworkGameLauncher] プレハブを読み込みました: {loadedCount} 件");
+        }
+
+        /// <summary>
         /// 全員で共有する状態オブジェクトを生成する
         /// </summary>
         void SpawnSharedState(NetworkBehaviour prefab)
@@ -259,7 +310,9 @@ namespace App.Network
                 return;
             }
 
-            var spawned = _runner.Spawn(networkObject, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
+            var spawned = NetworkSession.Spawn(
+                networkObject.transform, Vector3.zero, Quaternion.identity);
+
             if (spawned == null)
             {
                 Debug.LogError($"[NetworkGameLauncher] 生成に失敗しました: {prefab.name}");
@@ -317,6 +370,9 @@ namespace App.Network
 
         [SerializeField]
         NetworkFlowState _flowStatePrefab;
+
+        [SerializeField]
+        NetworkMatchState _matchStatePrefab;
 
         /// <summary>
         /// ランチャー自身は実行時に生成するため、これだけ Resources から取る

@@ -71,6 +71,26 @@ namespace App.Network
         }
 
         /// <summary>
+        /// 今このフレームに生成してよいか
+        ///
+        /// シーンのロード中はプレハブの読み込みが完了扱いにならず、生成に失敗する。
+        /// </summary>
+        public static bool IsReadyToSpawn
+        {
+            get
+            {
+                if (!IsOnline)
+                {
+                    return true;
+                }
+
+                var sceneManager = Runner.SceneManager;
+
+                return sceneManager == null || !sceneManager.IsBusy;
+            }
+        }
+
+        /// <summary>
         /// ギミックを生成する
         ///
         /// オンラインなら Runner.Spawn で全員に複製され、オフラインなら通常の Instantiate になる。
@@ -110,8 +130,25 @@ namespace App.Network
                 return localInstance;
             }
 
+            // シーンのロード中に生成しようとすると、プレハブの読み込みが完了扱いにならず失敗する。
+            if (!IsReadyToSpawn)
+            {
+                Debug.LogError(
+                    $"[NetworkSession] シーンのロード中は生成できません: {prefab.name}"
+                    + " (IsReadyToSpawn が true になるまで待ってから生成してください)");
+                return null;
+            }
+
+            // プレハブが自分の登録 ID を持っていないことがあるため、
+            // テーブルから引いた ID で生成する
+            if (!TryGetPrefabId(networkPrefab, out var prefabId))
+            {
+                Debug.LogError($"[NetworkSession] プレハブがテーブルに登録されていません: {prefab.name}");
+                return null;
+            }
+
             var spawned = Runner.Spawn(
-                networkPrefab,
+                prefabId,
                 position,
                 rotation,
                 Runner.LocalPlayer,
@@ -163,6 +200,34 @@ namespace App.Network
             }
 
             Runner.Despawn(networkObject);
+        }
+        #endregion
+
+        #region private メソッド
+        /// <summary>
+        /// プレハブの登録 ID を得る
+        ///
+        /// NetworkObject.NetworkTypeId は焼き込まれていないことがあるため、
+        /// テーブルを実際に引いて対応する ID を探す。
+        /// あわせて同期生成に必要なロードも済ませる。
+        /// </summary>
+        static bool TryGetPrefabId(NetworkObject prefab, out NetworkPrefabId prefabId)
+        {
+            var table = Runner.Prefabs;
+
+            foreach (var (id, _) in table.GetEntries())
+            {
+                var loaded = table.Load(id, isSynchronous: true);
+
+                if (loaded == prefab)
+                {
+                    prefabId = id;
+                    return true;
+                }
+            }
+
+            prefabId = default;
+            return false;
         }
         #endregion
 

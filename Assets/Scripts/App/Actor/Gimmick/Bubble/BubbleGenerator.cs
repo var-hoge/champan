@@ -24,6 +24,51 @@ namespace App.Actor.Gimmick.Bubble
                 return;
             }
 
+            // ネットワーク対戦では、このシーン自体を Fusion がロードしている最中に
+            // Start が走るため、その時点で生成しようとしても失敗する。
+            // セッションの準備が終わってから生成する。
+            if (Network.NetworkSession.IsOnline)
+            {
+                GenerateAfterReady().Forget();
+                return;
+            }
+
+            GenerateAll();
+        }
+
+        async UniTask GenerateAfterReady()
+        {
+            Debug.Log("[BubbleGenerator] セッションの準備を待ちます");
+
+            // 生成できる条件そのものを待つ
+            var isTimeout = await UniTask
+                .WaitUntil(() =>
+                    Network.NetworkSession.IsReadyToSpawn
+                    && Network.NetworkGameLauncher.Instance != null
+                    && Network.NetworkGameLauncher.Instance.IsMatchReady)
+                .TimeoutWithoutException(System.TimeSpan.FromSeconds(15.0));
+
+            if (isTimeout)
+            {
+                Debug.LogError(
+                    "[BubbleGenerator] セッションの準備を待てませんでした"
+                    + $" (生成可能={Network.NetworkSession.IsReadyToSpawn}"
+                    + $" 準備完了={Network.NetworkGameLauncher.Instance?.IsMatchReady})");
+                return;
+            }
+
+            if (this == null)
+            {
+                return;
+            }
+
+            Debug.Log("[BubbleGenerator] 準備ができたのでバブルを生成します");
+
+            GenerateAll();
+        }
+
+        void GenerateAll()
+        {
             List<Bubble> bubbles = new();
             for (var n = 0; n < _numOfBubble; ++n)
             {

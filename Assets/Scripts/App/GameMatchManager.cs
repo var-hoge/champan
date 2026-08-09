@@ -133,6 +133,25 @@ namespace App
         }
 
         /// <summary>
+        /// 勝ち点を上書きする
+        ///
+        /// ネットワーク対戦では勝敗の判定をホストが行うため、
+        /// その結果を他の台へ反映するために使う
+        /// </summary>
+        public void ApplyNetworkWinCounts(System.Collections.Generic.IReadOnlyList<int> winCounts)
+        {
+            for (int idx = 0; idx < _winCounts.Count && idx < winCounts.Count; ++idx)
+            {
+                _winCounts[idx] = winCounts[idx];
+            }
+        }
+
+        /// <summary>
+        /// 勝ち点の一覧
+        /// </summary>
+        public System.Collections.Generic.IReadOnlyList<int> WinCounts => _winCounts;
+
+        /// <summary>
         /// 各プレイヤーの勝ち点をリセット
         /// </summary>
         public void ResetPlayersWinCount()

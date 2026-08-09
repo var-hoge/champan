@@ -38,22 +38,43 @@ namespace App
         #region メソッド
         public void GameOver()
         {
+            // ネットワーク対戦では勝敗の判定はホストだけが行う
+            if (Network.NetworkSession.IsOnline && !Network.NetworkSession.HasAuthority)
+            {
+                return;
+            }
+
             WinnerPlayerIdx = Actor.Gimmick.Crown.Manager.Instance.LastCrownRidePlayerIdx;
 
-            var gameMatchManager = GameMatchManager.Instance;
-            gameMatchManager.AddWinScore(WinnerPlayerIdx);
-            if (gameMatchManager.TryGetWinner(out var playerIdx))
+            GameMatchManager.Instance.AddWinScore(WinnerPlayerIdx);
+
+            // 他の台へ結果を知らせる
+            Network.NetworkMatchState.Instance?.PublishRoundEnd(WinnerPlayerIdx);
+
+            PlayRoundEndSequence(WinnerPlayerIdx);
+        }
+
+        /// <summary>
+        /// ラウンド終了時の演出を再生する
+        ///
+        /// 勝敗の判定とは切り離してある。
+        /// ネットワーク対戦では、ホストが判定した結果を受け取った側もこれを呼ぶ。
+        /// </summary>
+        public void PlayRoundEndSequence(int winnerPlayerIdx)
+        {
+            WinnerPlayerIdx = winnerPlayerIdx;
+
+            if (GameMatchManager.Instance.TryGetWinner(out var playerIdx))
             {
-                Debug.Assert(playerIdx == WinnerPlayerIdx);
+                Debug.Assert(playerIdx == winnerPlayerIdx);
                 // ゲーム終了！
-                _gameEndUi.GameEnd(GetComponent<SimpleAnimation>(), WinnerPlayerIdx).Forget();
+                _gameEndUi.GameEnd(GetComponent<SimpleAnimation>(), winnerPlayerIdx).Forget();
             }
             else
             {
                 // ラウンドが続く
-                _gameEndUi.GameEndWithContinue(GetComponent<SimpleAnimation>(), WinnerPlayerIdx).Forget();
+                _gameEndUi.GameEndWithContinue(GetComponent<SimpleAnimation>(), winnerPlayerIdx).Forget();
             }
-
         }
 
         public void AnimFinish()
