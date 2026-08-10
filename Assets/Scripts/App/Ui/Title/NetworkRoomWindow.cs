@@ -95,9 +95,20 @@ namespace App.Ui.Title
 
             _canvasRoot.SetActive(isTitle);
 
-            if (!isTitle && _window != null)
+            if (!isTitle)
             {
-                _window.SetActive(false);
+                SetWindowOpen(false);
+            }
+        }
+
+        void SetWindowOpen(bool isOpen)
+        {
+            _window.SetActive(isOpen);
+            _dimmer.SetActive(isOpen);
+
+            if (isOpen)
+            {
+                RefreshView();
             }
         }
 
@@ -316,11 +327,27 @@ namespace App.Ui.Title
 
             _canvasRoot.AddComponent<GraphicRaycaster>();
 
+            // 背後を暗くする幕。
+            // 明るい背景との差をはっきりさせつつ、
+            // 「今はゲームを始められない」ことを見た目でも伝える。
+            //
+            // 開くボタンより先に作って、ボタンが幕の上に残るようにする。
+            BuildDimmer();
             BuildToggleButton();
             BuildWindow();
 
-            _window.SetActive(false);
+            SetWindowOpen(false);
             RefreshView();
+        }
+
+        void BuildDimmer()
+        {
+            _dimmer = CreateUiObject("Dimmer", _canvasRoot.transform);
+
+            var image = _dimmer.AddComponent<Image>();
+            image.color = DimmerColor;
+
+            StretchWithPadding(_dimmer.GetComponent<RectTransform>(), 0.0f, 0.0f);
         }
 
         /// <summary>
@@ -331,14 +358,7 @@ namespace App.Ui.Title
             var button = CreateButton(
                 _canvasRoot.transform,
                 "ネット対戦",
-                () =>
-                {
-                    _window.SetActive(!_window.activeSelf);
-                    if (_window.activeSelf)
-                    {
-                        RefreshView();
-                    }
-                });
+                () => SetWindowOpen(!_window.activeSelf));
 
             var rect = button.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = new Vector2(0.0f, 1.0f);
@@ -354,6 +374,12 @@ namespace App.Ui.Title
             windowImage.sprite = _roundedSprite;
             windowImage.type = Image.Type.Sliced;
             windowImage.color = PanelColor;
+
+            // 暗い面がそのまま背景に沈まないよう、明るい縁で輪郭を出す
+            var outline = _window.AddComponent<Outline>();
+            outline.effectColor = PanelEdgeColor;
+            outline.effectDistance = new Vector2(3.0f, 3.0f);
+            outline.useGraphicAlpha = false;
 
             var rect = _window.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = new Vector2(0.0f, 1.0f);
@@ -397,7 +423,7 @@ namespace App.Ui.Title
 
             // 閉じるボタン
             {
-                var close = CreateButton(_window.transform, "閉じる", () => _window.SetActive(false));
+                var close = CreateButton(_window.transform, "閉じる", () => SetWindowOpen(false));
                 AddLayoutElement(close, height: 56.0f);
             }
         }
@@ -466,9 +492,11 @@ namespace App.Ui.Title
                 rowLayout.childForceExpandHeight = true;
 
                 CreateButton(row.transform, "部屋を建てる",
-                    () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.Create));
+                    () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.Create),
+                    isPrimary: true);
                 CreateButton(row.transform, "部屋に入る",
-                    () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.JoinOnly));
+                    () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.JoinOnly),
+                    isPrimary: true);
             }
         }
 
@@ -552,24 +580,35 @@ namespace App.Ui.Title
             AddLayoutElement(label.gameObject, height: 28.0f);
         }
 
-        GameObject CreateButton(Transform parent, string label, UnityEngine.Events.UnityAction onClick)
+        /// <summary>
+        /// ボタンを作る
+        /// </summary>
+        /// <param name="isPrimary">
+        /// その画面で一番やってほしい操作かどうか。
+        /// すべて同じ強さで並べると、どれを押せばよいか分からなくなる。
+        /// </param>
+        GameObject CreateButton(
+            Transform parent,
+            string label,
+            UnityEngine.Events.UnityAction onClick,
+            bool isPrimary = false)
         {
             var obj = CreateUiObject($"Button_{label}", parent);
             var image = obj.AddComponent<Image>();
             image.sprite = _roundedSprite;
             image.type = Image.Type.Sliced;
-            image.color = ButtonColor;
+            image.color = isPrimary ? PrimaryButtonColor : ButtonColor;
 
             var button = obj.AddComponent<Button>();
             button.targetGraphic = image;
             button.onClick.AddListener(onClick);
 
             var colors = button.colors;
-            colors.highlightedColor = new Color(0.96f, 0.90f, 0.80f);
-            colors.pressedColor = new Color(0.88f, 0.80f, 0.68f);
+            colors.highlightedColor = new Color(1.15f, 1.15f, 1.15f);
+            colors.pressedColor = new Color(0.82f, 0.82f, 0.82f);
             button.colors = colors;
 
-            var text = CreateText(obj.transform, label, 26.0f, TextColor);
+            var text = CreateText(obj.transform, label, 26.0f, isPrimary ? DarkTextColor : TextColor);
             text.alignment = TextAlignmentOptions.Center;
             StretchWithPadding(text.rectTransform, 0.0f, 0.0f);
 
@@ -720,17 +759,25 @@ namespace App.Ui.Title
             "MS Gothic",
         };
 
-        static readonly Color PanelColor = new(1.00f, 0.97f, 0.90f, 0.97f);
-        static readonly Color ButtonColor = new(1.00f, 1.00f, 1.00f, 1.00f);
-        static readonly Color FieldColor = new(1.00f, 1.00f, 1.00f, 1.00f);
-        static readonly Color RowColor = new(1.00f, 1.00f, 1.00f, 0.6f);
-        static readonly Color SelfRowColor = new(1.00f, 0.92f, 0.75f, 1.0f);
-        static readonly Color TextColor = new(0.36f, 0.27f, 0.20f, 1.0f);
-        static readonly Color SubTextColor = new(0.55f, 0.47f, 0.40f, 1.0f);
-        static readonly Color AccentColor = new(0.85f, 0.55f, 0.15f, 1.0f);
-        static readonly Color ErrorColor = new(0.80f, 0.25f, 0.20f, 1.0f);
+        // タイトルの背景は明るい一枚絵のため、
+        // 明るいウィンドウだと背景に溶けて読みにくい。
+        // 暗い面に明るい文字を載せて、確実に浮かせる。
+        static readonly Color DimmerColor = new(0.05f, 0.03f, 0.02f, 0.55f);
+        static readonly Color PanelColor = new(0.16f, 0.12f, 0.09f, 0.97f);
+        static readonly Color PanelEdgeColor = new(0.87f, 0.72f, 0.48f, 1.00f);
+        static readonly Color FieldColor = new(0.25f, 0.20f, 0.15f, 1.00f);
+        static readonly Color ButtonColor = new(0.31f, 0.25f, 0.19f, 1.00f);
+        static readonly Color PrimaryButtonColor = new(0.91f, 0.66f, 0.25f, 1.00f);
+        static readonly Color RowColor = new(0.23f, 0.18f, 0.14f, 1.00f);
+        static readonly Color SelfRowColor = new(0.36f, 0.27f, 0.15f, 1.00f);
+        static readonly Color TextColor = new(0.96f, 0.93f, 0.87f, 1.00f);
+        static readonly Color SubTextColor = new(0.71f, 0.65f, 0.57f, 1.00f);
+        static readonly Color DarkTextColor = new(0.20f, 0.14f, 0.08f, 1.00f);
+        static readonly Color AccentColor = new(0.95f, 0.75f, 0.36f, 1.00f);
+        static readonly Color ErrorColor = new(1.00f, 0.56f, 0.48f, 1.00f);
 
         GameObject _canvasRoot;
+        GameObject _dimmer;
         GameObject _window;
         GameObject _formGroup;
         GameObject _joinedGroup;
