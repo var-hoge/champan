@@ -56,6 +56,29 @@ namespace App.Network
         #endregion
 
         #region Fusion.NetworkBehaviour の実装
+        /// <summary>
+        /// シールドの残りを配る
+        ///
+        /// シールドを減らすのはホストの担当だが、
+        /// 減らしているのは Crown.Manager が持つ通常の値で、
+        /// 配られる値とは別物になっている。
+        /// 配り直さないと、他の台は最初の値のまま見た目が変わらない。
+        /// </summary>
+        public override void FixedUpdateNetwork()
+        {
+            var manager = Actor.Gimmick.Crown.Manager.Instance;
+            if (manager == null)
+            {
+                return;
+            }
+
+            ShieldValue = manager.ShieldValue;
+            ExShieldValue = manager.ExShieldValue;
+            InitShieldValue = manager.InitShieldValue;
+        }
+        #endregion
+
+        #region Fusion.NetworkBehaviour の実装
         public override void Spawned()
         {
             Instance = this;
