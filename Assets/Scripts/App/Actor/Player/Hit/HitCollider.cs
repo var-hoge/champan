@@ -20,7 +20,26 @@ namespace App.Actor.Player.Hit
         , IScaleChanger
     {
         #region プロパティ
-        public bool IsEnabled => gameObject != null && gameObject.activeInHierarchy && GetComponent<DataHolder>().IsValidDummyPlayerPos is false;
+        public bool IsEnabled
+            => gameObject != null
+            && gameObject.activeInHierarchy
+            && GetComponent<DataHolder>().IsValidDummyPlayerPos is false
+            && !IsEnteredDoor;
+
+        /// <summary>
+        /// キャラセレクトで扉に入ったか
+        ///
+        /// 入った後も押し出しが残っていると、まだ選んでいる相手を押してしまう。
+        /// キャラセレクト以外では、この部品自体が付いていない。
+        /// </summary>
+        bool IsEnteredDoor
+        {
+            get
+            {
+                var checkerUnit = GetComponent<Ui.CharaSelect.CharaSelectFinishCheckerUnit>();
+                return checkerUnit != null && checkerUnit.IsEntered;
+            }
+        }
 
         public Vector2 CenterPos => (Vector2)(_root.transform.position + _offset);
 

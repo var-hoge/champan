@@ -71,6 +71,14 @@ namespace App.Network
             /// キャラの見た目の大きさ
             /// </summary>
             public Vector2 ViewScale;
+
+            /// <summary>
+            /// どの回のキャラセレクトで書かれた値か
+            ///
+            /// 画面に入り直しても、前回の値が残ったまま届く。
+            /// 古いものを読むと、相手が決定済みのまま即座に扉へ入ってしまう。
+            /// </summary>
+            public byte Generation;
         }
         #endregion
 
@@ -80,6 +88,15 @@ namespace App.Network
         [Networked]
         [Capacity(4)]
         public NetworkArray<SeatState> Seats { get; }
+
+        /// <summary>
+        /// 今が何回目のキャラセレクトか
+        ///
+        /// 画面に入り直すたびにホストが進める。
+        /// これと一致しない席の値は前回の残りなので読まない。
+        /// </summary>
+        [Networked]
+        public byte Generation { get; set; }
         #endregion
 
         #region メソッド
@@ -101,6 +118,16 @@ namespace App.Network
         public bool IsFacingLeft(int seatIdx)
         {
             return Seats[seatIdx].IsFacingLeft;
+        }
+
+        /// <summary>
+        /// その席の値が、今回のキャラセレクトで書かれたものか
+        ///
+        /// 前回の残りを読むと、相手が決定済みのまま即座に扉へ入ってしまう。
+        /// </summary>
+        public bool IsSeatFresh(int seatIdx)
+        {
+            return Seats[seatIdx].Generation == Generation;
         }
 
         public Vector2 GetScale(int seatIdx)
@@ -152,6 +179,11 @@ namespace App.Network
             {
                 return;
             }
+
+            // 消すだけでは足りない。
+            // 消したことが他の台に届く前に読まれてしまうため、
+            // 回を進めて「前回の値」と区別できるようにする。
+            Generation = (byte)(Generation + 1);
 
             for (int idx = 0; idx < Seats.Length; ++idx)
             {
@@ -217,6 +249,9 @@ namespace App.Network
                 IsFacingLeft = isFacingLeft,
                 Scale = current.Scale,
                 ViewScale = current.ViewScale,
+
+                // 今回のキャラセレクトで書いたことを残す
+                Generation = Generation,
             });
         }
 

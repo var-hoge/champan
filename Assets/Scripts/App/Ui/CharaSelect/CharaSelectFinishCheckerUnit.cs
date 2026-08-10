@@ -33,6 +33,14 @@ namespace App.Ui.CharaSelect
 
         public bool IsFinishReady { private set; get; }
 
+        /// <summary>
+        /// 扉に入ったか
+        ///
+        /// 入った後も当たり判定が残っていると、
+        /// まだ選んでいる相手を押し出してしまう。
+        /// </summary>
+        public bool IsEntered => _isEntered;
+
         void Update()
         {
             IsFinishReady = IsInner();

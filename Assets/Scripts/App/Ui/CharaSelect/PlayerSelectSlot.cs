@@ -115,6 +115,18 @@ namespace App.Ui.CharaSelect
             // 自分の担当なら、自分で動かせる状態に戻す
             RestoreLocalCharaPhysics();
 
+            // 前回の「決定済み」が残っていると、
+            // 戻ってきた相手が即座に扉へ入ってしまう。
+            // 自分の席は自分の台しか書き換えられないため、ここで送り直す。
+            //
+            // Start では早すぎる。
+            // 席テーブルもカーソルもまだ整っておらず、送っても弾かれる。
+            if (isSeatKnown && !_isInitialStatePublished)
+            {
+                _isInitialStatePublished = true;
+                PublishState();
+            }
+
             PublishCharaPos();
 
             switch (_phase)
@@ -203,6 +215,11 @@ namespace App.Ui.CharaSelect
 
         bool _isReselect = false;
 
+        /// <summary>
+        /// 画面に入ってから自分の席の状態を送り直したか
+        /// </summary>
+        bool _isInitialStatePublished = false;
+
         string[] _breadCrunchPaths = null;
 
         Vector3 _arrowOriginalScale = Vector3.one;
@@ -221,6 +238,14 @@ namespace App.Ui.CharaSelect
             }
 
             var remotePhase = state.GetPhase(_playerIdx);
+
+            // 前回の値が残ったまま読むと、相手が即座に扉へ入ってしまう。
+            // 消すのはホストの担当で、他の台には少し遅れて届く。
+            // 今回のキャラセレクトで書かれた値だけを読む。
+            if (!state.IsSeatFresh(_playerIdx))
+            {
+                return;
+            }
 
             // エントリー
             if (remotePhase != Network.NetworkCharaSelectState.Phase.WaitingForEntry

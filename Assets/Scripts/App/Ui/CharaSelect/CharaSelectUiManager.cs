@@ -142,6 +142,14 @@ namespace App.Ui.CharaSelect
 
         private void Start()
         {
+            // 前回の「決定済み」が残っていると、
+            // 各枠が最初の更新でそれを読み、相手が即座に扉へ入ってしまう。
+            //
+            // 各台が自分の席を送り直すだけでは間に合わない。
+            // 届く前に読まれてしまうため、ここで先に消しておく。
+            // (Start はどの枠の更新よりも先に走る)
+            Network.NetworkCharaSelectState.Instance?.ResetAll();
+
             // 初期化
             for (int idx = 0; idx < CharaMaxCount; idx++)
             {
