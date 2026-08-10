@@ -33,9 +33,15 @@ namespace App.Graphics.Outline
         #endregion
 
         #region メソッド
-        public bool TryGetOutlineMaterial(OutlineKind kind, bool considerCpu, out Material outMaterial)
+        /// <summary>
+        /// その種類がどの席を指すか
+        ///
+        /// 勝者は試合が決まるまで確定しない。
+        /// ネットワーク対戦では、決まったことが届くのが遅れることもある。
+        /// </summary>
+        public int ResolvePlayerIdx(OutlineKind kind)
         {
-            var playerIdx = kind switch
+            return kind switch
             {
                 OutlineKind.Player0 => 0,
                 OutlineKind.Player1 => 1,
@@ -44,6 +50,11 @@ namespace App.Graphics.Outline
                 OutlineKind.WinnerPlayer => GameSequenceManager.WinnerPlayerIdx,
                 _ => 0
             };
+        }
+
+        public bool TryGetOutlineMaterial(OutlineKind kind, bool considerCpu, out Material outMaterial)
+        {
+            var playerIdx = ResolvePlayerIdx(kind);
 
             outMaterial = null;
             if (considerCpu)
@@ -60,15 +71,7 @@ namespace App.Graphics.Outline
 
         public bool TryGetOutlineMaterialForImage(OutlineKind kind, bool considerCpu, out Material outMaterial)
         {
-            var playerIdx = kind switch
-            {
-                OutlineKind.Player0 => 0,
-                OutlineKind.Player1 => 1,
-                OutlineKind.Player2 => 2,
-                OutlineKind.Player3 => 3,
-                OutlineKind.WinnerPlayer => GameSequenceManager.WinnerPlayerIdx,
-                _ => 0
-            };
+            var playerIdx = ResolvePlayerIdx(kind);
 
             outMaterial = null;
             if (considerCpu)

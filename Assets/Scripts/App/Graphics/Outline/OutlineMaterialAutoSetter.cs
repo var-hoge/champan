@@ -24,32 +24,20 @@ namespace App.Graphics.Outline
         #region MonoBehavior の実装
         void Start()
         {
-            {
-                if (OutlineManager.Instance.TryGetOutlineMaterial(_outlineKind, _considerCpu, out var material))
-                {
-                    var spriteRenderer = GetComponent<SpriteRenderer>();
-                    if (spriteRenderer != null)
-                    {
-                        spriteRenderer.sharedMaterial = material;
-                        _spritePrev = spriteRenderer.sprite;
-                    }
-                }
-            }
-
-            {
-                if (OutlineManager.Instance.TryGetOutlineMaterialForImage(_outlineKind, _considerCpu, out var material))
-                {
-                    var image = GetComponent<UnityEngine.UI.Image>();
-                    if (image != null)
-                    {
-                        image.material = material;
-                    }
-                }
-            }
+            ApplyMaterials();
         }
 
         void Update()
         {
+            // 勝者は試合が決まるまで分からない。
+            // ネットワーク対戦では、決まったことが届くのが遅れることもあり、
+            // Start の時点では別の席を指していることがある。
+            var playerIdx = OutlineManager.Instance.ResolvePlayerIdx(_outlineKind);
+            if (playerIdx != _appliedPlayerIdx)
+            {
+                ApplyMaterials();
+            }
+
             if (_spritePrev == null)
             {
                 return;
@@ -84,9 +72,45 @@ namespace App.Graphics.Outline
         bool _considerCpu = true;
 
         Sprite _spritePrev = null;
+
+        /// <summary>
+        /// 今あてているマテリアルが、どの席のものか
+        /// </summary>
+        int _appliedPlayerIdx = -1;
         #endregion
 
         #region privateメソッド
+        void ApplyMaterials()
+        {
+            _appliedPlayerIdx = OutlineManager.Instance.ResolvePlayerIdx(_outlineKind);
+
+            {
+                if (OutlineManager.Instance.TryGetOutlineMaterial(_outlineKind, _considerCpu, out var material))
+                {
+                    var spriteRenderer = GetComponent<SpriteRenderer>();
+                    if (spriteRenderer != null)
+                    {
+                        spriteRenderer.sharedMaterial = material;
+                        _spritePrev = spriteRenderer.sprite;
+                    }
+                }
+            }
+
+            {
+                if (OutlineManager.Instance.TryGetOutlineMaterialForImage(_outlineKind, _considerCpu, out var material))
+                {
+                    var image = GetComponent<UnityEngine.UI.Image>();
+                    if (image != null)
+                    {
+                        image.material = material;
+
+                        // ShaderGraph で作ったマテリアルは、当て直しただけでは
+                        // 表示中のスプライトが反映されないことがある
+                        image.SetMaterialDirty();
+                    }
+                }
+            }
+        }
         #endregion
     }
 }
