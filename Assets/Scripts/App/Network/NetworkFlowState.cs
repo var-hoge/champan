@@ -133,6 +133,33 @@ namespace App.Network
             IsTitleStaged = false;
             IsTitleDecided = false;
         }
+
+        /// <summary>
+        /// 次の遷移で使う演出の長さを全員に知らせる
+        ///
+        /// 遷移の決定はホストが行うが、演出は各台で再生する。
+        /// 長さは画面ごとに違うため、遷移の直前に配る。
+        /// </summary>
+        public void NotifyFadeDurations(float fadeInDurationSec, float fadeOutDurationSec, bool isReverse)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority)
+            {
+                return;
+            }
+
+            RPC_NotifyFadeDurations(fadeInDurationSec, fadeOutDurationSec, isReverse);
+        }
+
+        /// <summary>
+        /// 演出の長さを受け取る
+        ///
+        /// 送った台では既に覚えているため、そこでは呼ばない。
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyFadeDurations(float fadeInDurationSec, float fadeOutDurationSec, NetworkBool isReverse)
+        {
+            NetworkTransition.ApplyFadeDurations(fadeInDurationSec, fadeOutDurationSec, isReverse);
+        }
         #endregion
 
         #region Fusion.NetworkBehaviour の実装

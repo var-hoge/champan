@@ -57,7 +57,9 @@ namespace TadaLib.Scene
             // 呼び出し側 (各 UI Manager) を変えずに済むよう、ここで分岐する。
             if (App.Network.NetworkSession.IsOnline)
             {
-                App.Network.NetworkTransition.RequestSceneChange(nextScene);
+                // 演出は各台で再生するため、長さも一緒に運ぶ
+                App.Network.NetworkTransition.RequestSceneChange(
+                    nextScene, fadeInDurationSec, fadeOutDurationSec, isReverse);
                 return;
             }
 
@@ -128,7 +130,8 @@ namespace TadaLib.Scene
             {
                 // preUnloadFunc はタイトルの演出用。遷移前に必ず走らせる
                 await preUnloadFunc();
-                App.Network.NetworkTransition.RequestSceneChange(nextScene);
+                App.Network.NetworkTransition.RequestSceneChange(
+                    nextScene, fadeInDurationSec, fadeOutDurationSec, isReverse);
                 return;
             }
 
