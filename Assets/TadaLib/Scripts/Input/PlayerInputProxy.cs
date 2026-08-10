@@ -66,8 +66,22 @@ namespace TadaLib.Input
             }
         }
 
+        /// <summary>
+        /// ゲームへの入力をまとめて止めるかどうか
+        ///
+        /// ウィンドウなどを開いている間、その裏でゲームが進まないようにする。
+        /// 読み取り口をすべて通るため、ここで止めれば取りこぼしがない。
+        /// (uGUI のマウス操作はこの経路を通らないため止まらない)
+        /// </summary>
+        public static bool IsSuppressed { get; set; } = false;
+
         public bool IsPressed(ButtonCode code)
         {
+            if (IsSuppressed)
+            {
+                return false;
+            }
+
             if (_gamePadInput == null)
             {
                 return IsPressedImpl(code, _basePlayerInput);
@@ -77,6 +91,11 @@ namespace TadaLib.Input
 
         public bool IsPressedTrigger(ButtonCode code)
         {
+            if (IsSuppressed)
+            {
+                return false;
+            }
+
             if (_gamePadInput == null)
             {
                 return IsPressedTriggerImpl(code, _basePlayerInput);
@@ -86,6 +105,11 @@ namespace TadaLib.Input
 
         public float Axis(AxisCode code)
         {
+            if (IsSuppressed)
+            {
+                return 0.0f;
+            }
+
             if (_gamePadInput == null)
             {
                 return AxisImpl(code, _basePlayerInput);
@@ -96,6 +120,11 @@ namespace TadaLib.Input
         public bool AxisTrigger(AxisCode code, out bool isPositive)
         {
             isPositive = false;
+
+            if (IsSuppressed)
+            {
+                return false;
+            }
 
             var deadZone = 0.5f;
 

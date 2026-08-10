@@ -2,15 +2,19 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace App.Ui.Title
+namespace App.Ui.CharaSelect
 {
     /// <summary>
     /// ネットワーク対戦の部屋建てウィンドウ
     ///
-    /// タイトル画面でのみ表示される。
+    /// キャラセレクト画面でのみ表示される。
+    /// プレイヤー同士が顔を合わせるのがこの画面のため、ここで部屋を決める。
     /// 通信の中身は持たず、NetworkGameLauncher を呼ぶだけ。
     ///
     /// UI はコードから組み立てる。
@@ -21,21 +25,15 @@ namespace App.Ui.Title
     public class NetworkRoomWindow
         : MonoBehaviour
     {
-        #region プロパティ
-        /// <summary>
-        /// タイトルの操作を止めるべきか
-        ///
-        /// ウィンドウが出ている間はゲームを開始できない。
-        /// 文字入力中のキー操作でメニューが動くのも防ぐ。
-        /// </summary>
-        public static bool IsInputBlocked
-            => _instance != null && _instance._window != null && _instance._window.activeSelf;
-        #endregion
-
         #region MonoBehaviour の実装
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void CreateSelf()
         {
+            if (_instance != null)
+            {
+                return;
+            }
+
             var obj = new GameObject(nameof(NetworkRoomWindow));
             DontDestroyOnLoad(obj);
             obj.AddComponent<NetworkRoomWindow>();
@@ -57,11 +55,23 @@ namespace App.Ui.Title
             {
                 SceneManager.activeSceneChanged -= OnActiveSceneChanged;
                 _instance = null;
+
+                // 止めたまま消えると、以降ゲームを操作できなくなる
+                TadaLib.Input.PlayerInputProxy.IsSuppressed = false;
             }
         }
 
         void Update()
         {
+            if (_canvasRoot == null || !_canvasRoot.activeSelf)
+            {
+                return;
+            }
+
+            // EventSystem はこの画面の読み込みより後に用意されることがあるため、
+            // 一度だけでは間に合わない
+            EnsureUiInputReady();
+
             if (_window == null || !_window.activeSelf)
             {
                 return;
@@ -86,25 +96,104 @@ namespace App.Ui.Title
         }
 
         /// <summary>
-        /// タイトル画面でのみ表示する
+        /// キャラセレクト画面でのみ表示する
         /// (部屋のセッション自体は NetworkGameLauncher が持ち続けるため切れない)
         /// </summary>
         void ApplySceneVisibility(string sceneName)
         {
-            var isTitle = sceneName == TitleSceneName;
+            var isCharaSelect = sceneName == CharaSelectSceneName;
 
-            _canvasRoot.SetActive(isTitle);
+            _canvasRoot.SetActive(isCharaSelect);
 
-            if (!isTitle)
+            if (!isCharaSelect)
             {
                 SetWindowOpen(false);
+                return;
             }
+
+            // 開くボタンを押せるようにしておく必要がある
+            EnsureUiInputReady();
+        }
+
+        /// <summary>
+        /// マウスで UI を操作できる状態にする
+        ///
+        /// この画面の EventSystem は、入力を読む設定が空のまま置かれている。
+        /// そのままではボタンを押しても何も起きない。
+        /// 画面ごとに EventSystem が違うため、開くたびに確かめる。
+        /// </summary>
+        static void EnsureUiInputReady()
+        {
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
+            {
+                return;
+            }
+
+            if (eventSystem.currentInputModule is not InputSystemUIInputModule module)
+            {
+                return;
+            }
+
+            // 同じものを何度も設定し直さない
+            if (ReferenceEquals(module, _preparedInputModule))
+            {
+                return;
+            }
+
+            _preparedInputModule = module;
+
+            // 既に設定されているものには触れない
+            if (module.point != null && module.point.action != null)
+            {
+                return;
+            }
+
+            if (_uiActions == null)
+            {
+                _uiActions = BuildUiActions();
+            }
+
+            module.point = InputActionReference.Create(_uiActions.FindAction(PointActionName));
+            module.leftClick = InputActionReference.Create(_uiActions.FindAction(ClickActionName));
+            module.scrollWheel = InputActionReference.Create(_uiActions.FindAction(ScrollActionName));
+
+            Debug.Log("[NetworkRoomWindow] UI の入力設定が空だったため、マウス操作を割り当てました");
+        }
+
+        /// <summary>
+        /// マウスで UI を触るのに要る最小限の入力を組み立てる
+        ///
+        /// 既存の入力アセットに頼らないのは、
+        /// 画面ごとに設定の有無がまちまちで、当てにできないため。
+        /// </summary>
+        static InputActionAsset BuildUiActions()
+        {
+            var asset = ScriptableObject.CreateInstance<InputActionAsset>();
+            asset.name = "NetworkRoomWindowUI";
+
+            var map = asset.AddActionMap("UI");
+            map.AddAction(PointActionName, InputActionType.PassThrough, "<Mouse>/position");
+            map.AddAction(ClickActionName, InputActionType.PassThrough, "<Mouse>/leftButton");
+            map.AddAction(ScrollActionName, InputActionType.PassThrough, "<Mouse>/scroll");
+
+            asset.Enable();
+
+            return asset;
         }
 
         void SetWindowOpen(bool isOpen)
         {
+            if (isOpen)
+            {
+                EnsureUiInputReady();
+            }
+
             _window.SetActive(isOpen);
             _dimmer.SetActive(isOpen);
+
+            // 開いている間は裏でゲームが進まないようにする
+            TadaLib.Input.PlayerInputProxy.IsSuppressed = isOpen;
 
             if (isOpen)
             {
@@ -742,7 +831,21 @@ namespace App.Ui.Title
         #region private フィールド
         static NetworkRoomWindow _instance;
 
-        const string TitleSceneName = "Title";
+        /// <summary>
+        /// マウス操作を割り当てた入力
+        /// </summary>
+        static InputActionAsset _uiActions;
+
+        /// <summary>
+        /// 設定済みか確かめた EventSystem の入力部品
+        /// </summary>
+        static InputSystemUIInputModule _preparedInputModule;
+
+        const string PointActionName = "Point";
+        const string ClickActionName = "Click";
+        const string ScrollActionName = "Scroll";
+
+        const string CharaSelectSceneName = "CharaSelect";
         const string SessionNamePrefix = "champan_";
         const string DefaultNickname = "PLAYER";
         const string DefaultPassphrase = "champan";
