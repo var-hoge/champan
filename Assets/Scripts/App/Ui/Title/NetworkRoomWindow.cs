@@ -14,8 +14,8 @@ namespace App.Ui.Title
     /// 通信の中身は持たず、NetworkGameLauncher を呼ぶだけ。
     ///
     /// UI はコードから組み立てる。
-    /// プロジェクトに日本語の TMP フォントが無いため、
-    /// OS のフォントから実行時に動的フォントを作って使う。
+    /// 文字はゲーム本体と同じフォントを使う。
+    /// このフォントに日本語は入っていないため、表記も入力も英数字に揃えてある。
     /// 大きさは CanvasScaler の基準解像度で決まり、画面解像度に依存しない。
     /// </summary>
     public class NetworkRoomWindow
@@ -128,7 +128,7 @@ namespace App.Ui.Title
             var passphrase = _passphraseField.text.Trim();
             if (passphrase.Length == 0)
             {
-                _errorText.text = "合言葉を入力してください";
+                _errorText.text = "ENTER A PASSWORD";
                 RefreshView();
                 return;
             }
@@ -147,8 +147,8 @@ namespace App.Ui.Title
             _isBusy = true;
             _errorText.text = "";
             _statusText.text = joinMode == Network.NetworkGameLauncher.JoinMode.Create
-                ? "部屋を建てています..."
-                : "部屋を探しています...";
+                ? "CREATING ROOM..."
+                : "SEARCHING ROOM...";
             RefreshView();
 
             var launcher = Network.NetworkGameLauncher.GetOrCreate();
@@ -217,10 +217,10 @@ namespace App.Ui.Title
                 return;
             }
 
-            _roomNameText.text = $"部屋: {_joinedPassphrase}";
+            _roomNameText.text = $"ROOM: {_joinedPassphrase}";
             _roleText.text = Network.NetworkSession.HasAuthority
-                ? "あなたはホストです。ゲームの開始はこの台の操作で進みます"
-                : "あなたはゲストです。ホストの操作に追従します";
+                ? "YOU ARE THE HOST. START THE GAME FROM THIS PC."
+                : "YOU ARE A GUEST. THE HOST LEADS THE GAME.";
 
             RebuildMemberList();
         }
@@ -240,7 +240,7 @@ namespace App.Ui.Title
             var seatTable = Network.NetworkSeatTable.Instance;
             if (seatTable == null)
             {
-                AddMemberRow("(席の情報を待っています...)", isSelf: false);
+                AddMemberRow("WAITING...", isSelf: false);
                 return;
             }
 
@@ -282,7 +282,7 @@ namespace App.Ui.Title
                 AddMemberRow(name, isSelf: seatTable.IsLocalSeat(idx));
             }
 
-            _memberCountText.text = $"メンバー ({occupied}/{Network.NetworkSeatTable.SeatCountMax})";
+            _memberCountText.text = $"MEMBERS  {occupied}/{Network.NetworkSeatTable.SeatCountMax}";
         }
 
         void AddMemberRow(string label, bool isSelf)
@@ -301,7 +301,7 @@ namespace App.Ui.Title
 
             if (isSelf)
             {
-                var tag = CreateText(row.transform, "自分", 20.0f, AccentColor);
+                var tag = CreateText(row.transform, "YOU", 20.0f, AccentColor);
                 tag.alignment = TextAlignmentOptions.MidlineRight;
                 StretchWithPadding(tag.rectTransform, 16.0f, 0.0f);
             }
@@ -312,7 +312,7 @@ namespace App.Ui.Title
         void BuildUi()
         {
             _roundedSprite = CreateRoundedSprite();
-            _fontAsset = CreateJapaneseFontAsset();
+            _fontAsset = LoadGameFontAsset();
 
             // Canvas (画面解像度に依存しないよう、基準解像度で設計する)
             _canvasRoot = CreateUiObject("NetworkRoomCanvas", transform);
@@ -357,7 +357,7 @@ namespace App.Ui.Title
         {
             var button = CreateButton(
                 _canvasRoot.transform,
-                "ネット対戦",
+                "NETWORK",
                 () => SetWindowOpen(!_window.activeSelf));
 
             var rect = button.GetComponent<RectTransform>();
@@ -403,7 +403,7 @@ namespace App.Ui.Title
 
             // タイトル行
             {
-                var title = CreateText(_window.transform, "ネット対戦", 34.0f, TextColor);
+                var title = CreateText(_window.transform, "NETWORK", 34.0f, TextColor);
                 title.fontStyle = FontStyles.Bold;
                 AddLayoutElement(title.gameObject, height: 44.0f);
             }
@@ -423,7 +423,7 @@ namespace App.Ui.Title
 
             // 閉じるボタン
             {
-                var close = CreateButton(_window.transform, "閉じる", () => SetWindowOpen(false));
+                var close = CreateButton(_window.transform, "CLOSE", () => SetWindowOpen(false));
                 AddLayoutElement(close, height: 56.0f);
             }
         }
@@ -435,19 +435,19 @@ namespace App.Ui.Title
         {
             _formGroup = CreateVerticalGroup(_window.transform, "FormGroup");
 
-            CreateLabel(_formGroup.transform, "ニックネーム");
+            CreateLabel(_formGroup.transform, "NAME");
             _nicknameField = CreateInputField(
                 _formGroup.transform,
                 PlayerPrefs.GetString(PrefKeyNickname, DefaultNickname),
                 NicknameMaxLength);
 
-            CreateLabel(_formGroup.transform, "合言葉 (英数字がおすすめ)");
+            CreateLabel(_formGroup.transform, "PASSWORD");
             _passphraseField = CreateInputField(
                 _formGroup.transform,
                 PlayerPrefs.GetString(PrefKeyPassphrase, DefaultPassphrase),
                 PassphraseMaxLength);
 
-            CreateLabel(_formGroup.transform, "この台で遊ぶ人数");
+            CreateLabel(_formGroup.transform, "PLAYERS ON THIS PC");
 
             // 人数のステッパー (◀ 1 ▶)
             {
@@ -462,14 +462,14 @@ namespace App.Ui.Title
                 rowLayout.childForceExpandHeight = true;
                 rowLayout.childAlignment = TextAnchor.MiddleLeft;
 
-                var minus = CreateButton(row.transform, "◀", () => ChangeLocalPlayerCount(-1));
+                var minus = CreateButton(row.transform, "<", () => ChangeLocalPlayerCount(-1));
                 AddLayoutElement(minus, width: 64.0f);
 
                 _localCountText = CreateText(row.transform, "1", 30.0f, TextColor);
                 _localCountText.alignment = TextAlignmentOptions.Center;
                 AddLayoutElement(_localCountText.gameObject, width: 64.0f);
 
-                var plus = CreateButton(row.transform, "▶", () => ChangeLocalPlayerCount(1));
+                var plus = CreateButton(row.transform, ">", () => ChangeLocalPlayerCount(1));
                 AddLayoutElement(plus, width: 64.0f);
             }
 
@@ -491,10 +491,10 @@ namespace App.Ui.Title
                 rowLayout.childForceExpandWidth = true;
                 rowLayout.childForceExpandHeight = true;
 
-                CreateButton(row.transform, "部屋を建てる",
+                CreateButton(row.transform, "CREATE",
                     () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.Create),
                     isPrimary: true);
-                CreateButton(row.transform, "部屋に入る",
+                CreateButton(row.transform, "JOIN",
                     () => OnJoinButton(Network.NetworkGameLauncher.JoinMode.JoinOnly),
                     isPrimary: true);
             }
@@ -515,13 +515,13 @@ namespace App.Ui.Title
             _roleText.textWrappingMode = TextWrappingModes.Normal;
             AddLayoutElement(_roleText.gameObject, height: 60.0f);
 
-            _memberCountText = CreateText(_joinedGroup.transform, "メンバー", 24.0f, SubTextColor);
+            _memberCountText = CreateText(_joinedGroup.transform, "MEMBERS", 24.0f, SubTextColor);
             AddLayoutElement(_memberCountText.gameObject, height: 32.0f);
 
             // 高さは人数で変わるため、決め打ちにしない
             _memberListRoot = CreateVerticalGroup(_joinedGroup.transform, "MemberList");
 
-            var leave = CreateButton(_joinedGroup.transform, "部屋を抜ける", OnLeaveButton);
+            var leave = CreateButton(_joinedGroup.transform, "LEAVE ROOM", OnLeaveButton);
             AddLayoutElement(leave, height: 56.0f);
         }
 
@@ -640,9 +640,27 @@ namespace App.Ui.Title
             input.fontAsset = _fontAsset;
             input.pointSize = 26.0f;
             input.characterLimit = maxLength;
+
+            // フォントに日本語が無く、打っても豆腐になる。
+            // 合言葉は文字列の一致で部屋を決めるため、
+            // 打てない文字を許すと入った先が食い違う。
+            input.onValidateInput = (_, _, addedChar) => IsAllowedChar(addedChar) ? addedChar : '\0';
+
             input.text = initial;
 
             return input;
+        }
+
+        /// <summary>
+        /// 入力を許す文字か
+        /// </summary>
+        static bool IsAllowedChar(char value)
+        {
+            return (value >= 'a' && value <= 'z')
+                || (value >= 'A' && value <= 'Z')
+                || (value >= '0' && value <= '9')
+                || value == '-'
+                || value == '_';
         }
 
         static void AddLayoutElement(GameObject obj, float height = -1.0f, float width = -1.0f)
@@ -703,30 +721,20 @@ namespace App.Ui.Title
         }
 
         /// <summary>
-        /// OS のフォントから日本語を表示できる動的フォントを作る
-        /// (プロジェクトに日本語の TMP フォントが無いため)
+        /// ゲームで使っているフォントを読む
+        ///
+        /// 日本語は入っていないため、表示は英数字だけにしてある。
         /// </summary>
-        static TMP_FontAsset CreateJapaneseFontAsset()
+        static TMP_FontAsset LoadGameFontAsset()
         {
-            var installed = new HashSet<string>(Font.GetOSInstalledFontNames());
-
-            foreach (var candidate in JapaneseFontCandidates)
+            var asset = Resources.Load<TMP_FontAsset>(GameFontResourcePath);
+            if (asset != null)
             {
-                if (!installed.Contains(candidate))
-                {
-                    continue;
-                }
-
-                // Font 経由では顔データを読めず失敗する。
-                // OS フォントはファミリー名から直接作る必要がある。
-                var asset = TMP_FontAsset.CreateFontAsset(candidate, "Regular", 64);
-                if (asset != null)
-                {
-                    return asset;
-                }
+                return asset;
             }
 
-            Debug.LogWarning("[NetworkRoomWindow] 日本語フォントが見つからないため、既定のフォントを使います");
+            Debug.LogWarning(
+                $"[NetworkRoomWindow] フォントが見つからないため既定のものを使います: Resources/{GameFontResourcePath}");
             return TMP_Settings.defaultFontAsset;
         }
         #endregion
@@ -745,19 +753,15 @@ namespace App.Ui.Title
         const float WindowWidth = 460.0f;
         const float MemberRefreshIntervalSec = 0.5f;
 
+        /// <summary>
+        /// ゲーム本体と同じフォント
+        /// </summary>
+        const string GameFontResourcePath = "Fonts/Asap-ExtraBold SDF";
+
         const string PrefKeyNickname = "NetworkRoom.Nickname";
         const string PrefKeyPassphrase = "NetworkRoom.Passphrase";
         const string PrefKeyLocalCount = "NetworkRoom.LocalCount";
 
-        static readonly string[] JapaneseFontCandidates =
-        {
-            "Meiryo UI",
-            "Meiryo",
-            "Yu Gothic UI",
-            "Yu Gothic",
-            "MS UI Gothic",
-            "MS Gothic",
-        };
 
         // タイトルの背景は明るい一枚絵のため、
         // 明るいウィンドウだと背景に溶けて読みにくい。
