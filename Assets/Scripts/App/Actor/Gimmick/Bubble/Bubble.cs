@@ -439,8 +439,20 @@ namespace App.Actor.Gimmick.Bubble
 
             if (!isFinalHit)
             {
-                transform.DOScale(Vector3.zero, 0.15f);
-                Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+                // 権威を持つ側と同じ見せ方にする。
+                // 縮めてから弾けさせると、弾ける瞬間が遅れて別物に見える。
+                transform.DOScale(transform.localScale * 1.15f, 0.1f).OnComplete(() =>
+                {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
+                    Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+
+                    // 破棄はホストが行う。届くまで見た目だけ消しておく
+                    gameObject.SetActive(false);
+                });
             }
 
             // 王冠バブルなら、シールドが減った見た目も先に出す。
