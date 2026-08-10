@@ -44,12 +44,21 @@ namespace App.Ui.Common
                 return;
             }
 
-            GetComponent<UnityEngine.UI.Image>().enabled = true;
-
             // プレイヤーの頭上に移動させる
             var dataHolder = player.GetComponent<Actor.Player.DataHolder>();
             var isDummyValid = dataHolder.IsValidDummyPlayerPos;
             var playerPos = isDummyValid ? dataHolder.DummyPlayerPos : player.transform.position;
+
+            // 落ちてから復帰用バブルに結び付くまでの間、キャラは画面外で待っている。
+            // その位置を追うと、画面の端に UI だけが残って見える。
+            if (!isDummyValid
+                && playerPos.y <= Actor.Gimmick.RespawnBubble.PlayerSpawner.OutOfScreenPoint.y + 1.0f)
+            {
+                GetComponent<UnityEngine.UI.Image>().enabled = false;
+                return;
+            }
+
+            GetComponent<UnityEngine.UI.Image>().enabled = true;
 
             var screenPos = Camera.main.WorldToScreenPoint(playerPos);
 

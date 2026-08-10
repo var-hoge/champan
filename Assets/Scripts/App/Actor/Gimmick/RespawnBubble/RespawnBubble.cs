@@ -36,6 +36,27 @@ namespace App.Actor.Gimmick.RespawnBubble
             _moveInfoCtrl = GetComponent<MoveInfoCtrl>();
         }
 
+        /// <summary>
+        /// 消えるときは、頭上の UI をバブルに置いていかない
+        ///
+        /// バブルの消え方は台によって違う。
+        /// 割れる処理を通らずに消えることもあるため、
+        /// そこで戻すのでは取りこぼす。
+        /// </summary>
+        void OnDisable()
+        {
+            if (_player == null)
+            {
+                return;
+            }
+
+            var playerDataHolder = _player.GetComponent<Player.DataHolder>();
+            if (playerDataHolder != null)
+            {
+                playerDataHolder.IsValidDummyPlayerPos = false;
+            }
+        }
+
         // Update is called once per frame
         void Update()
         {

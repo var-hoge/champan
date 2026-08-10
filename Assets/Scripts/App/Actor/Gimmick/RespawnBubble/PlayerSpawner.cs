@@ -23,7 +23,10 @@ namespace App.Actor.Gimmick.RespawnBubble
         private List<string> _SEPath = null;
         private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Player Death/Player_Death_", 9).ToList();
 
-        private static readonly Vector3 OutOfScreenPoint = new(0, -30, 0);
+        /// <summary>
+        /// 落ちたキャラを、復帰するまで待たせておく場所
+        /// </summary>
+        public static readonly Vector3 OutOfScreenPoint = new(0, -30, 0);
 
         /// <summary>
         /// 落下を続けて処理しない時間
