@@ -107,11 +107,11 @@ namespace App.Network
         /// 自分のピアの人数分の席を要求する
         /// 実際の割り当ては MasterClient が行うため、戻ってくるまでに 1 往復かかる
         /// </summary>
-        public void RequestSeats(int localPlayerCount)
+        public void RequestSeats(int localPlayerCount, string nickname)
         {
             for (int slot = 0; slot < localPlayerCount; ++slot)
             {
-                RPC_RequestSeat(Runner.LocalPlayer, slot);
+                RPC_RequestSeat(Runner.LocalPlayer, slot, nickname);
             }
         }
 
@@ -169,7 +169,7 @@ namespace App.Network
         /// 権威を持つ MasterClient 上でのみ実行される
         /// </summary>
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        void RPC_RequestSeat(PlayerRef owner, int localSlot)
+        void RPC_RequestSeat(PlayerRef owner, int localSlot, NetworkString<_16> nickname)
         {
             // 同じ要求が二重に届いても席を増やさない
             if (TryGetSeatIdx(owner, localSlot, out var assigned))
@@ -189,6 +189,7 @@ namespace App.Network
                 {
                     Owner = owner,
                     LocalSlot = localSlot,
+                    Nickname = nickname,
                 });
 
                 Debug.Log($"[NetworkSeatTable] 席を割り当てました: seatIdx={idx} owner={owner} localSlot={localSlot}");

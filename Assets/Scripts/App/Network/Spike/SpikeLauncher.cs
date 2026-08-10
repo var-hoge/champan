@@ -124,7 +124,7 @@ namespace App.Network.Spike
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                 .Timeout(_seatWaitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount);
+            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount, "");
 
             // 割り当ては MasterClient が行うため、結果が返るまで 1 往復かかる
             await UniTask.WaitUntil(() =>

@@ -35,6 +35,35 @@ namespace App.Network
         /// このピアが担当するローカル人数
         /// </summary>
         public int LocalPlayerCount { get; private set; } = 1;
+
+        /// <summary>
+        /// この台のニックネーム
+        /// </summary>
+        public string Nickname { get; private set; } = "";
+
+        /// <summary>
+        /// 参加に失敗したときの、表示に使える説明
+        /// 成功したら空になる
+        /// </summary>
+        public string LastJoinErrorMessage { get; private set; } = "";
+        #endregion
+
+        #region 定義
+        /// <summary>
+        /// 部屋への入り方
+        ///
+        /// Shared モードは既定で「無ければ作る」ため、
+        /// 合言葉を打ち間違えたときに気づかず一人部屋を建ててしまう。
+        /// 「入る」は部屋が無ければ失敗にする。
+        /// </summary>
+        public enum JoinMode
+        {
+            /// <summary>部屋を建てる (既にあればそこに入る)</summary>
+            Create,
+
+            /// <summary>ある部屋に入る (無ければ失敗)</summary>
+            JoinOnly,
+        }
         #endregion
 
         #region メソッド
@@ -69,7 +98,11 @@ namespace App.Network
         /// セッションに参加する
         /// オフラインで遊ぶ場合はこれを呼ばなければよい
         /// </summary>
-        public async UniTask JoinAsync(string sessionName, int localPlayerCount)
+        public async UniTask JoinAsync(
+            string sessionName,
+            int localPlayerCount,
+            string nickname = "",
+            JoinMode joinMode = JoinMode.Create)
         {
             if (_runner != null)
             {
@@ -77,6 +110,8 @@ namespace App.Network
             }
 
             LocalPlayerCount = localPlayerCount;
+            Nickname = nickname;
+            LastJoinErrorMessage = "";
 
             try
             {
@@ -87,6 +122,12 @@ namespace App.Network
                 {
                     GameMode = GameMode.Shared,
                     SessionName = sessionName,
+
+                    // 「入る」は部屋が無ければ失敗させる。
+                    // 既定の「無ければ作る」のままだと、
+                    // 合言葉の打ち間違いに気づけない。
+                    EnableClientSessionCreation = joinMode == JoinMode.Create,
+
                     // ここではシーンを指定しない。
                     // 対戦シーンへは参加者が揃ってから全員一緒に移動する。
                     SceneManager = gameObject.AddComponent<NetworkSceneManagerWithManagers>(),
@@ -94,7 +135,13 @@ namespace App.Network
 
                 if (!result.Ok)
                 {
+                    LastJoinErrorMessage = ToJoinErrorMessage(result, joinMode);
+
                     Debug.LogError($"[NetworkGameLauncher] 参加に失敗しました: {result.ShutdownReason}");
+
+                    // 失敗した Runner が残っていると、次の参加で「参加済み」扱いになる
+                    Destroy(_runner);
+                    _runner = null;
                     return;
                 }
 
@@ -108,7 +155,14 @@ namespace App.Network
             }
             catch (System.Exception e)
             {
+                LastJoinErrorMessage = "エラーが発生しました";
                 Debug.LogException(e);
+
+                if (_runner != null)
+                {
+                    Destroy(_runner);
+                    _runner = null;
+                }
             }
         }
 
@@ -156,6 +210,24 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// 失敗の理由を、表示に使える言葉へ直す
+        /// </summary>
+        static string ToJoinErrorMessage(StartGameResult result, JoinMode joinMode)
+        {
+            if (result.ShutdownReason == ShutdownReason.GameNotFound)
+            {
+                return "部屋が見つかりませんでした。合言葉を確認してください";
+            }
+
+            if (joinMode == JoinMode.JoinOnly)
+            {
+                return "部屋に入れませんでした。合言葉を確認してください";
+            }
+
+            return "部屋を建てられませんでした。通信環境を確認してください";
+        }
+
         /// <summary>
         /// @memo: 調査用。フレーム時間を測る
         /// 動きの不自然さがフレームレート由来かを切り分ける
@@ -228,7 +300,7 @@ namespace App.Network
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                 .Timeout(_waitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(LocalPlayerCount);
+            NetworkSeatTable.Instance.RequestSeats(LocalPlayerCount, Nickname);
 
             await UniTask.WaitUntil(() =>
             {

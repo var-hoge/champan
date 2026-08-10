@@ -372,6 +372,14 @@ namespace App.Ui.Title
                     continue;
                 }
 
+                // 部屋のウィンドウを開いている間は、ゲームを進めない。
+                // 文字入力中のキー操作でメニューが動いてしまうのも防ぐ。
+                if (NetworkRoomWindow.IsInputBlocked)
+                {
+                    await UniTask.Yield();
+                    continue;
+                }
+
                 foreach (var inputProxy in TadaLib.Input.PlayerInputManager.Instance.InputProxies)
                 {
                     // 決定優先

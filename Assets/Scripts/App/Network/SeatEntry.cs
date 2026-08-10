@@ -20,6 +20,7 @@ namespace App.Network
         {
             Owner = PlayerRef.None,
             LocalSlot = 0,
+            Nickname = default,
         };
 
         /// <summary>
@@ -46,6 +47,15 @@ namespace App.Network
         /// ローカルの入力順スロットに対応する。
         /// </summary>
         public int LocalSlot;
+
+        /// <summary>
+        /// この席のニックネーム
+        ///
+        /// 部屋のメンバー一覧のために、席と一緒に運ぶ。
+        /// 別の名簿を作ると同期経路が一本増えるため、席に載せる。
+        /// 同じピアの 2 人目以降は、表示側で「〇〇2」と添字を付ける。
+        /// </summary>
+        public NetworkString<_16> Nickname;
         #endregion
     }
 }

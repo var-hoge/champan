@@ -92,7 +92,7 @@ namespace App.Network.Spike
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                 .Timeout(_seatWaitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount);
+            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount, "");
 
             await UniTask.WaitUntil(() =>
             {
