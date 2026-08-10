@@ -101,6 +101,23 @@ namespace App.Network
             RPC_NotifyStepedOn(seatIdx);
         }
 
+        /// <summary>
+        /// 試合が決まったことを全員に知らせる (ホストのみ)
+        ///
+        /// 勝敗はホストが決めるが、終了演出は各台で再生する。
+        /// ホストでしか動かない破裂処理の中に置いていたため、
+        /// ゲスト側では演出が出ないままリザルト画面に飛んでいた。
+        /// </summary>
+        public void NotifyGameFinish(int winnerSeatIdx)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority)
+            {
+                return;
+            }
+
+            RPC_NotifyGameFinish(winnerSeatIdx);
+        }
+
         public void NotifyRespawn(int seatIdx, Vector3 position)
         {
             if (Object == null || !Object.IsValid)
@@ -246,6 +263,22 @@ namespace App.Network
 
                 return;
             }
+        }
+
+        /// <summary>
+        /// 試合が決まったという知らせを受けて、この台でも終了演出を再生する
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyGameFinish(int winnerSeatIdx)
+        {
+            var crownBubble = Actor.Gimmick.Crown.Manager.Instance?.CrownBubble;
+            if (crownBubble == null)
+            {
+                Debug.LogWarning("[NetworkMatchState] 王冠バブルが見つからないため終了演出を出せません");
+                return;
+            }
+
+            crownBubble.PlayFinishStaging(winnerSeatIdx);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]

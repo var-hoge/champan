@@ -67,6 +67,18 @@ namespace App.Actor.Gimmick.Bubble
         private float _burstGracePeriod = 0.05f;
         private bool _hasRidden = false;
         private bool _isBursting = false;
+
+        /// <summary>
+        /// 試合終了の演出を再生済みか
+        /// 自分で判定した直後に知らせが届くと二重になる
+        /// </summary>
+        private bool _hasPlayedFinishStaging = false;
+
+        /// <summary>
+        /// 試合終了の演出を終えてから王冠バブルを破棄するまでの待ち
+        /// 知らせが届くぶん、他の台は演出の開始が遅れる
+        /// </summary>
+        private const float FinishDespawnDelaySec = 0.5f;
         private BubbleShieldConfig currentShieldConfig;
         private Transform visualRoot;
         private bool _vibrating = false;
@@ -320,6 +332,57 @@ namespace App.Actor.Gimmick.Bubble
         }
 
         /// <summary>
+        /// 試合終了の演出
+        ///
+        /// 勝敗はホストが決めるが、演出は各台で再生する。
+        /// ホストでしか動かない破裂処理の中に置いていたため、
+        /// ゲスト側では演出が出ないままリザルト画面に飛んでいた。
+        /// </summary>
+        public void PlayFinishStaging(int winnerSeatIdx)
+        {
+            if (_hasPlayedFinishStaging)
+            {
+                return;
+            }
+
+            _hasPlayedFinishStaging = true;
+
+            // 手元のコントローラを鳴らせるのは、その席を操作している台だけ。
+            // 席番号とこの台のコントローラ番号も一致しない。
+            if (Cpu.CpuManager.Instance.IsCpu(winnerSeatIdx) is false)
+            {
+                Network.SeatInput.GetProxyOrNull(winnerSeatIdx)
+                    ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
+            }
+
+            GameSequenceManager.WinnerPlayerIdx = winnerSeatIdx;
+            GameSequenceManager.Instance.GameOver();
+
+            TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.01f, 0.015f, 0.0f);
+
+            transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
+            {
+                var scale = transform.lossyScale.x;
+                FinishCrown.Create(transform.position, scale);
+
+                // 破棄できるのは権威を持つ側だけ。
+                //
+                // すぐに破棄すると、知らせが届くぶん遅れて演出を始めた台では
+                // 縮み切る前にバブルごと消えて、王冠が飛び出さない。
+                // 全員が演出を終えるまで待つ。
+                DOVirtual.DelayedCall(FinishDespawnDelaySec, () =>
+                {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
+                    Network.NetworkSession.Despawn(gameObject);
+                });
+            });
+        }
+
+        /// <summary>
         /// 王冠バブルに触れたときの振動
         ///
         /// 手元のコントローラを鳴らせるのは、その席を操作している台だけ。
@@ -365,10 +428,20 @@ namespace App.Actor.Gimmick.Bubble
                 ? _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx
                 : -1;
 
+            // 最後の一撃なら、ここでバブルを消してはいけない。
+            // 試合終了の演出でゆっくり縮んでから王冠が飛び出すため、
+            // 先に消すと、知らせが届く頃にはもう何も残っていない。
+            var isFinalHit = HasCrown
+                && Crown.Manager.Instance.ShieldValue + Crown.Manager.Instance.ExShieldValue <= 1;
+
             // 見た目だけ先に出す
             PlaySE();
-            transform.DOScale(Vector3.zero, 0.15f);
-            Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+
+            if (!isFinalHit)
+            {
+                transform.DOScale(Vector3.zero, 0.15f);
+                Instantiate(_bubPopEff, transform.position, Quaternion.identity);
+            }
 
             // 王冠バブルなら、シールドが減った見た目も先に出す。
             // 正しい値はホストから配られてくるので、そこで上書きされる。
@@ -540,30 +613,13 @@ namespace App.Actor.Gimmick.Bubble
                 // �Ō�̉��o
                 if (Manager.Instance.IsShieldDestroyed)
                 {
-                    // �U��
-                    {
-                        var playerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
+                    var winnerSeatIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
 
-                        // 手元のコントローラを鳴らせるのは、その席を操作している台だけ。
-                        // 席番号とこの台のコントローラ番号も一致しない。
-                        if (Cpu.CpuManager.Instance.IsCpu(playerIdx) is false)
-                        {
-                            Network.SeatInput.GetProxyOrNull(playerIdx)
-                                ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
-                        }
-                    }
+                    // 勝敗はホストが決める。
+                    // 決まった結果を全台に伝えて、演出は各台で再生する。
+                    Network.NetworkMatchState.Instance?.NotifyGameFinish(winnerSeatIdx);
 
-                    GameSequenceManager.WinnerPlayerIdx = Crown.Manager.Instance.LastCrownRidePlayerIdx;
-                    GameSequenceManager.Instance.GameOver();
-
-                    TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.01f, 0.015f, 0.0f);
-
-                    transform.DOScale(Vector3.zero, 0.15f).OnComplete(() =>
-                    {
-                        var scale = transform.lossyScale.x;
-                        FinishCrown.Create(transform.position, scale);
-                        Network.NetworkSession.Despawn(gameObject);
-                    });
+                    PlayFinishStaging(winnerSeatIdx);
                     return;
                 }
                 else
