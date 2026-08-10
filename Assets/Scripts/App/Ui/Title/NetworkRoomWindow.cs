@@ -288,20 +288,20 @@ namespace App.Ui.Title
         void AddMemberRow(string label, bool isSelf)
         {
             var row = CreateUiObject("MemberRow", _memberListRoot.transform);
-            AddLayoutElement(row, height: 44.0f);
+            AddLayoutElement(row, height: 50.0f);
 
             var rowImage = row.AddComponent<Image>();
             rowImage.sprite = _roundedSprite;
             rowImage.type = Image.Type.Sliced;
             rowImage.color = isSelf ? SelfRowColor : RowColor;
 
-            var text = CreateText(row.transform, label, 26.0f, TextColor);
+            var text = CreateText(row.transform, label, 30.0f, TextColor);
             text.alignment = TextAlignmentOptions.MidlineLeft;
             StretchWithPadding(text.rectTransform, 16.0f, 0.0f);
 
             if (isSelf)
             {
-                var tag = CreateText(row.transform, "YOU", 20.0f, AccentColor);
+                var tag = CreateText(row.transform, "YOU", 23.0f, AccentColor);
                 tag.alignment = TextAlignmentOptions.MidlineRight;
                 StretchWithPadding(tag.rectTransform, 16.0f, 0.0f);
             }
@@ -364,7 +364,7 @@ namespace App.Ui.Title
             rect.anchorMin = rect.anchorMax = new Vector2(0.0f, 1.0f);
             rect.pivot = new Vector2(0.0f, 1.0f);
             rect.anchoredPosition = new Vector2(24.0f, -24.0f);
-            rect.sizeDelta = new Vector2(220.0f, 64.0f);
+            rect.sizeDelta = new Vector2(250.0f, 70.0f);
         }
 
         void BuildWindow()
@@ -384,7 +384,7 @@ namespace App.Ui.Title
             var rect = _window.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = new Vector2(0.0f, 1.0f);
             rect.pivot = new Vector2(0.0f, 1.0f);
-            rect.anchoredPosition = new Vector2(24.0f, -104.0f);
+            rect.anchoredPosition = new Vector2(24.0f, -110.0f);
             rect.sizeDelta = new Vector2(WindowWidth, 0.0f);
 
             var layout = _window.AddComponent<VerticalLayoutGroup>();
@@ -403,9 +403,9 @@ namespace App.Ui.Title
 
             // タイトル行
             {
-                var title = CreateText(_window.transform, "NETWORK", 34.0f, TextColor);
+                var title = CreateText(_window.transform, "NETWORK", 39.0f, TextColor);
                 title.fontStyle = FontStyles.Bold;
-                AddLayoutElement(title.gameObject, height: 44.0f);
+                AddLayoutElement(title.gameObject, height: 50.0f);
             }
 
             BuildFormGroup();
@@ -413,18 +413,18 @@ namespace App.Ui.Title
 
             // 状態・エラー表示 (常に一番下)
             // 中身が無いときは場所を取らないよう隠す
-            _statusText = CreateText(_window.transform, "", 24.0f, TextColor);
+            _statusText = CreateText(_window.transform, "", 27.0f, TextColor);
             _statusText.textWrappingMode = TextWrappingModes.Normal;
-            AddLayoutElement(_statusText.gameObject, height: 32.0f);
+            AddLayoutElement(_statusText.gameObject, height: 36.0f);
 
-            _errorText = CreateText(_window.transform, "", 24.0f, ErrorColor);
+            _errorText = CreateText(_window.transform, "", 27.0f, ErrorColor);
             _errorText.textWrappingMode = TextWrappingModes.Normal;
-            AddLayoutElement(_errorText.gameObject, height: 64.0f);
+            AddLayoutElement(_errorText.gameObject, height: 72.0f);
 
             // 閉じるボタン
             {
                 var close = CreateButton(_window.transform, "CLOSE", () => SetWindowOpen(false));
-                AddLayoutElement(close, height: 56.0f);
+                AddLayoutElement(close, height: 62.0f);
             }
         }
 
@@ -452,7 +452,7 @@ namespace App.Ui.Title
             // 人数のステッパー (◀ 1 ▶)
             {
                 var row = CreateUiObject("CountRow", _formGroup.transform);
-                AddLayoutElement(row, height: 56.0f);
+                AddLayoutElement(row, height: 62.0f);
 
                 var rowLayout = row.AddComponent<HorizontalLayoutGroup>();
                 rowLayout.spacing = 8.0f;
@@ -463,14 +463,14 @@ namespace App.Ui.Title
                 rowLayout.childAlignment = TextAnchor.MiddleLeft;
 
                 var minus = CreateButton(row.transform, "<", () => ChangeLocalPlayerCount(-1));
-                AddLayoutElement(minus, width: 64.0f);
+                AddLayoutElement(minus, width: 70.0f);
 
-                _localCountText = CreateText(row.transform, "1", 30.0f, TextColor);
+                _localCountText = CreateText(row.transform, "1", 34.0f, TextColor);
                 _localCountText.alignment = TextAlignmentOptions.Center;
-                AddLayoutElement(_localCountText.gameObject, width: 64.0f);
+                AddLayoutElement(_localCountText.gameObject, width: 70.0f);
 
                 var plus = CreateButton(row.transform, ">", () => ChangeLocalPlayerCount(1));
-                AddLayoutElement(plus, width: 64.0f);
+                AddLayoutElement(plus, width: 70.0f);
             }
 
             _localPlayerCount = Mathf.Clamp(
@@ -482,7 +482,7 @@ namespace App.Ui.Title
             // 建てる / 入る
             {
                 var row = CreateUiObject("JoinRow", _formGroup.transform);
-                AddLayoutElement(row, height: 64.0f);
+                AddLayoutElement(row, height: 70.0f);
 
                 var rowLayout = row.AddComponent<HorizontalLayoutGroup>();
                 rowLayout.spacing = 12.0f;
@@ -507,22 +507,22 @@ namespace App.Ui.Title
         {
             _joinedGroup = CreateVerticalGroup(_window.transform, "JoinedGroup");
 
-            _roomNameText = CreateText(_joinedGroup.transform, "", 28.0f, TextColor);
+            _roomNameText = CreateText(_joinedGroup.transform, "", 32.0f, TextColor);
             _roomNameText.fontStyle = FontStyles.Bold;
-            AddLayoutElement(_roomNameText.gameObject, height: 36.0f);
+            AddLayoutElement(_roomNameText.gameObject, height: 41.0f);
 
-            _roleText = CreateText(_joinedGroup.transform, "", 22.0f, SubTextColor);
+            _roleText = CreateText(_joinedGroup.transform, "", 25.0f, SubTextColor);
             _roleText.textWrappingMode = TextWrappingModes.Normal;
-            AddLayoutElement(_roleText.gameObject, height: 60.0f);
+            AddLayoutElement(_roleText.gameObject, height: 68.0f);
 
-            _memberCountText = CreateText(_joinedGroup.transform, "MEMBERS", 24.0f, SubTextColor);
-            AddLayoutElement(_memberCountText.gameObject, height: 32.0f);
+            _memberCountText = CreateText(_joinedGroup.transform, "MEMBERS", 27.0f, SubTextColor);
+            AddLayoutElement(_memberCountText.gameObject, height: 36.0f);
 
             // 高さは人数で変わるため、決め打ちにしない
             _memberListRoot = CreateVerticalGroup(_joinedGroup.transform, "MemberList");
 
             var leave = CreateButton(_joinedGroup.transform, "LEAVE ROOM", OnLeaveButton);
-            AddLayoutElement(leave, height: 56.0f);
+            AddLayoutElement(leave, height: 62.0f);
         }
 
         void ChangeLocalPlayerCount(int diff)
@@ -576,8 +576,8 @@ namespace App.Ui.Title
 
         void CreateLabel(Transform parent, string content)
         {
-            var label = CreateText(parent, content, 22.0f, SubTextColor);
-            AddLayoutElement(label.gameObject, height: 28.0f);
+            var label = CreateText(parent, content, 25.0f, SubTextColor);
+            AddLayoutElement(label.gameObject, height: 32.0f);
         }
 
         /// <summary>
@@ -608,7 +608,7 @@ namespace App.Ui.Title
             colors.pressedColor = new Color(0.82f, 0.82f, 0.82f);
             button.colors = colors;
 
-            var text = CreateText(obj.transform, label, 26.0f, isPrimary ? DarkTextColor : TextColor);
+            var text = CreateText(obj.transform, label, 30.0f, isPrimary ? DarkTextColor : TextColor);
             text.alignment = TextAlignmentOptions.Center;
             StretchWithPadding(text.rectTransform, 0.0f, 0.0f);
 
@@ -618,7 +618,7 @@ namespace App.Ui.Title
         TMP_InputField CreateInputField(Transform parent, string initial, int maxLength)
         {
             var obj = CreateUiObject("InputField", parent);
-            AddLayoutElement(obj, height: 56.0f);
+            AddLayoutElement(obj, height: 62.0f);
 
             var image = obj.AddComponent<Image>();
             image.sprite = _roundedSprite;
@@ -632,13 +632,13 @@ namespace App.Ui.Title
             viewport.AddComponent<RectMask2D>();
             StretchWithPadding(viewport.GetComponent<RectTransform>(), 16.0f, 8.0f);
 
-            var text = CreateText(viewport.transform, "", 26.0f, TextColor);
+            var text = CreateText(viewport.transform, "", 30.0f, TextColor);
             StretchWithPadding(text.rectTransform, 0.0f, 0.0f);
 
             input.textViewport = viewport.GetComponent<RectTransform>();
             input.textComponent = text;
             input.fontAsset = _fontAsset;
-            input.pointSize = 26.0f;
+            input.pointSize = 30.0f;
             input.characterLimit = maxLength;
 
             // フォントに日本語が無く、打っても豆腐になる。
@@ -750,7 +750,7 @@ namespace App.Ui.Title
         const int NicknameMaxLength = 8;
         const int PassphraseMaxLength = 16;
         const int CanvasSortingOrder = 500;
-        const float WindowWidth = 460.0f;
+        const float WindowWidth = 500.0f;
         const float MemberRefreshIntervalSec = 0.5f;
 
         /// <summary>
