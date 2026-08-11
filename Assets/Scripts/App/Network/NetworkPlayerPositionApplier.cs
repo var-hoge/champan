@@ -38,16 +38,32 @@ namespace App.Network
             }
 
             var binder = GetComponent<NetworkPlayerBinder>();
-            if (binder == null || binder.Object == null || !binder.Object.IsValid)
+            if (binder == null)
             {
                 return;
             }
 
             // キャラセレクトのキャラはシーンに置かれていて、権威はホストが持つ。
             // 権威の有無では「誰が動かしているか」を判断できないため、席で見る。
+            //
+            // Spawn されているかを先に見てはいけない。
+            // キャラセレクトのキャラは入場するまで無効になっているため、
+            // Fusion に登録されず、Object をいつまでも持たない。
+            // そこで弾くと、大きさが一度も配られない。
+            //
+            // 大きさを運ぶのは NetworkCharaSelectState であって、
+            // このキャラ自身の NetworkObject ではない。
+            // 位置の同期が Spawn を待たずに動いているのと同じ理由で、
+            // ここでも待つ必要がない。
             if (!NetworkSession.IsInMatchScene(gameObject))
             {
+                // SeatIdx は Spawn 前でも DataHolder から引ける
                 ApplyCharaSelectScale(binder.SeatIdx);
+                return;
+            }
+
+            if (binder.Object == null || !binder.Object.IsValid)
+            {
                 return;
             }
 
