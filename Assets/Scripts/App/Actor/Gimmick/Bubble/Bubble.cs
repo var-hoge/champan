@@ -69,6 +69,12 @@ namespace App.Actor.Gimmick.Bubble
         private bool _isBursting = false;
 
         /// <summary>
+        /// 最後にこのバブルへ乗った人
+        /// 王冠バブルでは、この人が勝者になる
+        /// </summary>
+        private int _lastRiderPlayerIdx = -1;
+
+        /// <summary>
         /// 試合終了の演出を再生済みか
         /// 自分で判定した直後に知らせが届くと二重になる
         /// </summary>
@@ -177,9 +183,20 @@ namespace App.Actor.Gimmick.Bubble
                     GetComponent<BubbleAnimator>().OnRide();
                 }
 
+                RememberRider();
+
                 if (HasCrown)
                 {
-                    Crown.Manager.Instance.LastCrownRidePlayerIdx = _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx;
+                    // 記録するのは、この台が動かしているキャラだけ。
+                    //
+                    // 他の台のキャラは、乗ったことが遅れて伝わってくる。
+                    // それを勝者として書くと、実際に触れた人を上書きしてしまう。
+                    // 他の台のキャラの分は、その台からの知らせで記録される。
+                    var riderIdx = _lastRiderPlayerIdx;
+                    if (riderIdx >= 0 && Network.SeatInput.IsMovableHere(riderIdx))
+                    {
+                        Crown.Manager.Instance.LastCrownRidePlayerIdx = riderIdx;
+                    }
                 }
 
                 if (_burstTimer == burstTime)
@@ -265,6 +282,8 @@ namespace App.Actor.Gimmick.Bubble
                     PlaySE();
                 }
 
+                RememberRider();
+
                 _burstTimer -= Time.deltaTime;
                 _hasRidden = true;
 
@@ -286,6 +305,23 @@ namespace App.Actor.Gimmick.Bubble
             {
                 RequestBurst();
             }
+        }
+
+        /// <summary>
+        /// 今このバブルに乗っている人を覚えておく
+        ///
+        /// 吹き飛ばした後や、乗っている人が居なくなった後でも、
+        /// 誰が触れたのかを伝えられるようにする。
+        /// </summary>
+        private void RememberRider()
+        {
+            if (_moveInfoCtrl.RideObjects.Count == 0)
+            {
+                return;
+            }
+
+            _lastRiderPlayerIdx = _moveInfoCtrl.RideObjects[0]
+                .GetComponent<Player.DataHolder>().PlayerIdx;
         }
 
         /// <summary>
@@ -424,9 +460,12 @@ namespace App.Actor.Gimmick.Bubble
 
             _isBursting = true;
 
-            var playerIdx = _moveInfoCtrl.RideObjects.Count > 0
-                ? _moveInfoCtrl.RideObjects[0].GetComponent<Player.DataHolder>().PlayerIdx
-                : -1;
+            // 覚えておいた人を伝える。
+            //
+            // 王冠入りのバブルは触れた瞬間に相手を吹き飛ばすため、
+            // ここに来たときには乗っている人が居なくなっている。
+            // その場で調べると誰も見つからず、勝者が決まらない。
+            var playerIdx = _lastRiderPlayerIdx;
 
             // 最後の一撃なら、ここでバブルを消してはいけない。
             // 試合終了の演出でゆっくり縮んでから王冠が飛び出すため、
