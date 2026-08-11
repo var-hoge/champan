@@ -159,6 +159,15 @@ namespace App.Network
                 await SetUpSeatsAsync();
 
                 IsSessionReady = true;
+
+                // 今いる画面の準備も行う。
+                //
+                // 準備はシーンが読み込まれたときに始まる作りだが、
+                // 部屋に入っただけではシーンは読み込まれない。
+                // そのままだと準備完了にならず、
+                // それを待っている Player の登録が時間切れまで進まない
+                // (頭上の名札が十数秒後にようやく出る、という形で現れる)。
+                await SetUpSceneAsync(SceneManager.GetActiveScene().name);
             }
             catch (System.Exception e)
             {

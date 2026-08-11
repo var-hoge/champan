@@ -36,11 +36,18 @@ namespace App.Ui.Common
 
         public void OnPostMove()
         {
+            // 名前の解決はキャラの生成を待たない。
+            //
+            // 対戦シーンでは、席と CPU の判定が済むまでキャラが作られない。
+            // その後ろに置くと、待っている間ずっと名前が出ず、
+            // 待ち時間は台ごとに違うため、出る時期も揃わない。
+            ApplyNamePlate();
+
             var player = TadaLib.ActionStd.PlayerManager.TryGetPlayer(_playerNumber);
 
             if (player == null || !player.activeSelf)
             {
-                GetComponent<UnityEngine.UI.Image>().enabled = false;
+                SetVisible(false);
                 return;
             }
 
@@ -54,15 +61,11 @@ namespace App.Ui.Common
             if (!isDummyValid
                 && playerPos.y <= Actor.Gimmick.RespawnBubble.PlayerSpawner.OutOfScreenPoint.y + 1.0f)
             {
-                GetComponent<UnityEngine.UI.Image>().enabled = false;
+                SetVisible(false);
                 return;
             }
 
-            GetComponent<UnityEngine.UI.Image>().enabled = true;
-
-            // ネットワーク対戦では、番号ではなく名前を出す。
-            // 名前は席と一緒に配られているので、ここで引くだけでよい。
-            ApplyNamePlate();
+            SetVisible(true);
 
             var screenPos = Camera.main.WorldToScreenPoint(playerPos);
 
@@ -128,6 +131,22 @@ namespace App.Ui.Common
 
         #region privateメソッド
         /// <summary>
+        /// 頭上の表示を出し入れする
+        ///
+        /// 名札に差し替わっている場合もあるため、まとめて扱う。
+        /// 元の絵だけを消しても、名札が残って浮いて見える。
+        /// </summary>
+        void SetVisible(bool isVisible)
+        {
+            GetComponent<UnityEngine.UI.Image>().enabled = isVisible;
+
+            if (_namePlate != null)
+            {
+                _namePlate.SetVisible(isVisible);
+            }
+        }
+
+        /// <summary>
         /// 名前の表示を反映する
         ///
         /// CPU 席は元の表示のままにする。
@@ -135,13 +154,14 @@ namespace App.Ui.Common
         /// </summary>
         void ApplyNamePlate()
         {
-            // CPU かどうかは席が配られてから決まる。
-            // Start の時点の判断を使い回すと、後から人が入っても名前が出ない。
-            if (Cpu.CpuManager.Instance.IsCpu(_playerNumber))
-            {
-                return;
-            }
-
+            // CPU かどうかで判断しない。
+            //
+            // 対戦シーンでは、席の割り当てが済むまで人間の席も CPU 扱いのままになる。
+            // それを見て決めると、確定するまで名前が出ず、
+            // 確定の時期は台ごとに違うため、出る時期も揃わない。
+            //
+            // 席に名前が入っているかどうかだけで決めればよい。
+            // CPU 席は誰も着いていないので、そもそも名前を持たない。
             var seatName = Network.SeatInput.GetSeatName(_playerNumber);
 
             // 一度分かった名前は覚えておく。

@@ -9,6 +9,30 @@ namespace App.Network
     /// </summary>
     public static class SeatInput
     {
+        #region private フィールド
+        /// <summary>
+        /// 分かっている席の表示名
+        ///
+        /// 席の情報が一時的に途切れても名前を出し続けるために覚えておく。
+        /// </summary>
+        static readonly string[] _seatNames =
+            CreateEmptyNames();
+
+        /// <summary>
+        /// 既定は null になるため、空文字で埋めておく
+        /// </summary>
+        static string[] CreateEmptyNames()
+        {
+            var names = new string[Actor.Player.Constant.PlayerCountMax];
+            for (int idx = 0; idx < names.Length; ++idx)
+            {
+                names[idx] = "";
+            }
+
+            return names;
+        }
+        #endregion
+
         #region メソッド
         /// <summary>
         /// この台が担当する席かどうか
@@ -41,22 +65,36 @@ namespace App.Network
         /// </summary>
         public static string GetSeatName(int seatIdx)
         {
-            if (!NetworkSession.IsOnline || NetworkSeatTable.Instance == null)
+            if (!NetworkSession.IsOnline)
             {
+                _seatNames[seatIdx] = "";
                 return "";
+            }
+
+            // 席の情報は画面の切り替わりで一時的に途切れる。
+            // 分からない間は、前に分かっていた名前を返す。
+            //
+            // 覚える場所を画面の外に置くのが要点。
+            // 画面ごとに作り直される場所に置くと、
+            // 対戦の開始時に空から始まり、名前が出るまで待たされる。
+            if (NetworkSeatTable.Instance == null)
+            {
+                return _seatNames[seatIdx];
             }
 
             var seats = NetworkSeatTable.Instance.Seats;
             var seat = seats[seatIdx];
             if (seat.IsEmpty)
             {
+                // 席が空いたと分かったときは覚えた名前も捨てる
+                _seatNames[seatIdx] = "";
                 return "";
             }
 
             var name = seat.Nickname.ToString();
             if (name.Length == 0)
             {
-                return "";
+                return _seatNames[seatIdx];
             }
 
             var sameOwnerCount = 0;
@@ -68,7 +106,9 @@ namespace App.Network
                 }
             }
 
-            return sameOwnerCount >= 2 ? $"{name}{seat.LocalSlot + 1}" : name;
+            _seatNames[seatIdx] = sameOwnerCount >= 2 ? $"{name}{seat.LocalSlot + 1}" : name;
+
+            return _seatNames[seatIdx];
         }
 
         /// <summary>

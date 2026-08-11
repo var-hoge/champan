@@ -171,10 +171,21 @@ namespace App.Network
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         void RPC_RequestSeat(PlayerRef owner, int localSlot, NetworkString<_16> nickname)
         {
-            // 同じ要求が二重に届いても席を増やさない
+            // 同じ要求が二重に届いても席を増やさない。
+            // ただし名前は入れ直す。
+            // 名前を持たずに割り当てられた後で届いた要求を捨てると、
+            // その席の名前が空のまま埋まらなくなる。
             if (TryGetSeatIdx(owner, localSlot, out var assigned))
             {
-                Debug.Log($"[NetworkSeatTable] 割り当て済みのため無視します: seatIdx={assigned} owner={owner} localSlot={localSlot}");
+                var current = Seats[assigned];
+                if (current.Nickname != nickname)
+                {
+                    current.Nickname = nickname;
+                    Seats.Set(assigned, current);
+
+                    Debug.Log($"[NetworkSeatTable] 名前を入れ直しました: seatIdx={assigned} 名前={nickname}");
+                }
+
                 return;
             }
 

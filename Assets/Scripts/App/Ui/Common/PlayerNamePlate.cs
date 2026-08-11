@@ -48,6 +48,22 @@ namespace App.Ui.Common
                 ResizeToFit();
             }
         }
+
+        /// <summary>
+        /// 頭上の表示ごと出し入れする
+        ///
+        /// キャラが居ないときや画面外で待っているときに隠すために使う。
+        /// 元の絵の表示に追従させる。
+        /// </summary>
+        public void SetVisible(bool isVisible)
+        {
+            if (_root == null)
+            {
+                return;
+            }
+
+            _root.SetActive(isVisible && _isPlateVisible);
+        }
         #endregion
 
         #region private メソッド
