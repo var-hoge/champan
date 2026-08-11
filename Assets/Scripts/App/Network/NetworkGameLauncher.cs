@@ -130,6 +130,11 @@ namespace App.Network
                     GameMode = GameMode.Shared,
                     SessionName = sessionName,
 
+                    // Fusion が数えるのは台の数であって人数ではない。
+                    // 「1 台に 2 人」でも 1 としか数えないため、
+                    // 人数の上限はこちらのメンバー表で見る。
+                    PlayerCount = NetworkSeatTable.MemberCountMax,
+
                     // 「入る」は部屋が無ければ失敗させる。
                     // 既定の「無ければ作る」のままだと、
                     // 合言葉の打ち間違いに気づけない。
@@ -295,6 +300,28 @@ namespace App.Network
             SetUpSceneAsync(scene.name).Forget();
         }
 
+        /// <summary>
+        /// 部屋のメンバーに載ったか
+        /// </summary>
+        bool IsJoinedRoom()
+        {
+            var seatTable = NetworkSeatTable.Instance;
+            if (seatTable == null)
+            {
+                return false;
+            }
+
+            for (int idx = 0; idx < seatTable.Members.Length; ++idx)
+            {
+                if (seatTable.Members[idx].Owner == _runner.LocalPlayer)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         async UniTask SetUpSeatsAsync()
         {
             // シーンのロード中に Spawn すると
@@ -316,20 +343,16 @@ namespace App.Network
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                 .Timeout(_waitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(LocalPlayerCount, Nickname);
+            // 席はここでは取らない。
+            // キャラセレクトでエントリーしたときに取る。
+            //
+            // 部屋には席の数より多くの人が居られるため、
+            // 入った時点で席を配ると、遅れて入った人が席を取れないまま
+            // 部屋にも入れないことになってしまう。
+            NetworkSeatTable.Instance.RequestJoinRoom(LocalPlayerCount, Nickname);
 
-            await UniTask.WaitUntil(() =>
-            {
-                for (int slot = 0; slot < LocalPlayerCount; ++slot)
-                {
-                    if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out _))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }).Timeout(_waitTimeout);
+            await UniTask.WaitUntil(() => IsJoinedRoom())
+                .Timeout(_waitTimeout);
         }
 
         /// <summary>

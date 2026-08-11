@@ -150,6 +150,10 @@ namespace App.Ui.CharaSelect
             // (Start はどの枠の更新よりも先に走る)
             Network.NetworkCharaSelectState.Instance?.ResetAll();
 
+            // ネットワーク対戦のエントリーを受け付ける。
+            // 席が無い状態で押されるため、席ごとの枠では受けられない。
+            gameObject.AddComponent<NetworkEntryWatcher>();
+
             // 初期化
             for (int idx = 0; idx < CharaMaxCount; idx++)
             {

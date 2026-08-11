@@ -550,6 +550,20 @@ namespace App.Ui.CharaSelect
             // ボタン入力待ち
             ResolveInputProxy();
 
+            // ネットワーク対戦では、押されたかどうかを見るのは NetworkEntryWatcher。
+            // 席が無い状態で押すため、この枠では受けられない。
+            // ここまで来た時点で席が付いているので、そのままエントリーする。
+            if (Network.NetworkSession.IsOnline)
+            {
+                if (_inputProxy == null)
+                {
+                    return;
+                }
+
+                EnterCharacterSelection();
+                return;
+            }
+
             // 他の台が担当する席は、この台では操作できない
             if (_inputProxy == null)
             {
@@ -558,13 +572,21 @@ namespace App.Ui.CharaSelect
 
             if (_inputProxy.IsPressed(TadaLib.Input.ButtonCode.Action))
             {
-                SEManager.Instance.Play(SEPath.PLAYER_JOIN);
-                _phase = Phase.InCharacterSelection;
-
-                _cursor.Show();
-                ShowChara();
-                PublishState();
+                EnterCharacterSelection();
             }
+        }
+
+        /// <summary>
+        /// エントリーしてキャラ選択に入る
+        /// </summary>
+        void EnterCharacterSelection()
+        {
+            SEManager.Instance.Play(SEPath.PLAYER_JOIN);
+            _phase = Phase.InCharacterSelection;
+
+            _cursor.Show();
+            ShowChara();
+            PublishState();
         }
 
         void InCharacterSelection()
@@ -641,6 +663,36 @@ namespace App.Ui.CharaSelect
         }
 
         /// <summary>
+        /// この席を返す
+        ///
+        /// 席を持っていない状態に戻すため、操作元も決め直させる。
+        /// </summary>
+        void ReleaseSeatIfOnline()
+        {
+            if (!Network.NetworkSession.IsOnline)
+            {
+                return;
+            }
+
+            var seatTable = Network.NetworkSeatTable.Instance;
+            if (seatTable == null)
+            {
+                return;
+            }
+
+            var seat = seatTable.Seats[_playerIdx];
+            if (seat.IsEmpty || !seatTable.IsLocalSeat(_playerIdx))
+            {
+                return;
+            }
+
+            seatTable.ReleaseSeat(seat.LocalSlot);
+
+            _isInputProxyResolved = false;
+            _inputProxy = null;
+        }
+
+        /// <summary>
         /// 部屋を出た席の見た目を片付ける
         ///
         /// 取り消しと違い、音は鳴らさない。
@@ -669,6 +721,10 @@ namespace App.Ui.CharaSelect
 
             _phase = Phase.WaitingForEntry;
             _isReselect = true;
+
+            // 席を返す。
+            // 返さないと、席が空くのを待っている人がいつまでも入れない。
+            ReleaseSeatIfOnline();
         }
         #endregion
     }

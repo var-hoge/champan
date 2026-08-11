@@ -92,7 +92,12 @@ namespace App.Network.Spike
             await UniTask.WaitUntil(() => NetworkSeatTable.Instance != null)
                 .Timeout(_seatWaitTimeout);
 
-            NetworkSeatTable.Instance.RequestSeats(_localPlayerCount, "");
+            // 検証用のため、部屋に入ると同時に席も取る
+            NetworkSeatTable.Instance.RequestJoinRoom(_localPlayerCount, "");
+            for (int slot = 0; slot < _localPlayerCount; ++slot)
+            {
+                NetworkSeatTable.Instance.RequestSeat(slot, "");
+            }
 
             await UniTask.WaitUntil(() =>
             {

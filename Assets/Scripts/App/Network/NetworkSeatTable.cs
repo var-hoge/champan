@@ -32,6 +32,49 @@ namespace App.Network
         [Networked]
         [Capacity(4)]
         public NetworkArray<SeatEntry> Seats { get; }
+
+        /// <summary>
+        /// 部屋にいる台の一覧
+        ///
+        /// 席とは別に持つ。
+        /// 席は対戦に出る 4 枠だけで、部屋にはそれより多くの人が居られる。
+        /// 席が空くのを待っている人も、ここには載る。
+        /// </summary>
+        [Networked]
+        [Capacity(MemberCountMax)]
+        public NetworkArray<MemberEntry> Members { get; }
+
+        /// <summary>
+        /// 部屋に入れる台の数
+        /// </summary>
+        public const int MemberCountMax = 8;
+
+        /// <summary>
+        /// 部屋に入れる人数
+        ///
+        /// 1 台に複数人いる場合、その人数ぶんを数える。
+        /// </summary>
+        public const int PlayerCountMax = 8;
+
+        /// <summary>
+        /// 今この部屋にいる人数
+        /// </summary>
+        public int JoinedPlayerCount
+        {
+            get
+            {
+                var count = 0;
+                for (int idx = 0; idx < Members.Length; ++idx)
+                {
+                    if (!Members[idx].IsEmpty)
+                    {
+                        count += Members[idx].LocalPlayerCount;
+                    }
+                }
+
+                return count;
+            }
+        }
         #endregion
 
         #region メソッド
@@ -107,12 +150,45 @@ namespace App.Network
         /// 自分のピアの人数分の席を要求する
         /// 実際の割り当ては MasterClient が行うため、戻ってくるまでに 1 往復かかる
         /// </summary>
-        public void RequestSeats(int localPlayerCount, string nickname)
+        /// <summary>
+        /// 部屋に入ったことをホストに知らせる
+        ///
+        /// 席はここでは取らない。
+        /// 席はキャラセレクトでエントリーしたときに取る。
+        /// </summary>
+        public void RequestJoinRoom(int localPlayerCount, string nickname)
         {
-            for (int slot = 0; slot < localPlayerCount; ++slot)
-            {
-                RPC_RequestSeat(Runner.LocalPlayer, slot, nickname);
-            }
+            RPC_RequestJoinRoom(Runner.LocalPlayer, localPlayerCount, nickname);
+        }
+
+        /// <summary>
+        /// 席を 1 つ要求する
+        ///
+        /// キャラセレクトでエントリーしたときに呼ぶ。
+        /// 空きが無ければ何も起きない (呼んだ側は席が付くかどうかで判断する)。
+        /// </summary>
+        public void RequestSeat(int localSlot, string nickname)
+        {
+            RPC_RequestSeat(Runner.LocalPlayer, localSlot, nickname);
+        }
+
+        /// <summary>
+        /// 席を 1 つ返す
+        ///
+        /// エントリーを取り消したときに呼ぶ。
+        /// 返さないと、待っている人がいつまでも入れない。
+        /// </summary>
+        public void ReleaseSeat(int localSlot)
+        {
+            RPC_ReleaseSeat(Runner.LocalPlayer, localSlot);
+        }
+
+        /// <summary>
+        /// この台が席を持っているか
+        /// </summary>
+        public bool HasSeat(int localSlot)
+        {
+            return TryGetSeatIdx(localSlot, out _);
         }
 
         /// <summary>
@@ -134,6 +210,15 @@ namespace App.Network
                     Debug.Log($"[NetworkSeatTable] 席を解放しました: seatIdx={idx} owner={owner}");
                 }
             }
+
+            for (int idx = 0; idx < Members.Length; ++idx)
+            {
+                if (Members[idx].Owner == owner)
+                {
+                    Members.Set(idx, MemberEntry.Empty);
+                    Debug.Log($"[NetworkSeatTable] 部屋から外しました: owner={owner}");
+                }
+            }
         }
         #endregion
 
@@ -152,6 +237,11 @@ namespace App.Network
             {
                 Seats.Set(idx, SeatEntry.Empty);
             }
+
+            for (int idx = 0; idx < Members.Length; ++idx)
+            {
+                Members.Set(idx, MemberEntry.Empty);
+            }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -164,6 +254,82 @@ namespace App.Network
         #endregion
 
         #region private メソッド
+        /// <summary>
+        /// 部屋への参加要求 (ホスト上でのみ実行される)
+        ///
+        /// 定員はここでだけ数える。
+        /// 各台が自分で数えると、同時に入ってきたときに超えてしまう。
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        void RPC_RequestJoinRoom(PlayerRef owner, int localPlayerCount, NetworkString<_16> nickname)
+        {
+            // 入り直しに備えて、同じ台の分は上書きする
+            for (int idx = 0; idx < Members.Length; ++idx)
+            {
+                if (Members[idx].Owner != owner)
+                {
+                    continue;
+                }
+
+                Members.Set(idx, new MemberEntry
+                {
+                    Owner = owner,
+                    LocalPlayerCount = localPlayerCount,
+                    Nickname = nickname,
+                });
+
+                return;
+            }
+
+            if (JoinedPlayerCount + localPlayerCount > PlayerCountMax)
+            {
+                Debug.LogWarning(
+                    $"[NetworkSeatTable] 定員を超えるため入れません:"
+                    + $" owner={owner} 人数={localPlayerCount} 現在={JoinedPlayerCount}");
+                return;
+            }
+
+            for (int idx = 0; idx < Members.Length; ++idx)
+            {
+                if (!Members[idx].IsEmpty)
+                {
+                    continue;
+                }
+
+                Members.Set(idx, new MemberEntry
+                {
+                    Owner = owner,
+                    LocalPlayerCount = localPlayerCount,
+                    Nickname = nickname,
+                });
+
+                Debug.Log($"[NetworkSeatTable] 部屋に入りました: owner={owner} 人数={localPlayerCount}");
+                return;
+            }
+
+            Debug.LogWarning($"[NetworkSeatTable] 部屋がいっぱいです: owner={owner}");
+        }
+
+        /// <summary>
+        /// 席を返す要求 (ホスト上でのみ実行される)
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        void RPC_ReleaseSeat(PlayerRef owner, int localSlot)
+        {
+            for (int idx = 0; idx < Seats.Length; ++idx)
+            {
+                if (!Seats[idx].Matches(owner, localSlot))
+                {
+                    continue;
+                }
+
+                Seats.Set(idx, SeatEntry.Empty);
+
+                Debug.Log($"[NetworkSeatTable] 席を返しました: seatIdx={idx} owner={owner} localSlot={localSlot}");
+                return;
+            }
+        }
+
         /// <summary>
         /// 席の割り当て要求
         /// 権威を持つ MasterClient 上でのみ実行される

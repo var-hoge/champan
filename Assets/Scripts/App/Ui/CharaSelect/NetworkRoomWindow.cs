@@ -310,7 +310,13 @@ namespace App.Ui.CharaSelect
 
                 if (!launcher.IsSessionReady)
                 {
-                    _errorText.text = launcher.LastJoinErrorMessage;
+                    _errorText.text = launcher.LastJoinErrorMessage.Length > 0
+                        ? launcher.LastJoinErrorMessage
+                        : "ROOM IS FULL";
+
+                    // 入れなかった以上、つないだままにしない
+                    await launcher.LeaveAsync();
+
                     RefreshView();
                     return;
                 }
@@ -506,45 +512,40 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
-            // 同じ台から何人参加しているかを数える (添字を付けるかの判断に使う)
-            var ownerCounts = new Dictionary<Fusion.PlayerRef, int>();
-            for (int idx = 0; idx < seatTable.Seats.Length; ++idx)
-            {
-                var seat = seatTable.Seats[idx];
-                if (seat.IsEmpty)
-                {
-                    continue;
-                }
-
-                ownerCounts[seat.Owner] = ownerCounts.TryGetValue(seat.Owner, out var count) ? count + 1 : 1;
-            }
-
+            // 席ではなくメンバー表から作る。
+            // 席は対戦に出る 4 枠だけで、席が空くのを待っている人は載らない。
+            var members = seatTable.Members;
             var occupied = 0;
-            for (int idx = 0; idx < seatTable.Seats.Length; ++idx)
+
+            for (int idx = 0; idx < members.Length; ++idx)
             {
-                var seat = seatTable.Seats[idx];
-                if (seat.IsEmpty)
+                var member = members[idx];
+                if (member.IsEmpty)
                 {
                     continue;
                 }
 
-                ++occupied;
+                occupied += member.LocalPlayerCount;
 
-                var name = seat.Nickname.ToString();
+                var name = member.Nickname.ToString();
                 if (name.Length == 0)
                 {
                     name = DefaultNickname;
                 }
 
-                if (ownerCounts[seat.Owner] >= 2)
-                {
-                    name = $"{name}{seat.LocalSlot + 1}";
-                }
+                var isSelf = Network.NetworkSession.Runner != null
+                    && member.Owner == Network.NetworkSession.Runner.LocalPlayer;
 
-                AddMemberRow(name, isSelf: seatTable.IsLocalSeat(idx));
+                // 同じ台に複数人いるときは、その人数ぶん並べる
+                for (int slot = 0; slot < member.LocalPlayerCount; ++slot)
+                {
+                    var label = member.LocalPlayerCount >= 2 ? $"{name}{slot + 1}" : name;
+                    AddMemberRow(label, isSelf);
+                }
             }
 
-            _memberCountText.text = $"MEMBERS  {occupied}/{Network.NetworkSeatTable.SeatCountMax}";
+            _memberCountText.text =
+                $"MEMBERS  {occupied}/{Network.NetworkSeatTable.PlayerCountMax}";
         }
 
         void AddMemberRow(string label, bool isSelf)
