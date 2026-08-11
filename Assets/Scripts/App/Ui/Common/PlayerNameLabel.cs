@@ -126,19 +126,22 @@ namespace App.Ui.Common
         /// <summary>
         /// 文字の色
         ///
-        /// 元の絵から抜き出した値。
-        /// 頭上の名札とは別の配色になっている。
+        /// 席の色を使う (頭上の名札や、スコア表の帯と同じ配色)。
+        ///
+        /// 元の「1P」の絵からは取らない。
+        /// この絵だけ配色が逆で (1 が青、2 が赤)、帯の色と食い違うため。
         /// </summary>
         static Color GetTextColor(int playerIdx)
         {
             return playerIdx switch
             {
-                0 => new Color32(97, 170, 254, 255),
-                1 => new Color32(239, 71, 111, 255),
-                2 => new Color32(6, 214, 160, 255),
-                _ => new Color32(255, 209, 102, 255),
+                0 => new Color32(239, 71, 111, 255),
+                1 => new Color32(97, 170, 254, 255),
+                2 => new Color32(37, 224, 104, 255),
+                _ => new Color32(255, 151, 85, 255),
             };
         }
+
         #endregion
 
         #region private フィールド
@@ -148,7 +151,13 @@ namespace App.Ui.Common
         static readonly Color OutlineColor = new Color32(92, 85, 77, 255);
 
         const float OutlineWidth = 0.2f;
-        const float FontSize = 30.0f;
+        /// <summary>
+        /// 文字の大きさ
+        ///
+        /// 隣に並ぶ「CPU」の絵は、文字が実寸で 41 ほどを占める。
+        /// それより少しだけ大きくしている。
+        /// </summary>
+        const float FontSize = 42.0f;
 
         /// <summary>
         /// 文字を白い部分に収めるための左右の余白
@@ -160,7 +169,7 @@ namespace App.Ui.Common
         const float SpriteMarginX = 30.0f;
 
         const float BackgroundWidthMin = 115.0f;
-        const float BackgroundHeight = 50.0f;
+        const float BackgroundHeight = 58.0f;
 
         const string BackgroundResourcePath = "Ui/Cursor_Player1_Bubble";
         const string FontResourcePath = "Fonts/Asap-ExtraBold SDF";

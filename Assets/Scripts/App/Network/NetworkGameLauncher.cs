@@ -525,9 +525,10 @@ namespace App.Network
 
             for (int slot = 0; slot < LocalPlayerCount; ++slot)
             {
+                // 席はエントリーした人だけが持つ。
+                // 部屋に居るだけでエントリーしなかった枠には席が無く、これは正常。
                 if (!NetworkSeatTable.Instance.TryGetSeatIdx(slot, out var seatIdx))
                 {
-                    Debug.LogError($"[NetworkGameLauncher] 席が割り当てられていません: localSlot={slot}");
                     continue;
                 }
 

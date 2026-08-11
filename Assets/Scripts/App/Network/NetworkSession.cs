@@ -21,6 +21,16 @@ namespace App.Network
         public static bool IsOnline => Runner != null;
 
         /// <summary>
+        /// Fusion がシーンを読み込んだことがあるか
+        ///
+        /// Fusion が読み込んだシーンは、いつものシーン管理の記録に載らない。
+        /// その状態でいつもの手順で読み直すと、記録に無いものを外そうとして落ちる。
+        ///
+        /// 部屋を抜けた後もシーンはそのまま残るため、一度立ったら戻さない。
+        /// </summary>
+        public static bool HasFusionLoadedScene { get; set; } = false;
+
+        /// <summary>
         /// ギミックの生成や勝敗判定を行ってよいかどうか
         ///
         /// オフラインでは常に true。

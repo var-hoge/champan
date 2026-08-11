@@ -48,6 +48,10 @@ namespace App.Network
             // マネージャ側を DontDestroyOnLoad へ移して破棄されないようにする。
             PersistManagerScenes();
 
+            // ここから先、シーンはいつものシーン管理の記録に載らない。
+            // 記録に無いものを外そうとして落ちるため、後で読み直す側に知らせる。
+            NetworkSession.HasFusionLoadedScene = true;
+
             yield return base.LoadSceneCoroutine(sceneRef, sceneParams);
         }
 

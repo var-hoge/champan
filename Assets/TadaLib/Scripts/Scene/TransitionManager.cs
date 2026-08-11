@@ -76,6 +76,27 @@ namespace TadaLib.Scene
             // 最低待ち時間
             await UniTask.Delay(TimeSpan.FromSeconds(guranteedWaitDurationSec));
 
+            // Fusion がシーンを読み込んだ後は、いつもの手順が使えない。
+            //
+            // Fusion が読み込んだシーンはシーン管理の記録に載っておらず、
+            // 記録をたどって外そうとすると落ちる。
+            // マネージャは常駐させてあるので、素直に読み直すだけでよい。
+            if (App.Network.NetworkSession.HasFusionLoadedScene)
+            {
+                var loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
+                    nextScene, UnityEngine.SceneManagement.LoadSceneMode.Single);
+
+                while (loadOperation != null && !loadOperation.isDone)
+                {
+                    await UniTask.Yield();
+                }
+
+                await TransitionEffectManager.Instance.FadeOut(fadeOutDurationSec, isReverse);
+
+                OnTransitionEnd();
+                return;
+            }
+
             var unloadScenes = new List<string>()
             {
                 UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
@@ -152,6 +173,29 @@ namespace TadaLib.Scene
             {
                 // 最低待ち時間
                 await UniTask.Delay(TimeSpan.FromSeconds(guranteedWaitDurationSec));
+            }
+
+            // Fusion がシーンを読み込んだ後は、いつもの手順が使えない
+            // (StartTransition と同じ理由)
+            if (App.Network.NetworkSession.HasFusionLoadedScene)
+            {
+                await preUnloadFunc();
+
+                var operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
+                    nextScene, UnityEngine.SceneManagement.LoadSceneMode.Single);
+
+                while (operation != null && !operation.isDone)
+                {
+                    await UniTask.Yield();
+                }
+
+                if (fadeOutDurationSec > 0.0f)
+                {
+                    await TransitionEffectManager.Instance.FadeOut(fadeOutDurationSec, isReverse);
+                }
+
+                OnTransitionEnd();
+                return;
             }
 
             // 次シーンロード (Activate は後ほど)
