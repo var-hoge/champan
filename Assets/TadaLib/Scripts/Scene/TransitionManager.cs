@@ -44,7 +44,12 @@ namespace TadaLib.Scene
         /// <param name="fadeInDurationSec">遷移エフェクトの時間(遷移開始時)</param>
         /// <param name="fadeOutDurationSec">遷移エフェクトの時間(遷移終了時)</param>
         /// <param name="guranteedWaitDurationSec">遷移中の最低待ち時間(エフェクト時間は含めない)</param>
-        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.05f, bool isReverse = false)
+        /// <param name="isLocalOnly">
+        /// この台だけで読み直す場合は true。
+        /// 部屋に入った直後にこの台の状態を作り直すときに使う。
+        /// (全員を動かすわけではないため、ネットワークの遷移に乗せてはいけない)
+        /// </param>
+        public async void StartTransition(string nextScene, float fadeInDurationSec, float fadeOutDurationSec, float guranteedWaitDurationSec = 0.05f, bool isReverse = false, bool isLocalOnly = false)
         {
             if (_isLocked)
             {
@@ -55,7 +60,7 @@ namespace TadaLib.Scene
             // ネットワーク対戦では、シーン上の NetworkObject を全員で共有するために
             // Fusion のシーンロードを通す必要がある。
             // 呼び出し側 (各 UI Manager) を変えずに済むよう、ここで分岐する。
-            if (App.Network.NetworkSession.IsOnline)
+            if (App.Network.NetworkSession.IsOnline && !isLocalOnly)
             {
                 // 演出は各台で再生するため、長さも一緒に運ぶ
                 App.Network.NetworkTransition.RequestSceneChange(

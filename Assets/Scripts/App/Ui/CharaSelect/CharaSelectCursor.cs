@@ -110,6 +110,11 @@ namespace App.Ui.CharaSelect
         TadaLib.Input.PlayerInputProxy _subscribedProxy = null;
         bool _isInputResolved = false;
 
+        /// <summary>
+        /// 操作元を決めたときに部屋へ入っていたか
+        /// </summary>
+        bool _isInputResolvedOnline = false;
+
         float _moveInputValuePrev = 0.0f;
         bool _isReady = false;
         Vector3 _initScale;
@@ -210,16 +215,9 @@ namespace App.Ui.CharaSelect
 
         private void OnDestroy()
         {
-            if (_subscribedProxy == null)
-            {
-                return;
-            }
-
-            _subscribedProxy.OnAction -= OnAction;
-            _subscribedProxy.OnMove -= OnMove;
-            _subscribedProxy.OnCancel -= OnCancel;
-            _subscribedProxy = null;
+            UnsubscribeInput();
         }
+
 
         /// <summary>
         /// この席を担当する入力を購読する
@@ -229,17 +227,27 @@ namespace App.Ui.CharaSelect
         /// </summary>
         void TrySubscribeInput()
         {
-            if (_isInputResolved)
+            // 部屋に入る前と後で、この席を担当する操作元が変わる。
+            // 一度決めたきりにすると、入った後も古い操作元を見続けてしまう。
+            var isOnline = Network.NetworkSession.IsOnline;
+            if (_isInputResolved && _isInputResolvedOnline == isOnline)
             {
                 return;
             }
 
-            if (Network.NetworkSession.IsOnline && Network.NetworkSeatTable.Instance == null)
+            if (isOnline && Network.NetworkSeatTable.Instance == null)
             {
                 return;
             }
 
-            _isInputResolved = true;
+            UnsubscribeInput();
+
+            _isInputResolvedOnline = isOnline;
+
+            // 席の割り当ては要求してから戻るまでに一往復かかる。
+            // 空席のまま決めると、割り当てられた後も操作できないままになる。
+            _isInputResolved = !isOnline
+                || !Network.NetworkSeatTable.Instance.Seats[_playerIdx].IsEmpty;
 
             _subscribedProxy = Network.SeatInput.GetProxyOrNull(_playerIdx);
             if (_subscribedProxy == null)
@@ -250,6 +258,19 @@ namespace App.Ui.CharaSelect
             _subscribedProxy.OnAction += OnAction;
             _subscribedProxy.OnMove += OnMove;
             _subscribedProxy.OnCancel += OnCancel;
+        }
+
+        void UnsubscribeInput()
+        {
+            if (_subscribedProxy == null)
+            {
+                return;
+            }
+
+            _subscribedProxy.OnAction -= OnAction;
+            _subscribedProxy.OnMove -= OnMove;
+            _subscribedProxy.OnCancel -= OnCancel;
+            _subscribedProxy = null;
         }
 
         void MoveImpl(bool isRight)

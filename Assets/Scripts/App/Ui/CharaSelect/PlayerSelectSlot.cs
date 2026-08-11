@@ -36,12 +36,19 @@ namespace App.Ui.CharaSelect
         /// </summary>
         void ResolveInputProxy()
         {
-            if (_isInputProxyResolved)
+            // 席が決まると、どの操作元がこの席を担当するかが変わる。
+            //
+            // オフラインのうちは席番号がそのまま操作元になるが、
+            // 部屋に入ると「2 台目の席 2」をその台の 1 人目が操作する形になる。
+            // 一度決めたきりにすると、入った後も古い対応のままになり、
+            // 自分のキャラを操作できず、他人のキャラを動かしてしまう。
+            var isOnline = Network.NetworkSession.IsOnline;
+            if (_isInputProxyResolved && _isInputProxyResolvedOnline == isOnline)
             {
                 return;
             }
 
-            if (Network.NetworkSession.IsOnline && Network.NetworkSeatTable.Instance == null)
+            if (isOnline && Network.NetworkSeatTable.Instance == null)
             {
                 // まだ席が配られていない
                 return;
@@ -53,7 +60,12 @@ namespace App.Ui.CharaSelect
                 ? TadaLib.Input.PlayerInputManager.Instance.InputProxy(localInputIdx)
                 : null;
 
-            _isInputProxyResolved = true;
+            // 席の割り当ては要求してから戻るまでに一往復かかる。
+            // 空席のまま決めてしまうと、割り当てられた後も操作できないままになる。
+            _isInputProxyResolved = !isOnline
+                || !Network.NetworkSeatTable.Instance.Seats[_playerIdx].IsEmpty;
+
+            _isInputProxyResolvedOnline = isOnline;
         }
 
         int GetLocalInputIdx()
@@ -181,6 +193,12 @@ namespace App.Ui.CharaSelect
         Phase _phase = Phase.WaitingForEntry;
         TadaLib.Input.PlayerInputProxy _inputProxy = null;
         bool _isInputProxyResolved = false;
+
+        /// <summary>
+        /// 操作元を決めたときに部屋へ入っていたか
+        /// 入る前と後で対応が変わるため、変わったら決め直す
+        /// </summary>
+        bool _isInputProxyResolvedOnline = false;
 
         /// <summary>
         /// 位置を配る間隔

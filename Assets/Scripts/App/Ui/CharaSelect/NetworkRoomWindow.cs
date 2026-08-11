@@ -249,16 +249,88 @@ namespace App.Ui.CharaSelect
                 nickname,
                 joinMode);
 
-            _isBusy = false;
             _statusText.text = "";
 
             if (!launcher.IsSessionReady)
             {
                 _errorText.text = launcher.LastJoinErrorMessage;
+                _isBusy = false;
+                RefreshView();
+                return;
             }
 
             _joinedPassphrase = passphrase;
             RefreshView();
+
+            // 入れたら、この画面をやり直す。
+            //
+            // 既にキャラを選んだ後で入ると、選択の状態が食い違ったまま残る。
+            // 入ってから一つずつ直すより、まっさらにして組み直すほうが確実。
+            //
+            // 入れなかったときはやり直さない。
+            // 合言葉を打ち間違えただけで画面が作り直されると煩わしい。
+            if (joinMode == Network.NetworkGameLauncher.JoinMode.JoinOnly)
+            {
+                await RestartSceneAsync();
+
+                // やり直しで閉じた状態から始まるため、開き直す
+                SetWindowOpen(true);
+            }
+
+            _isBusy = false;
+            RefreshView();
+        }
+
+        /// <summary>
+        /// この画面をやり直す
+        ///
+        /// 画面遷移の仕組みをそのまま使う。
+        /// まだ参加していないため、いつもの (オフラインの) 経路を通り、
+        /// 遷移エフェクトもマネージャシーンの読み直しも面倒を見てもらえる。
+        /// </summary>
+        async UniTask RestartSceneAsync()
+        {
+            var transitionManager = TadaLib.Scene.TransitionManager.Instance;
+            if (transitionManager == null)
+            {
+                return;
+            }
+
+            // この台だけで読み直す。
+            // 既に部屋へ入っているため、そのままではホストへの遷移要求に化けてしまう。
+            transitionManager.StartTransition(
+                CharaSelectSceneName,
+                RestartFadeDurationSec,
+                RestartFadeDurationSec,
+                isLocalOnly: true);
+
+            // StartTransition は待てない作りのため、状態を見て待つ。
+            // 遷移の途中でマネージャが入れ替わることがあるので、毎回引き直す。
+            while (IsTransitioning(isExpected: true))
+            {
+                await UniTask.Yield();
+            }
+
+            while (IsTransitioning(isExpected: false))
+            {
+                await UniTask.Yield();
+            }
+        }
+
+        /// <summary>
+        /// 遷移の開始待ち / 終了待ちを判定する
+        /// </summary>
+        /// <param name="isExpected">まだ始まっていないことを待つなら true</param>
+        static bool IsTransitioning(bool isExpected)
+        {
+            var manager = TadaLib.Scene.TransitionManager.Instance;
+            if (manager == null)
+            {
+                // マネージャが居ない間は待ち続けても進まない
+                return false;
+            }
+
+            return isExpected ? !manager.IsTransitioning : manager.IsTransitioning;
         }
 
         void OnLeaveButton()
@@ -855,6 +927,11 @@ namespace App.Ui.CharaSelect
         const int CanvasSortingOrder = 500;
         const float WindowWidth = 500.0f;
         const float MemberRefreshIntervalSec = 0.5f;
+
+        /// <summary>
+        /// 参加前にこの画面をやり直すときの遷移エフェクトの長さ
+        /// </summary>
+        const float RestartFadeDurationSec = 0.3f;
 
         /// <summary>
         /// ゲーム本体と同じフォント
