@@ -150,9 +150,21 @@ namespace App.Network
                 _hasOriginalBodyType = true;
             }
 
+            // 種類が変わるときだけ代入する。
+            // 2D 物理は種類を入れ直すと速度を失う。
+            // 権威が移るたびに代入していると、動き出した直後に止まってしまう。
             if (HasStateAuthority)
             {
-                rigidbody.bodyType = _originalBodyType;
+                if (rigidbody.bodyType != _originalBodyType)
+                {
+                    rigidbody.bodyType = _originalBodyType;
+                }
+
+                return;
+            }
+
+            if (rigidbody.bodyType == RigidbodyType2D.Kinematic)
+            {
                 return;
             }
 

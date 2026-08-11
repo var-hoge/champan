@@ -21,6 +21,32 @@ namespace App.Actor.Gimmick.RespawnBubble
         /// </summary>
         private bool _isRespawned = false;
 
+        /// <summary>
+        /// 降り始めの速度 (打ち消されたときに入れ直す)
+        /// </summary>
+        private Vector2 _descentVelocity = Vector2.zero;
+
+        private float _descentGuardTimer = 0.0f;
+
+        /// <summary>
+        /// 降り始めを見張る時間
+        /// </summary>
+        private const float DescentGuardSec = 0.5f;
+
+        /// <summary>
+        /// これ以下なら止まっているとみなす
+        /// </summary>
+        private const float DescentStoppedSqr = 0.01f;
+
+        /// <summary>
+        /// 降りる勢いを弱める強さ
+        ///
+        /// 大きいほど早く止まる。
+        /// 降りる距離はおよそ「初速 / (これ + Rigidbody の減衰)」になる。
+        /// </summary>
+        private const float DescentDamping = 0.4f;
+
+
         private const float BurstTime = 3f;
 
         private List<string> _SEPath = null;
@@ -77,6 +103,16 @@ namespace App.Actor.Gimmick.RespawnBubble
 
             playerDataHolder.IsValidDummyPlayerPos = true;
             playerDataHolder.DummyPlayerPos = transform.position;
+
+            // 降りる動きは、このバブルを生成した台が受け持つ。
+            // 他の台は物理を止めてあり、配られてくる位置に従う。
+            //
+            // 割れる判断とは受け持ちが違う点に注意。
+            // 割れる判断はキャラを動かしている台が行う (手応えを遅らせないため)。
+            if (IsDescentDriver())
+            {
+                KeepDescending();
+            }
 
             // 割れる判断と復帰位置は、そのキャラを動かしている台が決める。
             // ホストに問い合わせると往復の待ち時間がそのまま手応えの遅れになるため。
@@ -191,6 +227,77 @@ namespace App.Actor.Gimmick.RespawnBubble
         }
 
         /// <summary>
+        /// 降り始める
+        ///
+        /// このバブルを動かすのは、生成した台だけ。
+        /// 他の台は物理を止めて、配られてくる位置に従う。
+        ///
+        /// 力ではなく速度を直接与える。
+        /// 力は次の物理更新まで持ち越されるため、
+        /// その間に body の種類が入れ直されると失われ、
+        /// 重力が無いこのバブルは二度と降りてこない。
+        /// </summary>
+        void BeginDescent(float basePosX)
+        {
+            var x = Random.Range(0f, 10f) * Mathf.Sign(basePosX) * -1;
+
+            // 一度の力で得られる速さに合わせる (質量 0.1 に対し力 15 を 1 回)
+            _descentVelocity = new Vector2(x, -15.0f) / _rb.mass * Time.fixedDeltaTime;
+            _rb.linearVelocity = _descentVelocity;
+
+            _descentGuardTimer = DescentGuardSec;
+
+        }
+
+        /// <summary>
+        /// このバブルの動きを受け持つ台か
+        ///
+        /// 生成した台が動かし、その位置を他の台へ配る。
+        /// </summary>
+        bool IsDescentDriver()
+        {
+            if (!Network.NetworkSession.IsOnline)
+            {
+                return true;
+            }
+
+            var binder = GetComponent<Network.NetworkGimmickBinder>();
+
+            return binder != null
+                && binder.Object != null
+                && binder.Object.IsValid
+                && binder.Object.HasStateAuthority;
+        }
+
+        /// <summary>
+        /// 降り始めが打ち消されていたら、入れ直す
+        ///
+        /// 速度が消える経路をすべて塞ぎ切るのは難しい。
+        /// 降りてこないと復帰できず、試合が進まなくなるため、安全網を置く。
+        /// </summary>
+        void KeepDescending()
+        {
+            if (_descentGuardTimer > 0.0f)
+            {
+                _descentGuardTimer -= Time.deltaTime;
+
+                if (_rb.linearVelocity.sqrMagnitude <= DescentStoppedSqr)
+                {
+                    _rb.linearVelocity = _descentVelocity;
+                }
+            }
+
+            // 縦だけ強めに減速させる。
+            //
+            // Rigidbody の減衰を上げると横の操作まで重くなる。
+            // 落ちてくる勢いだけを弱めたいので、縦だけここで落とす。
+            var velocity = _rb.linearVelocity;
+            velocity.y *= Mathf.Exp(-DescentDamping * Time.deltaTime);
+            _rb.linearVelocity = velocity;
+
+        }
+
+        /// <summary>
         /// 動き出しと枠線を設定する
         ///
         /// ネットワーク対戦では、落ちた台からの要求でホストが生成するため、
@@ -199,8 +306,7 @@ namespace App.Actor.Gimmick.RespawnBubble
         /// </summary>
         public void InitForSeat(int seatIdx, float basePosX)
         {
-            var x = Random.Range(0f, 10f) * Mathf.Sign(basePosX) * -1;
-            _rb.AddForce(new(x, -15));
+            BeginDescent(basePosX);
 
             ApplyOutline(seatIdx);
         }
@@ -208,8 +314,7 @@ namespace App.Actor.Gimmick.RespawnBubble
         public void Init(GameObject player)
         {
             _player = player.transform;
-            var x = Random.Range(0f, 10f) * Mathf.Sign(_player.position.x) * -1;
-            _rb.AddForce(new(x, -15));
+            BeginDescent(_player.position.x);
             _body.sprite = CharacterManager.Instance.GetCharaImage(_player.GetComponent<Player.DataHolder>().CharaIdx);
 
             ApplyOutline(player.GetComponent<App.Actor.Player.DataHolder>().PlayerIdx);
