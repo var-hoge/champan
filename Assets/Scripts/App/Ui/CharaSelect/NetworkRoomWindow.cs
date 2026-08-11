@@ -371,17 +371,51 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
-            LeaveAsync().Forget();
+            LeaveAsync(isRoomClosedByHost: false).Forget();
         }
 
-        async UniTask LeaveAsync()
+        /// <summary>
+        /// ホストからの解散の知らせを受けて抜ける
+        /// </summary>
+        public static void NotifyRoomClosedByHost()
+        {
+            if (_instance == null || _instance._isBusy)
+            {
+                return;
+            }
+
+            _instance.LeaveAsync(isRoomClosedByHost: true).Forget();
+        }
+
+        async UniTask LeaveAsync(bool isRoomClosedByHost)
         {
             _isBusy = true;
+
+            // ホストは部屋を畳む側なので、先に全員へ知らせる。
+            // 自分が抜けた後では伝えられない。
+            var isHost = Network.NetworkSession.HasAuthority;
+            if (isHost && !isRoomClosedByHost)
+            {
+                Network.NetworkFlowState.Instance?.NotifyRoomClosed();
+
+                // 知らせが出ていくまで少し待つ
+                await UniTask.Delay(System.TimeSpan.FromSeconds(RoomCloseNoticeWaitSec));
+            }
 
             var launcher = Network.NetworkGameLauncher.Instance;
             if (launcher != null)
             {
                 await launcher.LeaveAsync();
+            }
+
+            // 抜けた側はこの画面をやり直す。
+            // 参加していた間の状態が残ったままになるため。
+            //
+            // ホストは部屋ごと畳んだだけで、この画面の主はそのまま自分なのでやり直さない。
+            if (!isHost)
+            {
+                await RestartSceneAsync();
+                SetWindowOpen(true);
             }
 
             _isBusy = false;
@@ -410,9 +444,13 @@ namespace App.Ui.CharaSelect
             }
 
             _roomNameText.text = $"ROOM: {_joinedPassphrase}";
-            _roleText.text = Network.NetworkSession.HasAuthority
+
+            // ホストが抜けることは部屋を畳むことなので、言葉を分ける
+            var isHost = Network.NetworkSession.HasAuthority;
+            _roleText.text = isHost
                 ? "YOU ARE THE HOST. START THE GAME FROM THIS PC."
                 : "YOU ARE A GUEST. THE HOST LEADS THE GAME.";
+            _leaveButtonLabel.text = isHost ? "CLOSE ROOM" : "LEAVE ROOM";
 
             RebuildMemberList();
         }
@@ -768,9 +806,11 @@ namespace App.Ui.CharaSelect
                 AddLayoutElement(spacer, height: 12.0f);
             }
 
-            var leave = CreateButton(_joinedGroup.transform, "LEAVE ROOM", OnLeaveButton);
-            leave.GetComponent<Image>().color = LeaveButtonColor;
-            AddLayoutElement(leave, height: 62.0f);
+            // 文字は参加のたびに変わるため、後から書き換える (RefreshView)
+            _leaveButton = CreateButton(_joinedGroup.transform, "", OnLeaveButton);
+            _leaveButton.GetComponent<Image>().color = LeaveButtonColor;
+            _leaveButtonLabel = _leaveButton.GetComponentInChildren<TextMeshProUGUI>();
+            AddLayoutElement(_leaveButton, height: 62.0f);
         }
 
         void ChangeLocalPlayerCount(int diff)
@@ -1079,6 +1119,11 @@ namespace App.Ui.CharaSelect
         const float RestartFadeDurationSec = 0.3f;
 
         /// <summary>
+        /// 解散の知らせが出ていくのを待つ時間
+        /// </summary>
+        const float RoomCloseNoticeWaitSec = 0.3f;
+
+        /// <summary>
         /// ゲーム本体と同じフォント
         /// </summary>
         const string GameFontResourcePath = "Fonts/Asap-ExtraBold SDF";
@@ -1112,6 +1157,8 @@ namespace App.Ui.CharaSelect
         GameObject _formGroup;
         GameObject _joinedGroup;
         GameObject _memberListRoot;
+        GameObject _leaveButton;
+        TextMeshProUGUI _leaveButtonLabel;
 
         TMP_InputField _nicknameField;
         TMP_InputField _passphraseField;

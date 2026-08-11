@@ -265,6 +265,25 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
+            // 退出
+            //
+            // 部屋を出た席はエントリー待ちに戻される。
+            // ここで戻さないと、出た人のキャラが選ばれたまま残り続ける。
+            if (remotePhase == Network.NetworkCharaSelectState.Phase.WaitingForEntry
+                && _phase != Phase.WaitingForEntry)
+            {
+                if (_phase == Phase.CharacterSelected)
+                {
+                    // 使用中のキャラを空ける
+                    _cursor.Manager.NotifyCancelSelect(_playerIdx);
+                    _cursor.ApplyRemoteSelected(false);
+                }
+
+                _phase = Phase.WaitingForEntry;
+                HideForLeave();
+                return;
+            }
+
             // エントリー
             if (remotePhase != Network.NetworkCharaSelectState.Phase.WaitingForEntry
                 && _phase == Phase.WaitingForEntry)
@@ -612,6 +631,21 @@ namespace App.Ui.CharaSelect
                 // ジャンプスタート
                 _player.GetComponent<TadaLib.ActionStd.StateMachine>().ChangeState(typeof(Actor.Player.State.StateJump));
             }
+        }
+
+        /// <summary>
+        /// 部屋を出た席の見た目を片付ける
+        ///
+        /// 取り消しと違い、音は鳴らさない。
+        /// 自分の操作ではないため、鳴ると誤解を招く。
+        /// </summary>
+        void HideForLeave()
+        {
+            _player.gameObject.SetActive(false);
+            _charaGroup.gameObject.SetActive(false);
+            _joinButton.gameObject.SetActive(true);
+
+            _cursor.ApplyRemoteSelected(false);
         }
 
         void OnCharaCanceled()

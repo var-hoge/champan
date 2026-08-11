@@ -135,6 +135,33 @@ namespace App.Network
         }
 
         /// <summary>
+        /// 部屋を解散したことを全員に知らせる (ホストのみ)
+        ///
+        /// ホストが抜けると Fusion は別の台をホストに繰り上げるが、
+        /// 解散は「この部屋を畳む」ことなので、全員に抜けてもらう。
+        /// </summary>
+        public void NotifyRoomClosed()
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority)
+            {
+                return;
+            }
+
+            RPC_NotifyRoomClosed();
+        }
+
+        /// <summary>
+        /// 解散の知らせを受ける
+        ///
+        /// 送ったホストは自分で抜けるため、そこでは呼ばない。
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyRoomClosed()
+        {
+            Ui.CharaSelect.NetworkRoomWindow.NotifyRoomClosedByHost();
+        }
+
+        /// <summary>
         /// 次の遷移で使う演出の長さを全員に知らせる
         ///
         /// 遷移の決定はホストが行うが、演出は各台で再生する。

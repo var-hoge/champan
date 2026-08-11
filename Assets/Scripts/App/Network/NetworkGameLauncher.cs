@@ -118,6 +118,13 @@ namespace App.Network
                 _runner = gameObject.AddComponent<NetworkRunner>();
                 _runner.ProvideInput = false;
 
+                // 出入りを受け取る。
+                // Runner と同じオブジェクトに付いていれば Fusion が呼んでくれる。
+                if (GetComponent<NetworkSessionCallbacks>() == null)
+                {
+                    gameObject.AddComponent<NetworkSessionCallbacks>();
+                }
+
                 var result = await _runner.StartGame(new StartGameArgs
                 {
                     GameMode = GameMode.Shared,

@@ -171,6 +171,32 @@ namespace App.Network
         }
 
         /// <summary>
+        /// 一つの席だけをやり直しにする (ホストのみ)
+        ///
+        /// 部屋を出た人の席に使う。
+        /// 空にするのではなく、今の回のエントリー待ちとして書き直す。
+        /// 空のままだと前回の残りと見分けが付かず、各台が読んでくれない。
+        /// </summary>
+        public void ResetSeat(int seatIdx)
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            Seats.Set(seatIdx, new SeatState
+            {
+                PhaseValue = (byte)Phase.WaitingForEntry,
+                SelectIdx = 0,
+                CharaPos = Vector2.zero,
+                IsFacingLeft = false,
+                Scale = Vector2.zero,
+                ViewScale = Vector2.zero,
+                Generation = Generation,
+            });
+        }
+
+        /// <summary>
         /// キャラセレクトをやり直すときに使う
         /// </summary>
         public void ResetAll()
