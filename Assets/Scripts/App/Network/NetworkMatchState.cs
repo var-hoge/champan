@@ -86,6 +86,23 @@ namespace App.Network
         }
 
         /// <summary>
+        /// ジャンプしたことを他の台に伝える
+        ///
+        /// ジャンプできるのは、そのキャラを動かしている台だけ。
+        /// 他の台では入力も物理も止めているため状態が切り替わらず、
+        /// ジャンプの音が鳴らないままになる。
+        /// </summary>
+        public void NotifyJump(int seatIdx)
+        {
+            if (Object == null || !Object.IsValid)
+            {
+                return;
+            }
+
+            RPC_NotifyJump(seatIdx);
+        }
+
+        /// <summary>
         /// 踏まれたことを、そのキャラを動かしている台に伝える
         ///
         /// 踏まれた動きは、そのキャラを動かしている台が行う。
@@ -231,6 +248,25 @@ namespace App.Network
                 seatIdx,
                 new Vector3(posX, posY, 0f),
                 new Vector3(velX, velY, 0f));
+        }
+
+        /// <summary>
+        /// ジャンプしたという知らせを受けて、この台でも音を鳴らす
+        ///
+        /// 見た目は拡縮と座標が配られるため、音だけでよい。
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
+        void RPC_NotifyJump(int seatIdx)
+        {
+            // この台でもそのキャラを動かしているなら、既に自分で鳴らしている。
+            // バブルに飛ばされたときのように、
+            // 持ち主以外の台からジャンプが始まる経路があるため念のため見る。
+            if (SeatInput.IsMovableHere(seatIdx))
+            {
+                return;
+            }
+
+            Actor.Player.State.StateJump.PlayJumpSe();
         }
 
         /// <summary>

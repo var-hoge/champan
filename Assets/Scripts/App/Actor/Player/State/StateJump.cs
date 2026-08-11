@@ -77,6 +77,18 @@ namespace App.Actor.Player.State
             state._jumpSpeed = jumpSpeedY;
             state.ChangeState(typeof(StateJump));
         }
+
+        /// <summary>
+        /// ジャンプの音を鳴らす
+        ///
+        /// ネットワーク相手のジャンプでは、この台の状態が切り替わらない。
+        /// 知らせを受けた側から鳴らせるように、状態の外へ出しておく。
+        /// </summary>
+        public static void PlayJumpSe()
+        {
+            var path = SEPath[Random.Range(0, SEPath.Count)];
+            SEManager.Instance.Play(path, 2f);
+        }
         #endregion
 
         #region プロパティ
@@ -96,8 +108,16 @@ namespace App.Actor.Player.State
             //}
 
             // SE再生
-            var path = SEPath[Random.Range(0, SEPath.Count)];
-            SEManager.Instance.Play(path, 2f);
+            PlayJumpSe();
+
+            // ジャンプできるのは、そのキャラを動かしている台だけ。
+            // 他の台では入力も物理も止めているためここへ来ず、
+            // 知らせないとジャンプの音が鳴らないままになる。
+            if (Network.NetworkSession.IsOnline)
+            {
+                Network.NetworkMatchState.Instance?.NotifyJump(
+                    obj.GetComponent<DataHolder>().PlayerIdx);
+            }
 
             var animator = obj.GetComponent<Animator>();
             //animator.Play("Jump");
@@ -196,8 +216,8 @@ namespace App.Actor.Player.State
         [SerializeField]
         AudioClip _jumpSe;
 
-        private List<string> _SEPath = null;
-        private List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Player Jump/Player_Jump_", 16).ToList();
+        static List<string> _SEPath = null;
+        static List<string> SEPath => _SEPath ??= Sound.SePathGenerator.GetSEPath("SE/Player Jump/Player_Jump_", 16).ToList();
         #endregion
     }
 }
