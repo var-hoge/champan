@@ -77,6 +77,17 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
+            // ゲームを遊ぶ手で閉じられるようにする。
+            // 閉じるためにマウスへ持ち替えるのが煩わしいため。
+            //
+            // 入力は止めてあるので、いつもの読み取り口は使えない。
+            // キーボードは文字入力と重なるため、コントローラだけを見る。
+            if (IsGamepadCloseButtonPressed())
+            {
+                SetWindowOpen(false);
+                return;
+            }
+
             // メンバーの出入りを追うため、開いている間は定期的に作り直す
             _memberRefreshTimer -= Time.unscaledDeltaTime;
             if (_memberRefreshTimer <= 0.0f)
@@ -180,6 +191,26 @@ namespace App.Ui.CharaSelect
             asset.Enable();
 
             return asset;
+        }
+
+        /// <summary>
+        /// コントローラの決定 / キャンセルが押されたか
+        ///
+        /// どのボタンでも閉じると、トリガーや肩ボタンに触れただけで閉じてしまう。
+        /// 閉じる意思が読み取れる 2 つに絞る。
+        /// </summary>
+        static bool IsGamepadCloseButtonPressed()
+        {
+            foreach (var gamepad in Gamepad.all)
+            {
+                if (gamepad.buttonSouth.wasPressedThisFrame
+                    || gamepad.buttonEast.wasPressedThisFrame)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         void SetWindowOpen(bool isOpen)
@@ -508,6 +539,12 @@ namespace App.Ui.CharaSelect
             var image = _dimmer.AddComponent<Image>();
             image.color = DimmerColor;
 
+            // ウィンドウの外を押したら閉じる。
+            // ウィンドウ自身はこの上に載っているため、そちらの操作は奪わない。
+            var button = _dimmer.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            button.onClick.AddListener(() => SetWindowOpen(false));
+
             StretchWithPadding(_dimmer.GetComponent<RectTransform>(), 0.0f, 0.0f);
         }
 
@@ -526,6 +563,39 @@ namespace App.Ui.CharaSelect
             rect.pivot = new Vector2(0.0f, 1.0f);
             rect.anchoredPosition = new Vector2(24.0f, -24.0f);
             rect.sizeDelta = new Vector2(250.0f, 70.0f);
+
+            // マウスで触るものだと分かるように、文字の隣に絵を添える。
+            //
+            // ボタンの中に収める。
+            // 外に置くと、絵とボタンが別のものに見えてしまう。
+            //
+            // 位置は数値で寄せずに並べて決める。
+            // 文字の幅はフォントや表示倍率で変わるため、
+            // 数値で寄せると環境によってずれる。
+            var layout = button.AddComponent<HorizontalLayoutGroup>();
+            layout.spacing = 10.0f;
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+
+            var label = button.GetComponentInChildren<TextMeshProUGUI>();
+            label.alignment = TextAlignmentOptions.Midline;
+
+            // 並べる対象になるため、引き伸ばしの設定は捨てる
+            var labelRect = label.rectTransform;
+            labelRect.anchorMin = labelRect.anchorMax = new Vector2(0.5f, 0.5f);
+            labelRect.offsetMin = labelRect.offsetMax = Vector2.zero;
+
+            var mouse = CreateUiObject("MouseIcon", button.transform);
+            var mouseImage = mouse.AddComponent<Image>();
+            mouseImage.sprite = CreateMouseSprite();
+            mouseImage.color = TextColor;
+            mouseImage.raycastTarget = false;
+            mouseImage.preserveAspect = true;
+
+            AddLayoutElement(mouse, height: MouseIconHeight, width: MouseIconWidth);
         }
 
         void BuildWindow()
@@ -582,10 +652,20 @@ namespace App.Ui.CharaSelect
             _errorText.textWrappingMode = TextWrappingModes.Normal;
             AddLayoutElement(_errorText.gameObject, height: 72.0f);
 
-            // 閉じるボタン
+            // 閉じ方の案内
+            //
+            // 閉じるボタンは置かない。
+            // 「部屋を出る」と並ぶと押し間違えるうえ、
+            // 遊ぶ手を止めてマウスへ持ち替えさせることになる。
             {
-                var close = CreateButton(_window.transform, "CLOSE", () => SetWindowOpen(false));
-                AddLayoutElement(close, height: 62.0f);
+                var hint = CreateText(
+                    _window.transform,
+                    "PRESS A / B OR CLICK OUTSIDE TO CLOSE",
+                    19.0f,
+                    SubTextColor);
+                hint.alignment = TextAlignmentOptions.Center;
+                hint.textWrappingMode = TextWrappingModes.Normal;
+                AddLayoutElement(hint.gameObject, height: 52.0f);
             }
         }
 
@@ -682,7 +762,14 @@ namespace App.Ui.CharaSelect
             // 高さは人数で変わるため、決め打ちにしない
             _memberListRoot = CreateVerticalGroup(_joinedGroup.transform, "MemberList");
 
+            // 部屋を出るのは戻しにくい操作のため、他と色を分けて間を空ける
+            {
+                var spacer = CreateUiObject("Spacer", _joinedGroup.transform);
+                AddLayoutElement(spacer, height: 12.0f);
+            }
+
             var leave = CreateButton(_joinedGroup.transform, "LEAVE ROOM", OnLeaveButton);
+            leave.GetComponent<Image>().color = LeaveButtonColor;
             AddLayoutElement(leave, height: 62.0f);
         }
 
@@ -848,6 +935,58 @@ namespace App.Ui.CharaSelect
         }
 
         /// <summary>
+        /// マウスの絵を作る
+        ///
+        /// マウスで触るものだと分かるようにする。
+        /// 画像アセットを持ち込まずに済ませたいので、輪郭を直接描く。
+        /// </summary>
+        static Sprite CreateMouseSprite()
+        {
+            const int width = 24;
+            const int height = 34;
+            const float radius = 10.0f;
+            const float thickness = 2.5f;
+
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    var point = new Vector2(x + 0.5f, y + 0.5f);
+
+                    // 角丸の枠からの距離を測る
+                    var inner = new Vector2(
+                        Mathf.Clamp(point.x, radius, width - radius),
+                        Mathf.Clamp(point.y, radius, height - radius));
+                    var distance = Vector2.Distance(point, inner);
+
+                    var outer = Mathf.Clamp01(radius - distance + 0.5f);
+                    var hollow = Mathf.Clamp01(radius - thickness - distance + 0.5f);
+                    var alpha = Mathf.Clamp01(outer - hollow);
+
+                    // ホイール (上寄りの中央に短い縦線)
+                    var isWheel = Mathf.Abs(point.x - width * 0.5f) <= thickness * 0.5f
+                        && point.y >= height * 0.62f
+                        && point.y <= height * 0.84f;
+                    if (isWheel)
+                    {
+                        alpha = 1.0f;
+                    }
+
+                    texture.SetPixel(x, y, new Color(1.0f, 1.0f, 1.0f, alpha));
+                }
+            }
+
+            texture.Apply();
+
+            return Sprite.Create(
+                texture,
+                new Rect(0, 0, width, height),
+                new Vector2(0.5f, 0.5f));
+        }
+
+        /// <summary>
         /// 角丸の 9 スライス用スプライトを作る
         /// (画像アセットを持ち込まずに、柔らかい見た目にするため)
         /// </summary>
@@ -926,6 +1065,12 @@ namespace App.Ui.CharaSelect
         const int PassphraseMaxLength = 16;
         const int CanvasSortingOrder = 500;
         const float WindowWidth = 500.0f;
+
+        /// <summary>
+        /// 開くボタンに添えるマウスの絵の大きさ
+        /// </summary>
+        const float MouseIconWidth = 26.0f;
+        const float MouseIconHeight = 38.0f;
         const float MemberRefreshIntervalSec = 0.5f;
 
         /// <summary>
@@ -952,6 +1097,7 @@ namespace App.Ui.CharaSelect
         static readonly Color FieldColor = new(0.25f, 0.20f, 0.15f, 1.00f);
         static readonly Color ButtonColor = new(0.31f, 0.25f, 0.19f, 1.00f);
         static readonly Color PrimaryButtonColor = new(0.91f, 0.66f, 0.25f, 1.00f);
+        static readonly Color LeaveButtonColor = new(0.44f, 0.22f, 0.18f, 1.00f);
         static readonly Color RowColor = new(0.23f, 0.18f, 0.14f, 1.00f);
         static readonly Color SelfRowColor = new(0.36f, 0.27f, 0.15f, 1.00f);
         static readonly Color TextColor = new(0.96f, 0.93f, 0.87f, 1.00f);
