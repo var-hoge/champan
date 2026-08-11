@@ -119,6 +119,13 @@ namespace App.Ui.CharaSelect
                 && Network.NetworkSession.IsOnline
                 && !Network.SeatInput.IsLocalSeat(_playerIdx))
             {
+                // 部屋に入った直後は、画面をやり直すまで触らない。
+                // 作り直す前の画面に相手の選択が現れると、ちぐはぐに見える。
+                if (NetworkRoomWindow.IsRemoteApplySuspended)
+                {
+                    return;
+                }
+
                 ApplyRemoteState();
                 ApplyRemoteCharaPos();
                 return;

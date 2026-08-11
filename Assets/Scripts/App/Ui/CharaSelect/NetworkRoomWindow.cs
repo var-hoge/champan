@@ -25,6 +25,17 @@ namespace App.Ui.CharaSelect
     public class NetworkRoomWindow
         : MonoBehaviour
     {
+        #region プロパティ
+        /// <summary>
+        /// 他の台の状態をこの画面に映さない期間か
+        ///
+        /// 部屋に入ってから、画面をやり直し終えるまでの間。
+        /// この間に映すと、相手のキャラが選ばれる様子が見えてから
+        /// 画面が作り直されることになり、ちぐはぐに見える。
+        /// </summary>
+        public static bool IsRemoteApplySuspended { get; private set; } = false;
+        #endregion
+
         #region MonoBehaviour の実装
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void CreateSelf()
@@ -271,45 +282,66 @@ namespace App.Ui.CharaSelect
                 : "SEARCHING ROOM...";
             RefreshView();
 
-            var launcher = Network.NetworkGameLauncher.GetOrCreate();
+            // 入る側は、やり直しが済むまで他の台の状態を映さない。
+            //
+            // 席が配られた時点から同期は始まるが、
+            // やり直しはその後になる。
+            // そのままだと、相手のキャラが選ばれる様子が見えてから
+            // 画面が作り直されることになり、ちぐはぐに見える。
+            var isJoining = joinMode == Network.NetworkGameLauncher.JoinMode.JoinOnly;
 
-            // 合言葉そのものを部屋名にせず、ゲーム固有の前置きを付ける
-            await launcher.JoinAsync(
-                SessionNamePrefix + passphrase,
-                _localPlayerCount,
-                nickname,
-                joinMode);
-
-            _statusText.text = "";
-
-            if (!launcher.IsSessionReady)
+            try
             {
-                _errorText.text = launcher.LastJoinErrorMessage;
+                if (isJoining)
+                {
+                    IsRemoteApplySuspended = true;
+                }
+
+                var launcher = Network.NetworkGameLauncher.GetOrCreate();
+
+                // 合言葉そのものを部屋名にせず、ゲーム固有の前置きを付ける
+                await launcher.JoinAsync(
+                    SessionNamePrefix + passphrase,
+                    _localPlayerCount,
+                    nickname,
+                    joinMode);
+
+                _statusText.text = "";
+
+                if (!launcher.IsSessionReady)
+                {
+                    _errorText.text = launcher.LastJoinErrorMessage;
+                    RefreshView();
+                    return;
+                }
+
+                _joinedPassphrase = passphrase;
+
+                // 入れたら、この画面をやり直す。
+                //
+                // 既にキャラを選んだ後で入ると、選択の状態が食い違ったまま残る。
+                // 入ってから一つずつ直すより、まっさらにして組み直すほうが確実。
+                //
+                // 入れなかったときはやり直さない。
+                // 合言葉を打ち間違えただけで画面が作り直されると煩わしい。
+                if (isJoining)
+                {
+                    await RestartSceneAsync();
+
+                    // やり直しで閉じた状態から始まるため、開き直す
+                    SetWindowOpen(true);
+                }
+            }
+            finally
+            {
+                // 途中で失敗しても必ず戻す。
+                // 止めたままだと、以降ずっと相手の状態が映らなくなる。
+                IsRemoteApplySuspended = false;
+
+                _statusText.text = "";
                 _isBusy = false;
                 RefreshView();
-                return;
             }
-
-            _joinedPassphrase = passphrase;
-            RefreshView();
-
-            // 入れたら、この画面をやり直す。
-            //
-            // 既にキャラを選んだ後で入ると、選択の状態が食い違ったまま残る。
-            // 入ってから一つずつ直すより、まっさらにして組み直すほうが確実。
-            //
-            // 入れなかったときはやり直さない。
-            // 合言葉を打ち間違えただけで画面が作り直されると煩わしい。
-            if (joinMode == Network.NetworkGameLauncher.JoinMode.JoinOnly)
-            {
-                await RestartSceneAsync();
-
-                // やり直しで閉じた状態から始まるため、開き直す
-                SetWindowOpen(true);
-            }
-
-            _isBusy = false;
-            RefreshView();
         }
 
         /// <summary>
