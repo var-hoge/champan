@@ -60,6 +60,10 @@ namespace App.Ui.Common
 
             GetComponent<UnityEngine.UI.Image>().enabled = true;
 
+            // ネットワーク対戦では、番号ではなく名前を出す。
+            // 名前は席と一緒に配られているので、ここで引くだけでよい。
+            ApplyNamePlate();
+
             var screenPos = Camera.main.WorldToScreenPoint(playerPos);
 
             var offsetY = 155.0f;
@@ -114,9 +118,43 @@ namespace App.Ui.Common
         bool _isDummyPrev = false;
         float _offsetY = 170.0f;
         bool _isCpu = false;
+        PlayerNamePlate _namePlate = null;
+
+        /// <summary>
+        /// 一度分かった表示名
+        /// </summary>
+        string _seatName = "";
         #endregion
 
         #region privateメソッド
+        /// <summary>
+        /// 名前の表示を反映する
+        ///
+        /// CPU 席は元の表示のままにする。
+        /// 人間と同じ吹き出しにすると、CPU を控えめに見せている意図が崩れる。
+        /// </summary>
+        void ApplyNamePlate()
+        {
+            // CPU かどうかは席が配られてから決まる。
+            // Start の時点の判断を使い回すと、後から人が入っても名前が出ない。
+            if (Cpu.CpuManager.Instance.IsCpu(_playerNumber))
+            {
+                return;
+            }
+
+            var seatName = Network.SeatInput.GetSeatName(_playerNumber);
+
+            // 一度分かった名前は覚えておく。
+            // 席の情報は画面の切り替わりで一時的に途切れることがあり、
+            // その間だけ元の番号に戻ると点滅して見える。
+            if (seatName.Length > 0)
+            {
+                _seatName = seatName;
+            }
+
+            _namePlate ??= gameObject.AddComponent<PlayerNamePlate>();
+            _namePlate.SetName(_seatName, _playerNumber);
+        }
         #endregion
     }
 }

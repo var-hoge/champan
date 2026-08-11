@@ -1133,7 +1133,7 @@ namespace App.Ui.CharaSelect
         const string DefaultNickname = "PLAYER";
         const string DefaultPassphrase = "champan";
         const int DefaultLocalPlayerCount = 1;
-        const int NicknameMaxLength = 8;
+        const int NicknameMaxLength = 6;
         const int PassphraseMaxLength = 16;
         const int CanvasSortingOrder = 500;
         const float WindowWidth = 500.0f;

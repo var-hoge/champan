@@ -31,6 +31,47 @@ namespace App.Network
         }
 
         /// <summary>
+        /// その席の表示名を取得する
+        ///
+        /// ネットワーク対戦の人間の席だけ名前を持つ。
+        /// オフラインや CPU 席では空を返す (呼び出し側が元の表示を使う)。
+        ///
+        /// 同じ台から 2 人以上参加している席には添字を付ける。
+        /// 同じ名前が並ぶと、どちらが自分か分からないため。
+        /// </summary>
+        public static string GetSeatName(int seatIdx)
+        {
+            if (!NetworkSession.IsOnline || NetworkSeatTable.Instance == null)
+            {
+                return "";
+            }
+
+            var seats = NetworkSeatTable.Instance.Seats;
+            var seat = seats[seatIdx];
+            if (seat.IsEmpty)
+            {
+                return "";
+            }
+
+            var name = seat.Nickname.ToString();
+            if (name.Length == 0)
+            {
+                return "";
+            }
+
+            var sameOwnerCount = 0;
+            for (int idx = 0; idx < seats.Length; ++idx)
+            {
+                if (!seats[idx].IsEmpty && seats[idx].Owner == seat.Owner)
+                {
+                    ++sameOwnerCount;
+                }
+            }
+
+            return sameOwnerCount >= 2 ? $"{name}{seat.LocalSlot + 1}" : name;
+        }
+
+        /// <summary>
         /// この台でそのキャラを動かしてよいか
         ///
         /// IsLocalSeat とは別物。
