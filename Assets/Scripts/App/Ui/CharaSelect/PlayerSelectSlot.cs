@@ -262,6 +262,30 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
+            // 誰も座っていない席なのに、この枠が入った状態のままなら戻す。
+            //
+            // 対戦から戻ると、前回遊んでいた人が自動で再エントリーされる
+            // (ローカル対戦では正しい動き)。
+            // その状態で部屋に入ると席は空から始まるため、
+            // 席の無い枠が入ったまま残ってしまう。
+            //
+            // 席の状態より前に見る。
+            // 空席には今回の印が付いておらず、下の判定で弾かれてしまうため。
+            var seatTable = Network.NetworkSeatTable.Instance;
+            if (seatTable != null
+                && seatTable.IsCpuSeat(_playerIdx)
+                && _phase != Phase.WaitingForEntry)
+            {
+                if (_phase == Phase.CharacterSelected)
+                {
+                    _cursor.Manager.NotifyCancelSelect(_playerIdx);
+                }
+
+                _phase = Phase.WaitingForEntry;
+                HideForLeave();
+                return;
+            }
+
             var remotePhase = state.GetPhase(_playerIdx);
 
             // 前回の値が残ったまま読むと、相手が即座に扉へ入ってしまう。
@@ -534,6 +558,17 @@ namespace App.Ui.CharaSelect
 
         void WaitingForEntry()
         {
+            // ネットワーク対戦では、席が付くまでエントリーしない。
+            //
+            // 部屋に入る前はオフラインと同じ状態のため、
+            // 「CPU でなければ自動でエントリーする」がそのまま働き、
+            // 4 席とも一瞬エントリーされてしまう。
+            if (Network.NetworkSession.IsOnline
+                && !Network.SeatInput.IsLocalSeat(_playerIdx))
+            {
+                return;
+            }
+
             // 最初から CPU じゃなければ自動エントリーする
             if (Cpu.CpuManager.Instance.IsCpu(_playerIdx) is false)
             {
