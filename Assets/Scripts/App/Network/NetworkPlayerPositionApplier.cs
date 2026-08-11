@@ -188,25 +188,19 @@ namespace App.Network
                 return;
             }
 
-            var targetPos = binder.SyncPosition;
-            if (targetPos == Vector3.zero)
+            var syncPos = binder.SyncPosition;
+            if (syncPos == Vector3.zero)
             {
                 // まだ配られていない
                 return;
             }
 
-            var current = transform.position;
-
-            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * gameObject.DeltaTime());
-            var next = Vector3.Lerp(current, targetPos, rate);
-
-            // 離れすぎたら補間せずに合わせる (リスポーンなど)
-            if ((current - targetPos).sqrMagnitude > PosSnapDistanceSqr)
+            if (!_smoother.TryFollow(syncPos, transform.position, out var nextPos))
             {
-                next = targetPos;
+                return;
             }
 
-            transform.position = next;
+            transform.position = nextPos;
         }
         #endregion
 
@@ -258,8 +252,7 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        const float PosFollowSpeed = 25.0f;
-        const float PosSnapDistanceSqr = 25.0f;
+        readonly RemotePosSmoother _smoother = new();
         #endregion
     }
 }

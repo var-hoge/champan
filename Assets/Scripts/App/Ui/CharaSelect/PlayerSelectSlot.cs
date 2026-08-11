@@ -208,28 +208,16 @@ namespace App.Ui.CharaSelect
         bool _isInputProxyResolvedOnline = false;
 
         /// <summary>
-        /// 位置を配る間隔
-        /// Fusion のティックレート (既定 60) より速く送っても状態は更新されない
-        /// </summary>
-        const float PosPublishIntervalSec = 1.0f / 60.0f;
-
-        /// <summary>
         /// この距離以下しか動いていなければ送らない
         /// </summary>
         const float PosPublishThresholdSqr = 0.0001f;
 
         /// <summary>
-        /// 受け取った位置への追従の速さ
-        /// 大きいほど遅れが減り、小さいほど滑らかになる
+        /// 受け取った位置のたどり方
+        /// 対戦シーンと同じものを使う
         /// </summary>
-        const float PosFollowSpeed = 25.0f;
+        readonly Network.RemotePosSmoother _posSmoother = new();
 
-        /// <summary>
-        /// これ以上離れていたら補間せずに合わせる
-        /// </summary>
-        const float PosSnapDistanceSqr = 25.0f;
-
-        float _posPublishTimer = 0.0f;
         Vector2 _lastPublishedPos = Vector2.zero;
         bool _lastPublishedFacingLeft = false;
 
@@ -442,14 +430,14 @@ namespace App.Ui.CharaSelect
                 return;
             }
 
-            // ネットワークの状態が更新されるのはティックごとなので、
-            // それより速く送っても意味がない
-            _posPublishTimer -= Time.deltaTime;
-            if (_posPublishTimer > 0.0f)
-            {
-                return;
-            }
-            _posPublishTimer = PosPublishIntervalSec;
+            // @memo: ここで間隔を空けて送っていたが、やめた。
+            //
+            // 1 フレームぶんの間隔と 1 フレームの経過時間はほぼ同じ長さのため、
+            // わずかな揺らぎで「送るフレーム」と「送らないフレーム」が交互になり、
+            // 受け取る側から見ると進んだり止まったりして見えていた。
+            //
+            // 送るのは値の書き込みだけで、実際に運ばれるのはティックごとのため、
+            // 毎フレーム書いても通信量は変わらない。
 
             // 動いておらず向きも変わっていないなら送らない
             var currentPos = (Vector2)_player.transform.position;
@@ -542,15 +530,12 @@ namespace App.Ui.CharaSelect
 
             var current = _player.transform.position;
 
-            // 固定値の Lerp はフレームレートで速さが変わってしまうため、
-            // 経過時間から補間率を出す
-            var rate = 1.0f - Mathf.Exp(-PosFollowSpeed * Time.deltaTime);
-            var next = Vector2.Lerp(current, targetPos, rate);
-
-            // 離れすぎたら補間せずに合わせる (復帰やワープ時)
-            if (((Vector2)current - targetPos).sqrMagnitude > PosSnapDistanceSqr)
+            // 届いた座標を追いかけると、届く間隔のばらつきが動きのムラになる。
+            // 少し遅らせて、届いた座標の間をたどる。
+            var syncPos = new Vector3(targetPos.x, targetPos.y, current.z);
+            if (!_posSmoother.TryFollow(syncPos, current, out var next))
             {
-                next = targetPos;
+                return;
             }
 
             _player.transform.position = new Vector3(next.x, next.y, current.z);
