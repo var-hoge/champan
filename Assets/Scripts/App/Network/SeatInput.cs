@@ -31,6 +31,37 @@ namespace App.Network
         }
 
         /// <summary>
+        /// この台でそのキャラを動かしてよいか
+        ///
+        /// IsLocalSeat とは別物。
+        /// CPU 席は誰も着いていないため、どの台から見ても「自分の席」にならない。
+        /// そのままだと CPU のキャラを誰も動かさず、
+        /// バブルを踏んでも吹き飛ばず、割れないままになる。
+        ///
+        /// CPU はホストが動かす。
+        /// </summary>
+        public static bool IsMovableHere(int seatIdx)
+        {
+            if (!NetworkSession.IsOnline)
+            {
+                return true;
+            }
+
+            if (IsLocalSeat(seatIdx))
+            {
+                return true;
+            }
+
+            if (NetworkSeatTable.Instance == null)
+            {
+                return false;
+            }
+
+            return NetworkSession.HasAuthority
+                && NetworkSeatTable.Instance.IsCpuSeat(seatIdx);
+        }
+
+        /// <summary>
         /// 席に対応するこの台のコントローラ番号を取得する
         /// 他の台が担当する席なら -1
         /// </summary>

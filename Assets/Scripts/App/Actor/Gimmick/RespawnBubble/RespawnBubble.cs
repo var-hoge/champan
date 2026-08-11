@@ -81,7 +81,7 @@ namespace App.Actor.Gimmick.RespawnBubble
             // 割れる判断と復帰位置は、そのキャラを動かしている台が決める。
             // ホストに問い合わせると往復の待ち時間がそのまま手応えの遅れになるため。
             if (Network.NetworkSession.IsOnline
-                && !Network.SeatInput.IsLocalSeat(playerDataHolder.PlayerIdx))
+                && !Network.SeatInput.IsMovableHere(playerDataHolder.PlayerIdx))
             {
                 return;
             }

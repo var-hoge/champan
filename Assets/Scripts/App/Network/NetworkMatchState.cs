@@ -255,7 +255,7 @@ namespace App.Network
 
                 // 拡縮と動きは、そのキャラを動かしている台だけ。
                 // 拡縮の結果は他の台へ配られる。
-                if (SeatInput.IsLocalSeat(seatIdx))
+                if (SeatInput.IsMovableHere(seatIdx))
                 {
                     hitCollider.PlayStepedOnSquash();
                     hitCollider.PlayStepedOnMove();

@@ -138,7 +138,7 @@ namespace App.Network
                 return;
             }
 
-            if (SeatInput.IsLocalSeat(seatIdx))
+            if (SeatInput.IsMovableHere(seatIdx))
             {
                 charaSelectState.PublishScale(
                     seatIdx,

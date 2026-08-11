@@ -317,7 +317,7 @@ namespace App.Actor.Gimmick.Bubble
 
                 var playerIdx = player.GetComponent<Player.DataHolder>().PlayerIdx;
                 if (Network.NetworkSession.IsOnline
-                    && !Network.SeatInput.IsLocalSeat(playerIdx))
+                    && !Network.SeatInput.IsMovableHere(playerIdx))
                 {
                     continue;
                 }

@@ -65,7 +65,7 @@ namespace App.Actor.Gimmick.RespawnBubble
                 // 他の台では物理を止めているため、ここには来ない。
                 // 検知した台が知らせるので、二重に処理しないようにする。
                 if (Network.NetworkSession.IsOnline
-                    && !Network.SeatInput.IsLocalSeat(holder.PlayerIdx))
+                    && !Network.SeatInput.IsMovableHere(holder.PlayerIdx))
                 {
                     continue;
                 }

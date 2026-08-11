@@ -107,7 +107,7 @@ namespace App.Actor.Player.Hit
                 // 他の台では、そこで再生された拡縮がそのまま配られてくる。
                 // 各台で別々に再生すると、配られた値と食い違ってちらつく。
                 if (!Network.NetworkSession.IsOnline
-                    || Network.SeatInput.IsLocalSeat(PlayerIdx))
+                    || Network.SeatInput.IsMovableHere(PlayerIdx))
                 {
                     PlayStepedOnSquash();
                     PlayStepedOnMove();
