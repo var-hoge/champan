@@ -136,9 +136,6 @@ namespace App.Network
 
         void OnCrownBubbleChanged()
         {
-            // @memo: 調査用。原因が判明したら削除する
-            Debug.Log($"[王冠調査] 王冠バブルの通知を受けました 権威={HasStateAuthority} 対象={(CrownBubble != null ? "あり" : "無し")}");
-
             if (HasStateAuthority)
             {
                 return;
@@ -147,7 +144,6 @@ namespace App.Network
             var manager = Actor.Gimmick.Crown.Manager.Instance;
             if (manager == null)
             {
-                Debug.LogWarning("[王冠調査] Crown.Manager が見つかりません");
                 return;
             }
 

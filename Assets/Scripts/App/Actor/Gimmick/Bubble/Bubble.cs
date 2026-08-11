@@ -376,6 +376,13 @@ namespace App.Actor.Gimmick.Bubble
         /// </summary>
         public void PlayFinishStaging(int winnerSeatIdx)
         {
+            // 勝者はホストが決める。
+            // 先に演出を始めていても、届いた値で必ず上書きする。
+            if (winnerSeatIdx >= 0)
+            {
+                GameSequenceManager.WinnerPlayerIdx = winnerSeatIdx;
+            }
+
             if (_hasPlayedFinishStaging)
             {
                 return;
@@ -391,7 +398,6 @@ namespace App.Actor.Gimmick.Bubble
                     ?.Vibrate(TadaLib.Input.PlayerInputProxy.VibrateType.Happy);
             }
 
-            GameSequenceManager.WinnerPlayerIdx = winnerSeatIdx;
             GameSequenceManager.Instance.GameOver();
 
             TadaLib.Scene.TimeScaleManager.Instance.SetTemporaryTimeScale(0.01f, 0.015f, 0.0f);
@@ -476,6 +482,15 @@ namespace App.Actor.Gimmick.Bubble
             // 見た目だけ先に出す
             PlaySE();
 
+            if (isFinalHit)
+            {
+                // 決着の演出も待たずに始める。
+                //
+                // ホストの返事を待つと、踏んでからスローが始まるまで間が空く。
+                // 勝者はホストが決め、後から届いた値で上書きされる。
+                PlayFinishStaging(playerIdx);
+            }
+
             if (!isFinalHit)
             {
                 // 権威を持つ側と同じ見せ方にする。
@@ -494,12 +509,12 @@ namespace App.Actor.Gimmick.Bubble
                 });
             }
 
-            // 王冠バブルなら、シールドが減った見た目も先に出す。
-            // 正しい値はホストから配られてくるので、そこで上書きされる。
-            if (HasCrown && Crown.Manager.Instance.ShieldValue > 0)
-            {
-                SetupCrown(Crown.Manager.Instance.ShieldValue - 1, withGameStart: false);
-            }
+            // シールドの見た目は、このバブルには出さない。
+            //
+            // このバブルは今まさに割れる最中で、すぐ消える。
+            // ここで減らすと、割れる演出の途中で外側のエフェクトが出てしまう。
+            //
+            // 減った後の見た目は、王冠が移った先のバブルが出す。
 
             var binder = GetComponent<Network.NetworkGimmickBinder>();
             if (binder != null)
@@ -543,6 +558,18 @@ namespace App.Actor.Gimmick.Bubble
         public void RefreshCrownVisual()
         {
             if (!HasCrown)
+            {
+                return;
+            }
+
+            // 割れている最中のバブルには出さない。
+            //
+            // シールドが減ったという知らせは、このバブルが割れたから届く。
+            // それをこのバブルに映すと、割れる演出の途中で
+            // 外側のエフェクトが出てしまう。
+            //
+            // 減った後の見た目は、王冠が移った先のバブルが出す。
+            if (_isBursting)
             {
                 return;
             }
