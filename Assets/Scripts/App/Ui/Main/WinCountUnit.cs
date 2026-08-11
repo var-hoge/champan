@@ -94,6 +94,20 @@ namespace App.Ui.Main
         #endregion
 
         #region privateメソッド
+        /// <summary>
+        /// 名前の表示を反映する
+        ///
+        /// CPU 席や、ローカル対戦では元の絵のままにする。
+        /// (席に名前が入っていないため、そのまま何もしない)
+        /// </summary>
+        void ApplyNameLabel()
+        {
+            var label = _playerIdImage.GetComponent<Common.PlayerNameLabel>()
+                ?? _playerIdImage.gameObject.AddComponent<Common.PlayerNameLabel>();
+
+            label.SetName(Network.SeatInput.GetSeatName(_playerIdx), _playerIdx);
+        }
+
         async void Appear()
         {
             Debug.Assert(_playerIdx >= 0);
@@ -107,6 +121,9 @@ namespace App.Ui.Main
                 var charaSprite = CharacterManager.Instance.GetCharaMainVisualImage(charaIdx);
                 _charaImage.SetSprite(charaSprite);
                 _playerIdImage.SetSprite(PlayerUiManager.Instance.GetPlayerIdSprite(_playerIdx));
+
+                // ネットワーク対戦では、番号ではなく名前を出す
+                ApplyNameLabel();
                 // @todo: panel の画像セット
 
                 // 王冠の設定
