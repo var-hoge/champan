@@ -1166,23 +1166,22 @@ namespace App.Ui.CharaSelect
         const string PrefKeyLocalCount = "NetworkRoom.LocalCount";
 
 
-        // タイトルの背景は明るい一枚絵のため、
-        // 明るいウィンドウだと背景に溶けて読みにくい。
-        // 暗い面に明るい文字を載せて、確実に浮かせる。
-        static readonly Color DimmerColor = new(0.05f, 0.03f, 0.02f, 0.55f);
-        static readonly Color PanelColor = new(0.16f, 0.12f, 0.09f, 0.97f);
-        static readonly Color PanelEdgeColor = new(0.87f, 0.72f, 0.48f, 1.00f);
-        static readonly Color FieldColor = new(0.25f, 0.20f, 0.15f, 1.00f);
-        static readonly Color ButtonColor = new(0.31f, 0.25f, 0.19f, 1.00f);
-        static readonly Color PrimaryButtonColor = new(0.91f, 0.66f, 0.25f, 1.00f);
-        static readonly Color LeaveButtonColor = new(0.44f, 0.22f, 0.18f, 1.00f);
-        static readonly Color RowColor = new(0.23f, 0.18f, 0.14f, 1.00f);
-        static readonly Color SelfRowColor = new(0.36f, 0.27f, 0.15f, 1.00f);
-        static readonly Color TextColor = new(0.96f, 0.93f, 0.87f, 1.00f);
-        static readonly Color SubTextColor = new(0.71f, 0.65f, 0.57f, 1.00f);
-        static readonly Color DarkTextColor = new(0.20f, 0.14f, 0.08f, 1.00f);
-        static readonly Color AccentColor = new(0.95f, 0.75f, 0.36f, 1.00f);
-        static readonly Color ErrorColor = new(1.00f, 0.56f, 0.48f, 1.00f);
+        // 配色は音量ウィンドウと共通のものを引く。
+        // それぞれが持つと、片方だけ直して食い違うため。
+        static readonly Color DimmerColor = Common.GameUiStyle.DimmerColor;
+        static readonly Color PanelColor = Common.GameUiStyle.PanelColor;
+        static readonly Color PanelEdgeColor = Common.GameUiStyle.PanelEdgeColor;
+        static readonly Color FieldColor = Common.GameUiStyle.FieldColor;
+        static readonly Color ButtonColor = Common.GameUiStyle.ButtonColor;
+        static readonly Color PrimaryButtonColor = Common.GameUiStyle.PrimaryButtonColor;
+        static readonly Color LeaveButtonColor = Common.GameUiStyle.LeaveButtonColor;
+        static readonly Color RowColor = Common.GameUiStyle.RowColor;
+        static readonly Color SelfRowColor = Common.GameUiStyle.SelfRowColor;
+        static readonly Color TextColor = Common.GameUiStyle.TextColor;
+        static readonly Color SubTextColor = Common.GameUiStyle.SubTextColor;
+        static readonly Color DarkTextColor = Common.GameUiStyle.DarkTextColor;
+        static readonly Color AccentColor = Common.GameUiStyle.AccentColor;
+        static readonly Color ErrorColor = Common.GameUiStyle.ErrorColor;
 
         GameObject _canvasRoot;
         GameObject _dimmer;
