@@ -293,6 +293,8 @@ MonoBehaviour:
   _animRate: 1.2
   _moveAmount: 12
   _moveDir: {x: 0, y: 1}
+  _rotZAmount: 0
+  _enabledForAnim: 0
 --- !u!114 &383646610
 MonoBehaviour:
   m_ObjectHideFlags: 0
