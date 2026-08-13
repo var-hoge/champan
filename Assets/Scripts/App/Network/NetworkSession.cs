@@ -104,7 +104,14 @@ namespace App.Network
         /// ギミックを生成する
         ///
         /// オンラインなら Runner.Spawn で全員に複製され、オフラインなら通常の Instantiate になる。
-        /// 権威を持たない側から呼んではいけない (HasAuthority で判定すること)。
+        ///
+        /// 生成した台がそのものを持ち、位置を他の台へ配ることになる。
+        /// 「全員で一致している必要があるもの」はホストだけが生成すること。
+        /// (バブルの配置や王冠のように、乱数で決まるもの)
+        ///
+        /// 逆に、持ち主が動かすものは持たせたい台から生成する。
+        /// 復帰バブルは落ちた本人の台が生成する。
+        /// ホストに生成させると、本人が左右に動かせなくなる。
         /// </summary>
         /// <param name="onBeforeSpawned">
         /// Spawned() より前に初期化したい場合に渡す。
@@ -125,11 +132,10 @@ namespace App.Network
                 return instance;
             }
 
-            if (!HasAuthority)
-            {
-                Debug.LogError($"[NetworkSession] 権威を持たない側から Spawn が呼ばれました: {prefab.name}");
-                return null;
-            }
+            // @memo: ここでホスト以外からの生成を弾いていたが、やめた。
+            //        Shared Mode ではどの台からも生成でき、
+            //        生成した台がそのものを持つ。
+            //        弾いていたため、落ちた本人が復帰バブルを持てなかった。
 
             // NetworkObject を持たないもの (エフェクトなど) は同期対象ではないのでローカルに生成する
             var networkPrefab = prefab.GetComponent<NetworkObject>();

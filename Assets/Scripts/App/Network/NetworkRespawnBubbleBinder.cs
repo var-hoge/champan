@@ -55,8 +55,15 @@ namespace App.Network
                     target.PlayBurstVisual();
                 }
 
-                // 破棄できるのは権威を持つ側だけ
-                if (NetworkSession.HasAuthority)
+                // 破棄できるのは、このバブルを持っている台だけ。
+                //
+                // 持ち主はホストとは限らない。
+                // 復帰バブルは落ちた本人の台が生成して持つ。
+                var isOwner = binder.Object != null
+                    && binder.Object.IsValid
+                    && binder.Object.HasStateAuthority;
+
+                if (isOwner)
                 {
                     NetworkSession.Despawn(binder.gameObject);
                 }

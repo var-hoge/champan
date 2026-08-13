@@ -49,14 +49,17 @@ namespace App.Network
 
         #region メソッド
         /// <summary>
-        /// 復帰用バブルの生成をホストに要求する
+        /// 落下に添える追加のバブルの生成をホストに要求する
         ///
         /// 落下の検知は、そのキャラを動かしている台でしか行えない。
         /// (ホスト側では他の台のキャラの物理を止めているため検知できない)
+        ///
+        /// 復帰バブル本体は落ちた本人の台が持つ。
+        /// ホストに持たせると、落ちた本人がバブルを左右に動かせなくなる。
         /// </summary>
-        public void RequestRespawnBubble(int seatIdx, float spawnPointX, float spawnPointY)
+        public void RequestExtraBubbles(float spawnPointX)
         {
-            RPC_RequestRespawnBubble(seatIdx, spawnPointX, spawnPointY);
+            RPC_RequestExtraBubbles(spawnPointX);
         }
 
         /// <summary>
@@ -218,10 +221,10 @@ namespace App.Network
 
         #region private メソッド
         /// <summary>
-        /// 復帰用バブルの生成 (ホスト上でのみ実行される)
+        /// 追加のバブルの生成 (ホスト上でのみ実行される)
         /// </summary>
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        void RPC_RequestRespawnBubble(int seatIdx, float spawnPointX, float spawnPointY)
+        void RPC_RequestExtraBubbles(float spawnPointX)
         {
             var spawner = FindAnyObjectByType<Actor.Gimmick.RespawnBubble.PlayerSpawner>();
             if (spawner == null)
@@ -230,7 +233,7 @@ namespace App.Network
                 return;
             }
 
-            spawner.SpawnRespawnBubbleForSeat(seatIdx, spawnPointX, spawnPointY);
+            spawner.SpawnExtraBubbles(spawnPointX);
         }
 
         /// <summary>

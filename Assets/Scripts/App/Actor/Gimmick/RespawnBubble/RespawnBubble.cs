@@ -104,11 +104,11 @@ namespace App.Actor.Gimmick.RespawnBubble
             playerDataHolder.IsValidDummyPlayerPos = true;
             playerDataHolder.DummyPlayerPos = transform.position;
 
-            // 降りる動きは、このバブルを生成した台が受け持つ。
+            // 降りる動きと左右の操作は、このバブルを生成した台が受け持つ。
             // 他の台は物理を止めてあり、配られてくる位置に従う。
             //
-            // 割れる判断とは受け持ちが違う点に注意。
-            // 割れる判断はキャラを動かしている台が行う (手応えを遅らせないため)。
+            // 生成するのは落ちた本人の台なので、
+            // 割れる判断 (下の IsMovableHere) と受け持ちは一致する。
             if (IsDescentDriver())
             {
                 KeepDescending();
@@ -219,11 +219,21 @@ namespace App.Actor.Gimmick.RespawnBubble
         /// 各台が自分の Player を結び付ける必要があるため、
         /// 見た目と対象の設定だけを切り出してある。
         /// </summary>
+        /// <summary>
+        /// 生成した台以外が、対象の Player に結び付ける
+        ///
+        /// 見た目は生成した台と揃える。
+        /// 動き出しだけは与えない (動かすのは生成した台だけ)。
+        /// </summary>
         public void Bind(GameObject player)
         {
             _player = player.transform;
-            _body.sprite = CharacterManager.Instance.GetCharaImage(
-                player.GetComponent<Player.DataHolder>().CharaIdx);
+
+            var dataHolder = player.GetComponent<Player.DataHolder>();
+
+            _body.sprite = CharacterManager.Instance.GetCharaImage(dataHolder.CharaIdx);
+
+            ApplyOutline(dataHolder.PlayerIdx);
         }
 
         /// <summary>
@@ -298,19 +308,8 @@ namespace App.Actor.Gimmick.RespawnBubble
         }
 
         /// <summary>
-        /// 動き出しと枠線を設定する
-        ///
-        /// ネットワーク対戦では、落ちた台からの要求でホストが生成するため、
-        /// 生成の時点では対象の Player がまだ結び付いていない。
-        /// Player に依らない部分だけを切り出してある。
+        /// 生成した台が、対象の Player に結び付けて動き出す
         /// </summary>
-        public void InitForSeat(int seatIdx, float basePosX)
-        {
-            BeginDescent(basePosX);
-
-            ApplyOutline(seatIdx);
-        }
-
         public void Init(GameObject player)
         {
             _player = player.transform;
