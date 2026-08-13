@@ -163,6 +163,12 @@ namespace App.Ui.Title
 
             await UniTask.WaitUntil(() => _introPlayer.isPrepared);
 
+            // 動画の音声は BGMManager / SEManager を通らないため、音量設定を個別に合わせる
+            if (_introPlayer.GetTargetAudioSource(0) is { } introAudioSource)
+            {
+                introAudioSource.volume = Sound.VolumeSettings.Volume;
+            }
+
             _introPlayer.frame = 0; // 明示的に最初から再生する
             _introPlayer.Play();
 

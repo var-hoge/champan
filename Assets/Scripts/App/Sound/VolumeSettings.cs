@@ -83,6 +83,10 @@ namespace App.Sound
         #region private メソッド
         static void Apply()
         {
+            // BGM は演出で音量を一時的に下げ、あとで戻す。
+            // 戻し先を書き換えないと、演出のたびに設定が消える。
+            TadaLib.Sound.BgmVolumeManager.BaseVolume = Volume;
+
             BGMManager.Instance.ChangeBaseVolume(Volume);
             SEManager.Instance.ChangeBaseVolume(Volume);
         }
