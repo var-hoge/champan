@@ -24,6 +24,11 @@ namespace App.Ui.GameModeSelect
         public void StartGame()
         {
             SEManager.Instance.Play(SEPath.MENU_VALIDATION);
+
+            // @memo: ここで選んでいた項目を先頭に戻していたが、やめた。
+            //        戻すとゲスト側でカーソルが一番上まで上がるアニメが出てしまう。
+            //        代わりに「ホストが動かしたときだけ動かす」形にしてある。
+
             // シーン遷移
             TadaLib.Scene.TransitionManager.Instance.StartTransition("Main", 0.4f, 0.4f);
             _isEnd = true;
@@ -38,6 +43,13 @@ namespace App.Ui.GameModeSelect
             _menuCtrl.ActivePageItemChanged += () =>
             {
                 SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+
+                // 自分で動かしたことを他の台に伝える。
+                // 追従する側は、これを見たときだけカーソルを動かす。
+                if (Network.NetworkSession.IsOnline && Network.NetworkSession.HasAuthority)
+                {
+                    Network.NetworkFlowState.Instance?.NotifyRuleMenuMoved();
+                }
             };
             _menuCtrl.ActivePageItemPickedValueChanged += () =>
             {
@@ -91,6 +103,12 @@ namespace App.Ui.GameModeSelect
         bool _isEnd = false;
 
         float _backProgress = 0.0f;
+
+        /// <summary>
+        /// 見たことのある「ホストがカーソルを動かした回数」
+        /// </summary>
+        int _seenMenuMoveCount = 0;
+        bool _isMenuMoveCountKnown = false;
         #endregion
 
         #region private メソッド
@@ -128,7 +146,19 @@ namespace App.Ui.GameModeSelect
 
             if (flowState != null)
             {
-                _menuCtrl.SetActivePageItemIndex(flowState.RuleMenuItemIdx);
+                // カーソルを動かすのは、ホストが動かしたときだけにする。
+                //
+                // 選んでいる項目は前にこの画面へ来たときの値が残っているため、
+                // 合わせるたびに動かすと、誰も操作していないのに動いて見える。
+                // 位置は合わせるが、動きは出さない。
+                var isMoved = _isMenuMoveCountKnown
+                    && flowState.RuleMenuMoveCount != _seenMenuMoveCount;
+
+                _seenMenuMoveCount = flowState.RuleMenuMoveCount;
+                _isMenuMoveCountKnown = true;
+
+                _menuCtrl.SetActivePageItemIndex(
+                    flowState.RuleMenuItemIdx, isImmediate: !isMoved);
             }
         }
 

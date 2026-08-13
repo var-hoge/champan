@@ -58,6 +58,18 @@ namespace App.Network
         public int RuleMenuItemIdx { get; set; }
 
         /// <summary>
+        /// ルール選択: ホストがカーソルを動かした回数
+        ///
+        /// 追従する側は、これが増えたときだけカーソルを動かす。
+        ///
+        /// 選んでいる項目そのものは、前にこの画面へ来たときの値が残っている。
+        /// それに合わせるだけでカーソルを動かすと、
+        /// 誰も操作していないのに勝手に動いたように見える。
+        /// </summary>
+        [Networked]
+        public int RuleMenuMoveCount { get; set; }
+
+        /// <summary>
         /// スコア表を閉じて次へ進んだ回数
         ///
         /// 真偽値にすると前のラウンドの値が残り、
@@ -140,6 +152,19 @@ namespace App.Network
             }
 
             RuleMenuItemIdx = idx;
+        }
+
+        /// <summary>
+        /// ルール選択でカーソルを動かしたことを伝える
+        /// </summary>
+        public void NotifyRuleMenuMoved()
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            ++RuleMenuMoveCount;
         }
 
         /// <summary>

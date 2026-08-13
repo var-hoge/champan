@@ -64,7 +64,16 @@ namespace TadaLib.Ui.Menu
         /// ローカルで操作したときと同じ経路を通るので、
         /// カーソルの移動アニメと通知も同じように行われる。
         /// </summary>
-        public void SetActivePageItemIndex(int idx)
+        /// <param name="isImmediate">
+        /// カーソルを動かさずに合わせるか。
+        ///
+        /// 他の台の状態に合わせるだけのときに使う。
+        /// 動かすと、誰も操作していないのに勝手に動いたように見える。
+        ///
+        /// 操作したことを知らせる通知も出さない。
+        /// 出すと、触っていないのに選択の効果音が鳴る。
+        /// </param>
+        public void SetActivePageItemIndex(int idx, bool isImmediate = false)
         {
             if (_activePageCache is null || idx < 0 || idx >= _activePageCache.Count)
             {
@@ -82,6 +91,12 @@ namespace TadaLib.Ui.Menu
 
             currentItem.OnUnselected();
             GetActivePageItem().OnSelected();
+
+            if (isImmediate)
+            {
+                _cursor?.SetupCursor(GetActivePageItemIndex());
+                return;
+            }
 
             _cursor?.OnActiveItemChanged(GetActivePageItemIndex());
 

@@ -42,6 +42,20 @@ namespace TadaLib.Ui.Menu.PageItem
         }
         #endregion
 
+        #region メソッド
+        /// <summary>
+        /// 今の値を、値が変わったときと同じように知らせる
+        ///
+        /// 作った時点では知らせていない。
+        /// 表示は初期値になるが、それを受け取る側は前の値のままになる。
+        /// 画面を作り直しても設定が引き継がれてしまうため、作った後に呼ぶ。
+        /// </summary>
+        public void ApplyCurrentValue()
+        {
+            _valueChanged?.Invoke(_options[ActiveOptionIdx]);
+        }
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 選択肢

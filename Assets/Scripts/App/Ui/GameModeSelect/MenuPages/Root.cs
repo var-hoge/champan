@@ -77,10 +77,16 @@ namespace App.Ui.GameModeSelect.MenuPages
             var items = new List<TadaLib.Ui.Menu.IPageItem>();
 
             {
+                // 表示は今の設定から始める。
+                //
+                // 決め打ちにすると、一度遊んで戻ってきたときに
+                // 表示だけ初期値へ戻り、設定は前回のまま残って食い違う。
+                var options = new string[] { "Yes", "No" };
+
                 var recipe = new TadaLib.Ui.Menu.PageItem.ValuePicker.Recipe();
                 recipe.Obj = _addCpu.gameObject;
-                recipe.Options = new string[] { "Yes", "No" };
-                recipe.ActiveOptionIdx = 0;
+                recipe.Options = options;
+                recipe.ActiveOptionIdx = GameMatchManager.Instance.IsExistCpu ? 0 : 1;
                 recipe.CanLoop = true;
                 recipe.Decided += () =>
                 {
@@ -96,10 +102,15 @@ namespace App.Ui.GameModeSelect.MenuPages
             }
 
             {
+                var options = new string[] { "1", "3", "5" };
+
                 var recipe = new TadaLib.Ui.Menu.PageItem.ValuePicker.Recipe();
                 recipe.Obj = _playsToWin.gameObject;
-                recipe.Options = new string[] { "1", "3", "5" };
-                recipe.ActiveOptionIdx = 1;
+                recipe.Options = options;
+                recipe.ActiveOptionIdx = FindOptionIdx(
+                    options,
+                    GameMatchManager.Instance.WinCountToMatchFinish.ToString(),
+                    defaultIdx: 1);
                 recipe.CanLoop = true;
                 recipe.Decided += () =>
                 {
@@ -126,7 +137,30 @@ namespace App.Ui.GameModeSelect.MenuPages
                 items.Add(new TadaLib.Ui.Menu.PageItem.Button(recipe));
             }
 
+            // 表示と設定を必ず一致させる。
+            //
+            // 作っただけでは値を知らせないため、
+            // 選択肢に無い設定だったときに、表示と設定が食い違ったままになる。
+            _cpuPicker.ApplyCurrentValue();
+            _winCountPicker.ApplyCurrentValue();
+
             return items;
+        }
+
+        /// <summary>
+        /// 今の設定にあたる選択肢を探す
+        /// </summary>
+        static int FindOptionIdx(string[] options, string value, int defaultIdx)
+        {
+            for (int idx = 0; idx < options.Length; ++idx)
+            {
+                if (options[idx] == value)
+                {
+                    return idx;
+                }
+            }
+
+            return defaultIdx;
         }
         #endregion
 
