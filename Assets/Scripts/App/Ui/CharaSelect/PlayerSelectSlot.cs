@@ -109,6 +109,8 @@ namespace App.Ui.CharaSelect
         #region IProcUpdate の実装
         public void OnUpdate()
         {
+            HideCharaUntilSelected();
+
             // 席が配られる前は、どの席が自分の担当か分からない。
             // その状態で「他の台の席」として扱うと、自分のキャラの移動を止めてしまう。
             var isSeatKnown = !Network.NetworkSession.IsOnline
@@ -617,6 +619,32 @@ namespace App.Ui.CharaSelect
 
         void CharacterSelected()
         {
+        }
+
+        /// <summary>
+        /// キャラを決めるまでは、キャラを出さないでおく
+        ///
+        /// シーンに置かれたキャラは無効な状態で待っているが、
+        /// Fusion はシーン上の NetworkObject を Spawn するときに有効化する。
+        /// そのため、こちらが出すつもりのない時点で勝手に現れてしまう。
+        ///
+        /// 置き場所を決めるのはキャラを決めたときなので、
+        /// 勝手に現れたキャラは原点 (画面の中央) に立ってしまう。
+        ///
+        /// いつ有効にされるか分からないため、
+        /// 一度きりの初期化ではなく、毎フレーム見て閉じ直す。
+        /// </summary>
+        void HideCharaUntilSelected()
+        {
+            if (_player == null || _phase == Phase.CharacterSelected)
+            {
+                return;
+            }
+
+            if (_player.activeSelf)
+            {
+                _player.SetActive(false);
+            }
         }
 
         void ShowChara()
