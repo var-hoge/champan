@@ -448,14 +448,16 @@ namespace App.Network
                 FindObjectsInactive.Include,
                 FindObjectsSortMode.None);
 
+            var isExistCpu = GameMatchManager.Instance.IsExistCpu;
+
             foreach (var binder in binders)
             {
-                var isCpu = Cpu.CpuManager.Instance.IsCpu(binder.SeatIdx);
+                var isCpuSeat = Cpu.CpuManager.Instance.IsCpu(binder.SeatIdx);
 
                 var reader = binder.GetComponent<TadaLib.Input.PlayerInputReader>();
                 if (reader != null)
                 {
-                    reader.ActionEnabled = !isCpu;
+                    reader.ActionEnabled = !isCpuSeat;
 
                     // 席が確定する前に操作元を決めていた場合に備えて決め直す
                     reader.ResetInputResolve();
@@ -464,7 +466,9 @@ namespace App.Network
                 var cpuInput = binder.GetComponent<Cpu.CpuInput>();
                 if (cpuInput != null)
                 {
-                    cpuInput.ActionEnabled = isCpu;
+                    // CPU を出さない設定なら、その席のキャラは出さない。
+                    // 出ないものを動かし始めないよう、入力も入れない。
+                    cpuInput.ActionEnabled = isCpuSeat && isExistCpu;
                 }
             }
 
@@ -682,7 +686,18 @@ namespace App.Network
         /// 人間が着いていない席を CPU 席として CpuManager に反映する
         ///
         /// 席テーブルは全員に複製されているため、どのピアでも同じ結果になる。
-        /// CPU を出すかどうかはルール設定 (GameMatchManager.IsExistCpu) に従う。
+        ///
+        /// ここでは「人が着いていない席か」だけを見る。
+        /// CPU を出すかどうか (GameMatchManager.IsExistCpu) は混ぜない。
+        ///
+        /// この 2 つは別の情報で、混ぜると
+        /// 「人も CPU も居ない席」が人の席として扱われてしまう。
+        /// そうなると、その席のキャラが消されずに出てきて、
+        /// 誰も動かさないまま立ち尽くす。
+        ///
+        /// CPU 無しのときにキャラを消すのは PlayerRegistorator の役目で、
+        /// 「CPU 席であること」と「CPU を出さない設定であること」の
+        /// 両方が揃ってはじめて消える。
         /// </summary>
         void ApplyCpuSeats()
         {
@@ -693,15 +708,15 @@ namespace App.Network
                 return;
             }
 
-            var isExistCpu = GameMatchManager.Instance.IsExistCpu;
-
             for (int seatIdx = 0; seatIdx < NetworkSeatTable.SeatCountMax; ++seatIdx)
             {
-                var isCpuSeat = isExistCpu && IsCpuSeat(seatIdx);
-                cpuManager.SetIsCpu(seatIdx, isCpuSeat);
+                cpuManager.SetIsCpu(seatIdx, IsCpuSeat(seatIdx));
             }
 
-            Debug.Log($"[NetworkGameLauncher] CPU 席を反映しました (CPU 有無: {isExistCpu}, CPU 数: {cpuManager.CpuCount()})");
+            Debug.Log(
+                $"[NetworkGameLauncher] CPU 席を反映しました"
+                + $" (CPU 席: {cpuManager.CpuCount()}"
+                + $" / CPU を出す設定: {GameMatchManager.Instance.IsExistCpu})");
         }
 
         #endregion
