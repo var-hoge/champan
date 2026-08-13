@@ -29,6 +29,8 @@ namespace App.Ui.Main
         {
             // この関数が呼ばれる時点で勝ち点は加算されている
 
+            var advanceCountAtStart = GetScoreAdvanceCount();
+
             await UniTask.WaitForSeconds(0.25f);
 
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
@@ -62,26 +64,7 @@ namespace App.Ui.Main
             _continueButton.OnSelected();
 
             // クリックまで待つ
-            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-            while (true)
-            {
-                var isEnd = false;
-                for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
-                {
-                    if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
-                    {
-                        isEnd = true;
-                        break;
-                    }
-                }
-
-                if (isEnd)
-                {
-                    break;
-                }
-
-                await UniTask.Yield();
-            }
+            await WaitForScoreAdvanceAsync(advanceCountAtStart);
 
             _continueButton.OnDecided();
 
@@ -105,6 +88,8 @@ namespace App.Ui.Main
 
         public async UniTask GameEnd(SimpleAnimation animation, int winnerPlayerIdx)
         {
+            var advanceCountAtStart = GetScoreAdvanceCount();
+
             await UniTask.WaitForSeconds(0.25f);
 
             GameSequenceManager.Instance.PhaseKind = Phase.AfterBattle;
@@ -136,26 +121,7 @@ namespace App.Ui.Main
                 await UniTask.WaitForSeconds(0.05f);
 
                 // クリックまで待つ
-                var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-                while (true)
-                {
-                    var isEnd = false;
-                    for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
-                    {
-                        if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
-                        {
-                            isEnd = true;
-                            break;
-                        }
-                    }
-
-                    if (isEnd)
-                    {
-                        break;
-                    }
-
-                    await UniTask.Yield();
-                }
+                await WaitForScoreAdvanceAsync(advanceCountAtStart);
 
                 _continueButton.OnDecided();
 
@@ -209,6 +175,73 @@ namespace App.Ui.Main
         #endregion
 
         #region privateメソッド
+        /// <summary>
+        /// スコア表を閉じてよくなるまで待つ
+        ///
+        /// ネットワーク対戦では、進めるかどうかをホストだけが決める。
+        ///
+        /// 各台のボタンで進ませると、進んだ台と待ち続ける台に分かれる。
+        /// 待っている台はこの先の後始末 (拍手を止める、BGM を落とす) に進めないまま
+        /// ホストにシーンを移されるため、音が鳴りっぱなしで次のラウンドに入っていた。
+        /// </summary>
+        /// <param name="advanceCountAtStart">
+        /// 演出を始めた時点の回数。
+        /// 待ち始めてから数えると、それより前にホストが進めていた場合に取りこぼす。
+        /// </param>
+        static async UniTask WaitForScoreAdvanceAsync(int advanceCountAtStart)
+        {
+            var flowState = Network.NetworkFlowState.Instance;
+
+            // 状態が届いていないときは、待ち続けて詰まらせるより自分で進む
+            var isFollower = Network.NetworkSession.IsOnline
+                && !Network.NetworkSession.HasAuthority
+                && flowState != null;
+
+            while (true)
+            {
+                if (isFollower)
+                {
+                    if (flowState.ScoreAdvanceCount != advanceCountAtStart)
+                    {
+                        break;
+                    }
+
+                    await UniTask.Yield();
+                    continue;
+                }
+
+                if (IsAnyActionPressed())
+                {
+                    // 他の台にも進むことを伝える
+                    flowState?.AdvanceScorePanel();
+                    break;
+                }
+
+                await UniTask.Yield();
+            }
+        }
+
+        static int GetScoreAdvanceCount()
+        {
+            var flowState = Network.NetworkFlowState.Instance;
+            return flowState != null ? flowState.ScoreAdvanceCount : 0;
+        }
+
+        static bool IsAnyActionPressed()
+        {
+            var inputManager = TadaLib.Input.PlayerInputManager.Instance;
+
+            for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
+            {
+                if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void Start()
         {
             // 全て初期化

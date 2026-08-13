@@ -29,6 +29,14 @@ namespace Ui.Main
         #region メソッド
         public async UniTask Staging(SimpleAnimation animation)
         {
+            // 選択と決定はホストが配る。
+            //
+            // 演出に入る前に初期値を配り、決定の回数も控えておく。
+            // 待ち始めてから控えると、その前にホストが決めていた場合に取りこぼす。
+            var flowState = App.Network.NetworkFlowState.Instance;
+            flowState?.SetFinishMenuItemIdx(0);
+            var decidedCountAtStart = flowState != null ? flowState.FinishDecidedCount : 0;
+
             var name = BGMManager.Instance.GetCurrentAudioNames()[0];
             BGMManager.Instance.FadeOut(0.25f);
             BGMManager.Instance.Play(audioPath: name, volumeRate: 1f, delay: 5f);
@@ -62,17 +70,45 @@ namespace Ui.Main
             await UniTask.WaitForSeconds(0.5f);
 
             // クリックまで待つ
+            //
+            // ネットワーク対戦では、ルール選択と同じくホストだけが操作する。
+            // 各台で選ばせると、選んだ先が食い違ううえ、
+            // 待ち続けた台は決定後の後始末 (BGM の切り替え) に進めないまま
+            // ホストにシーンを移され、対戦の BGM が鳴り続けていた。
             var inputManager = TadaLib.Input.PlayerInputManager.Instance;
-            bool isRematch = true;
+
+            // 状態が届いていないときは、待ち続けて詰まらせるより自分で操作する
+            var isFollower = App.Network.NetworkSession.IsOnline
+                && !App.Network.NetworkSession.HasAuthority
+                && flowState != null;
+
             int selectedIdx = 0;
+
             while (true)
             {
+                if (isFollower)
+                {
+                    // ホストの選択に追従する
+                    if (flowState.FinishMenuItemIdx != selectedIdx)
+                    {
+                        selectedIdx = flowState.FinishMenuItemIdx;
+                        ApplyMenuSelection(selectedIdx);
+                    }
+
+                    if (flowState.FinishDecidedCount != decidedCountAtStart)
+                    {
+                        break;
+                    }
+
+                    await UniTask.Yield();
+                    continue;
+                }
+
                 var isEnd = false;
                 for (int idx = 0; idx < inputManager.MaxPlayerCount; ++idx)
                 {
                     if (inputManager.InputProxy(idx).IsPressed(TadaLib.Input.ButtonCode.Action))
                     {
-                        isRematch = selectedIdx == 0;
                         isEnd = true;
                         break;
                     }
@@ -80,6 +116,8 @@ namespace Ui.Main
 
                 if (isEnd)
                 {
+                    // 他の台にも決定を伝える
+                    flowState?.DecideFinishMenu();
                     break;
                 }
 
@@ -90,26 +128,20 @@ namespace Ui.Main
                     {
                         continue;
                     }
-                    
-                    SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
 
                     selectedIdx = 1 - selectedIdx;
-                    if (selectedIdx == 0)
-                    {
-                        _rematchButton.OnSelected(doReaction: true);
-                        _meinMenuButton.OnUnselected();
-                    }
-                    else
-                    {
-                        _rematchButton.OnUnselected();
-                        _meinMenuButton.OnSelected(doReaction: true);
-                    }
+                    ApplyMenuSelection(selectedIdx);
+
+                    // 他の台にも選択を伝える
+                    flowState?.SetFinishMenuItemIdx(selectedIdx);
 
                     break;
                 }
 
                 await UniTask.Yield();
             }
+
+            var isRematch = selectedIdx == 0;
 
             GameMatchManager.Instance.ResetPlayersWinCount();
 
@@ -165,6 +197,26 @@ namespace Ui.Main
         #endregion
 
         #region privateメソッド
+        /// <summary>
+        /// 選んでいる項目を見た目に反映する
+        ///
+        /// 追従する側も同じここを通す。
+        /// 状態だけ映して見た目を別に書くと、必ず食い違う。
+        /// </summary>
+        void ApplyMenuSelection(int selectedIdx)
+        {
+            SEManager.Instance.Play(SEPath.MENU_NAVIGATION);
+
+            if (selectedIdx == 0)
+            {
+                _rematchButton.OnSelected(doReaction: true);
+                _meinMenuButton.OnUnselected();
+                return;
+            }
+
+            _rematchButton.OnUnselected();
+            _meinMenuButton.OnSelected(doReaction: true);
+        }
         #endregion
     }
 }

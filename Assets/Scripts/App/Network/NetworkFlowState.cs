@@ -56,6 +56,29 @@ namespace App.Network
         /// </summary>
         [Networked]
         public int RuleMenuItemIdx { get; set; }
+
+        /// <summary>
+        /// スコア表を閉じて次へ進んだ回数
+        ///
+        /// 真偽値にすると前のラウンドの値が残り、
+        /// 次のラウンドでスコア表が即座に閉じてしまう。
+        /// 数えることで「今回進んだか」を毎回見分けられる。
+        /// </summary>
+        [Networked]
+        public int ScoreAdvanceCount { get; set; }
+
+        /// <summary>
+        /// 最終結果: 選んでいる項目 (0: もう一度、1: メインメニュー)
+        /// </summary>
+        [Networked]
+        public int FinishMenuItemIdx { get; set; }
+
+        /// <summary>
+        /// 最終結果: 決定した回数
+        /// もう一度遊ぶと再び最終結果に来るため、こちらも数える
+        /// </summary>
+        [Networked]
+        public int FinishDecidedCount { get; set; }
         #endregion
 
         #region メソッド
@@ -117,6 +140,42 @@ namespace App.Network
             }
 
             RuleMenuItemIdx = idx;
+        }
+
+        /// <summary>
+        /// スコア表を閉じて次へ進むことを全員に伝える
+        /// </summary>
+        public void AdvanceScorePanel()
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            ++ScoreAdvanceCount;
+        }
+
+        public void SetFinishMenuItemIdx(int idx)
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            FinishMenuItemIdx = idx;
+        }
+
+        /// <summary>
+        /// 最終結果で決定したことを全員に伝える
+        /// </summary>
+        public void DecideFinishMenu()
+        {
+            if (!HasStateAuthority)
+            {
+                return;
+            }
+
+            ++FinishDecidedCount;
         }
 
         /// <summary>
