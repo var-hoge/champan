@@ -65,16 +65,28 @@ namespace App.Actor.Player
             var rotVec3 = _mesh.transform.localEulerAngles;
 
             var velocityX = GetComponent<MoveCtrl>().Velocity.x;
+
+            // 向きが変わるとみなす大きさ。
+            // 速さで見るときは、歩き出しのわずかな速度で向きが暴れないようにする。
+            var threshold = VelocityThreshold;
+
             // 試合開始前に方向を変更できるようにする
             if (GameSequenceManager.Instance != null)
             {
                 if (GameSequenceManager.Instance.PhaseKind == GameSequenceManager.Phase.BeforeBattle)
                 {
                     velocityX = InputUtil.GetAxis(gameObject).x;
+
+                    // 入力は最大でも 1 のため、速さと同じ 1 で比べると
+                    // 真横に倒し切ったときしか向きが変わらない。
+                    // 少しでも斜めに入ると 1 に届かず、変えられなくなる。
+                    //
+                    // 他の場所で入力の遊びに使っている値に合わせる。
+                    threshold = InputDeadZone;
                 }
             }
 
-            if (Mathf.Abs(velocityX) >= 1.0f)
+            if (Mathf.Abs(velocityX) >= threshold)
             {
                 rotVec3.y = velocityX < 0.0f ? 180.0f : 0.0f;
             }
@@ -90,6 +102,17 @@ namespace App.Actor.Player
         #endregion
 
         #region privateフィールド
+        /// <summary>
+        /// 速さで向きを決めるときのしきい値
+        /// </summary>
+        const float VelocityThreshold = 1.0f;
+
+        /// <summary>
+        /// 入力で向きを決めるときのしきい値 (試合開始前)
+        /// PlayerInputProxy の遊びと同じ値
+        /// </summary>
+        const float InputDeadZone = 0.5f;
+
         [SerializeField]
         Transform _mesh;
         #endregion
