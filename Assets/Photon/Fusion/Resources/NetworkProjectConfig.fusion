@@ -33,10 +33,10 @@
         "SimulationUpdateTimeMode": 0,
         "PlayerCount": 10,
         "TickRateSelection": {
-            "Client": 0,
-            "ClientSendInterval": 0,
-            "ServerTickInterval": 0,
-            "ServerSendInterval": 0,
+            "Client": 60,
+            "ClientSendInterval": 1,
+            "ServerTickInterval": 1,
+            "ServerSendInterval": 1,
             "ClientSendIndex": 0,
             "ServerIndex": 0,
             "ServerSendIndex": 0

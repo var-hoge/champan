@@ -216,7 +216,8 @@ namespace App.Ui.CharaSelect
         /// 受け取った位置のたどり方
         /// 対戦シーンと同じものを使う
         /// </summary>
-        readonly Network.RemotePosSmoother _posSmoother = new();
+        readonly Network.RemoteValueSmoother _posSmoother =
+            Network.RemoteSmootherFactory.CreateForPosition();
 
         Vector2 _lastPublishedPos = Vector2.zero;
         bool _lastPublishedFacingLeft = false;

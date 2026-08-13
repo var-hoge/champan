@@ -88,13 +88,49 @@ namespace App.Network
             // 拡縮は元の値からは再現しきれない。
             // 踏まれたときの拡縮のように、時間で動く演出が混ざっているため、
             // 通り道の結果をそのまま映す。
-            var totalScaleCtrl = GetComponentInChildren<TadaLib.ActionStd.TotalScaleCtrl>(true);
-            if (totalScaleCtrl != null && binder.SyncScale != Vector2.zero)
+            if (binder.SyncScale != Vector2.zero)
             {
-                totalScaleCtrl.SetScaleForcibly(
-                    new Vector3(binder.SyncScale.x, binder.SyncScale.y, 1.0f),
-                    new Vector3(binder.SyncViewScale.x, binder.SyncViewScale.y, 1.0f));
+                ApplyScale(binder.SyncScale, binder.SyncViewScale);
             }
+        }
+
+        /// <summary>
+        /// 配られた拡縮を、座標と同じようにたどって反映する
+        ///
+        /// そのまま当てると、届いた瞬間だけ段階的に変わってカクついて見える。
+        /// 届く間隔は毎フレームではないため、間を補う必要がある。
+        ///
+        /// 対戦シーンとキャラセレクトで配り方は違うが、ここを共通で通す。
+        /// </summary>
+        void ApplyScale(Vector2 scale, Vector2 viewScale)
+        {
+            var totalScaleCtrl = GetComponentInChildren<TadaLib.ActionStd.TotalScaleCtrl>(true);
+            if (totalScaleCtrl == null)
+            {
+                return;
+            }
+
+            var nextScale = Follow(_scaleSmoother, scale, totalScaleCtrl.CurrentScale);
+            var nextViewScale = Follow(_viewScaleSmoother, viewScale, totalScaleCtrl.CurrentViewScale);
+
+            totalScaleCtrl.SetScaleForcibly(nextScale, nextViewScale);
+        }
+
+        /// <summary>
+        /// 今の値から、配られた値へ滑らかにたどる
+        /// </summary>
+        static Vector3 Follow(RemoteValueSmoother smoother, Vector2 syncValue, Vector3 currentValue)
+        {
+            var sync = new Vector3(syncValue.x, syncValue.y, 1.0f);
+            var current = new Vector3(currentValue.x, currentValue.y, 1.0f);
+
+            if (!smoother.TryFollow(sync, current, out var next))
+            {
+                return sync;
+            }
+
+            // z は運んでいない。常に 1
+            return new Vector3(next.x, next.y, 1.0f);
         }
         #endregion
 
@@ -171,10 +207,8 @@ namespace App.Network
                 return;
             }
 
-            var viewScale = charaSelectState.GetViewScale(seatIdx);
-            totalScaleCtrl.SetScaleForcibly(
-                new Vector3(scale.x, scale.y, 1.0f),
-                new Vector3(viewScale.x, viewScale.y, 1.0f));
+            // 対戦シーンと同じたどり方を通す
+            ApplyScale(scale, charaSelectState.GetViewScale(seatIdx));
         }
         #endregion
 
@@ -268,7 +302,9 @@ namespace App.Network
         #endregion
 
         #region private フィールド
-        readonly RemotePosSmoother _smoother = new();
+        readonly RemoteValueSmoother _smoother = RemoteSmootherFactory.CreateForPosition();
+        readonly RemoteValueSmoother _scaleSmoother = RemoteSmootherFactory.CreateForScale();
+        readonly RemoteValueSmoother _viewScaleSmoother = RemoteSmootherFactory.CreateForScale();
         #endregion
     }
 }
