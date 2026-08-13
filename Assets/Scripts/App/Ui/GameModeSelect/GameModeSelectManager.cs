@@ -61,6 +61,10 @@ namespace App.Ui.GameModeSelect
             // ネットワーク対戦では、戻る操作もホストだけが行う
             if (Network.NetworkSession.IsOnline && !Network.NetworkSession.HasAuthority)
             {
+                // 操作できないことを伝える。
+                // 何も出ないと、固まっているように見えてしまう
+                Ui.Common.NetworkNoticeUi.SetStatus(
+                    Ui.Common.NetworkNoticeUi.StatusWaitingForHost);
                 return;
             }
 

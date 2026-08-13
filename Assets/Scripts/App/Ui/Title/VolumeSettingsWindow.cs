@@ -19,6 +19,26 @@ namespace App.Ui.Title
     public class VolumeSettingsWindow
         : MonoBehaviour
     {
+        #region プロパティ
+        /// <summary>
+        /// 画面隅の開くボタンを出しているか
+        ///
+        /// 同じ隅に出る他の表示が、重ならない位置を決めるために見る。
+        /// </summary>
+        public static bool IsButtonVisible { get; private set; } = false;
+
+        /// <summary>
+        /// ウィンドウを開いているか
+        /// </summary>
+        public static bool IsWindowOpen { get; private set; } = false;
+
+        /// <summary>
+        /// 画面左上のうち、この表示が使っている下端
+        /// 上を 0 とした負の値。何も出していなければ 0
+        /// </summary>
+        public static float OccupiedBottomY { get; private set; } = 0.0f;
+        #endregion
+
         #region メソッド
         /// <summary>
         /// シーンに置かずに自分で現れる
@@ -73,6 +93,8 @@ namespace App.Ui.Title
             // 開くボタンを押せる状態にしておく
             GameUiStyle.EnsureUiInputReady();
 
+            RefreshOccupiedBottom();
+
             if (_window == null || !_window.activeSelf)
             {
                 return;
@@ -103,6 +125,7 @@ namespace App.Ui.Title
             var isTitle = sceneName == TitleSceneName;
 
             _canvasRoot.SetActive(isTitle);
+            IsButtonVisible = isTitle;
 
             if (!isTitle)
             {
@@ -111,6 +134,31 @@ namespace App.Ui.Title
             }
 
             GameUiStyle.EnsureUiInputReady();
+        }
+
+        /// <summary>
+        /// 左上のどこまで使っているかを知らせる
+        /// 開いていればウィンドウの下端、閉じていればボタンの下端
+        /// </summary>
+        void RefreshOccupiedBottom()
+        {
+            if (!IsButtonVisible)
+            {
+                OccupiedBottomY = 0.0f;
+                return;
+            }
+
+            var rect = (_window != null && _window.activeSelf)
+                ? _window.GetComponent<RectTransform>()
+                : _toggleButtonRect;
+
+            if (rect == null)
+            {
+                OccupiedBottomY = 0.0f;
+                return;
+            }
+
+            OccupiedBottomY = rect.anchoredPosition.y - rect.rect.height;
         }
 
         void SetWindowOpen(bool isOpen)
@@ -129,6 +177,7 @@ namespace App.Ui.Title
 
             _window.SetActive(isOpen);
             _dimmer.SetActive(isOpen);
+            IsWindowOpen = isOpen;
 
             // 開いている間は裏でタイトルの選択が進まないようにする
             TadaLib.Input.PlayerInputProxy.IsSuppressed = isOpen;
@@ -213,6 +262,8 @@ namespace App.Ui.Title
             rect.pivot = new Vector2(0.0f, 1.0f);
             rect.anchoredPosition = new Vector2(24.0f, -24.0f);
             rect.sizeDelta = new Vector2(230.0f, 70.0f);
+
+            _toggleButtonRect = rect;
 
             GameUiStyle.AddMouseIcon(button);
         }
@@ -417,6 +468,7 @@ namespace App.Ui.Title
         GameObject _canvasRoot;
         GameObject _dimmer;
         GameObject _window;
+        RectTransform _toggleButtonRect;
 
         Slider _slider;
         TextMeshProUGUI _valueText;

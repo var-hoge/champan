@@ -197,6 +197,13 @@ namespace App.Ui.Main
                 && !Network.NetworkSession.HasAuthority
                 && flowState != null;
 
+            if (isFollower)
+            {
+                // 自分では進められないことを伝える。
+                // 何も出ないと、進め方が分からず止まって見える
+                Common.NetworkNoticeUi.SetStatus(Common.NetworkNoticeUi.StatusWaitingForHost);
+            }
+
             while (true)
             {
                 if (isFollower)
@@ -219,6 +226,8 @@ namespace App.Ui.Main
 
                 await UniTask.Yield();
             }
+
+            Common.NetworkNoticeUi.ClearStatus();
         }
 
         static int GetScoreAdvanceCount()

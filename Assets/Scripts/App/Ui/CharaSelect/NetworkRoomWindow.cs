@@ -34,6 +34,27 @@ namespace App.Ui.CharaSelect
         /// 画面が作り直されることになり、ちぐはぐに見える。
         /// </summary>
         public static bool IsRemoteApplySuspended { get; private set; } = false;
+
+        /// <summary>
+        /// 画面隅の開くボタンを出しているか
+        ///
+        /// 同じ隅に出る他の表示が、重ならない位置を決めるために見る。
+        /// </summary>
+        public static bool IsButtonVisible { get; private set; } = false;
+
+        /// <summary>
+        /// ウィンドウを開いているか
+        /// </summary>
+        public static bool IsWindowOpen { get; private set; } = false;
+
+        /// <summary>
+        /// 画面左上のうち、この表示が使っている下端
+        ///
+        /// 上を 0 とした負の値。何も出していなければ 0。
+        /// 同じ隅に出る他の表示が、その下に並べるために見る。
+        /// ウィンドウの高さは中身で変わるため、決め打ちにはできない。
+        /// </summary>
+        public static float OccupiedBottomY { get; private set; } = 0.0f;
         #endregion
 
         #region MonoBehaviour の実装
@@ -74,6 +95,11 @@ namespace App.Ui.CharaSelect
 
         void Update()
         {
+            // 隅をどこまで使っているかは、この画面を出していないときも知らせる。
+            // 下の早期脱出より後ろに置くと、他の画面へ移っても
+            // ここの値が古いまま残り、通知が要らない隙間を空けて出てしまう。
+            RefreshOccupiedBottom();
+
             if (_canvasRoot == null || !_canvasRoot.activeSelf)
             {
                 return;
@@ -126,6 +152,7 @@ namespace App.Ui.CharaSelect
             var isCharaSelect = sceneName == CharaSelectSceneName;
 
             _canvasRoot.SetActive(isCharaSelect);
+            IsButtonVisible = isCharaSelect;
 
             if (!isCharaSelect)
             {
@@ -224,6 +251,32 @@ namespace App.Ui.CharaSelect
             return false;
         }
 
+        /// <summary>
+        /// 左上のどこまで使っているかを知らせる
+        ///
+        /// 開いていればウィンドウの下端、閉じていればボタンの下端。
+        /// </summary>
+        void RefreshOccupiedBottom()
+        {
+            if (!IsButtonVisible)
+            {
+                OccupiedBottomY = 0.0f;
+                return;
+            }
+
+            var rect = (_window != null && _window.activeSelf)
+                ? _window.GetComponent<RectTransform>()
+                : _toggleButtonRect;
+
+            if (rect == null)
+            {
+                OccupiedBottomY = 0.0f;
+                return;
+            }
+
+            OccupiedBottomY = rect.anchoredPosition.y - rect.rect.height;
+        }
+
         void SetWindowOpen(bool isOpen)
         {
             if (isOpen)
@@ -233,6 +286,7 @@ namespace App.Ui.CharaSelect
 
             _window.SetActive(isOpen);
             _dimmer.SetActive(isOpen);
+            IsWindowOpen = isOpen;
 
             // 開いている間は裏でゲームが進まないようにする
             TadaLib.Input.PlayerInputProxy.IsSuppressed = isOpen;
@@ -634,6 +688,8 @@ namespace App.Ui.CharaSelect
             rect.pivot = new Vector2(0.0f, 1.0f);
             rect.anchoredPosition = new Vector2(24.0f, -24.0f);
             rect.sizeDelta = new Vector2(250.0f, 70.0f);
+
+            _toggleButtonRect = rect;
 
             // マウスで触るものだと分かるように、文字の隣に絵を添える。
             //
@@ -1184,6 +1240,7 @@ namespace App.Ui.CharaSelect
         static readonly Color ErrorColor = Common.GameUiStyle.ErrorColor;
 
         GameObject _canvasRoot;
+        RectTransform _toggleButtonRect;
         GameObject _dimmer;
         GameObject _window;
         GameObject _formGroup;

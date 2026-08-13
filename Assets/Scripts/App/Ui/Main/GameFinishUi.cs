@@ -84,6 +84,13 @@ namespace Ui.Main
 
             int selectedIdx = 0;
 
+            if (isFollower)
+            {
+                // 自分では選べないことを伝える
+                App.Ui.Common.NetworkNoticeUi.SetStatus(
+                    App.Ui.Common.NetworkNoticeUi.StatusWaitingForHost);
+            }
+
             while (true)
             {
                 if (isFollower)
@@ -140,6 +147,8 @@ namespace Ui.Main
 
                 await UniTask.Yield();
             }
+
+            App.Ui.Common.NetworkNoticeUi.ClearStatus();
 
             var isRematch = selectedIdx == 0;
 
